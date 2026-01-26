@@ -1,37 +1,39 @@
-# Stage 1: Build
+# 1. Étape de Build
 FROM node:20-slim AS builder
 
-# Installation de openssl et des outils nécessaires
-RUN apt-get update -y && apt-get install -y openssl
-
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@latest --activate
 
-COPY package.json pnpm-lock.yaml ./
+# Activation de corepack pour yarn
+RUN corepack enable
+
+# Copie des fichiers de dépendances
+COPY package.json yarn.lock ./
 COPY prisma ./prisma/
 
-# Installation précise
-RUN pnpm install --frozen-lockfile
-
-# Forcer le generate avec la version du projet
+# Installation avec Prisma generate
+RUN yarn install --frozen-lockfile
 RUN npx prisma generate
 
+# Copie du reste et Build
 COPY . .
-RUN pnpm build
+RUN yarn build
 
-# Stage 2: Runtime
+# 2. Étape de Production (Image légère)
 FROM node:20-slim AS runner
-# Installation de openssl en runtime aussi
-RUN apt-get update -y && apt-get install -y openssl
 
 WORKDIR /app
+
+# Copie du build depuis l'étape précédente
 COPY --from=builder /app/.output ./.output
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/package.json ./package.json
 
+# Variable pour dire à Nuxt d'écouter sur le bon port
 ENV PORT=3000
 ENV NODE_ENV=production
 
 EXPOSE 3000
 
-# On lance la synchro DB puis l'app
+# Commande de démarrage
+# On lance les migrations Prisma avant de démarrer pour être sûr que la DB est à jour
 CMD npx prisma db push && node .output/server/index.mjs
