@@ -1,0 +1,36 @@
+services:
+  app:
+    image: ghcr.io/TON_NOM_GITHUB/MON_PROJET:latest
+    restart: always
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      NUXT_SECRET: ${NUXT_SECRET}
+    networks:
+      - web # Ton network Traefik
+      - internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cheptel.rule=Host(`cheptel.ton-domaine.com`)"
+      - "traefik.http.routers.cheptel.entrypoints=websecure"
+      - "traefik.http.routers.cheptel.tls.certresolver=myresolver"
+
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: user_prod
+      POSTGRES_PASSWORD: password_prod
+      POSTGRES_DB: cheptel_db
+    volumes:
+      - pg_prod_data:/var/lib/postgresql/data
+    networks:
+      - internal
+
+networks:
+  web:
+    external: true
+  internal:
+    driver: bridge
+
+volumes:
+  pg_prod_data:

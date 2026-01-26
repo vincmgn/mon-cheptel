@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Location {
+  id        Int        @id @default(autoincrement())
+  name      String
+  buildings Building[]
+}
+
+model Building {
+  id         Int      @id @default(autoincrement())
+  name       String
+  locationId Int
+  location   Location @relation(fields: [locationId], references: [id])
+  pens       Pen[]
+}
+
+model Pen { 
+  id         Int      @id @default(autoincrement())
+  name       String
+  buildingId Int
+  building   Building @relation(fields: [buildingId], references: [id])
+  cows       Cow[]
+}
+
+model Cow {
+  id          Int        @id @default(autoincrement())
+  officialId  String     @unique
+  penId       Int
+  pen         Pen        @relation(fields: [penId], references: [id])
+  prophylaxis Boolean    @default(false)
+  comments    Comment[]
+  breedings   Breeding[]
+  calves      Calf[]
+  createdAt   DateTime   @default(now())
+}
+
+model Calf { 
+  id         Int       @id @default(autoincrement())
+  sex        String   
+  birthDate  DateTime  @default(now())
+  cowId      Int
+  cow        Cow       @relation(fields: [cowId], references: [id])
+  comments   Comment[]
+}
+
+model Bull { 
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  comments  Comment[]  
+  breedings Breeding[] 
+  createdAt DateTime   @default(now())
+}
+
+model Breeding { 
+  id       Int      @id @default(autoincrement())
+  date     DateTime @default(now())
+  isMaybe  Boolean  @default(false)
+  cowId    Int
+  cow      Cow      @relation(fields: [cowId], references: [id])
+  bullId   Int?     
+  bull     Bull?    @relation(fields: [bullId], references: [id])
+  bullName String? 
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  
+  cowId     Int?
+  cow       Cow?     @relation(fields: [cowId], references: [id])
+  
+  calfId    Int?
+  calf      Calf?    @relation(fields: [calfId], references: [id])
+  
+  bullId    Int?
+  bull      Bull?    @relation(fields: [bullId], references: [id])
+}
