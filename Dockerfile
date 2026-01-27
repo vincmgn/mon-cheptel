@@ -10,9 +10,9 @@ RUN corepack enable
 COPY package.json yarn.lock ./
 COPY prisma ./prisma/
 
-# Installation avec Prisma generate
+# Installation avec Prisma generate (force version 6.19.2)
 RUN yarn install --frozen-lockfile
-RUN npx prisma generate
+RUN yarn prisma generate
 
 # Copie du reste et Build
 COPY . .
@@ -34,6 +34,9 @@ ENV NODE_ENV=production
 
 EXPOSE 3000
 
+# Installation de Prisma CLI en production (version lockée)
+RUN corepack enable && yarn add -D prisma@6.19.2
+
 # Commande de démarrage
 # On lance les migrations Prisma avant de démarrer pour être sûr que la DB est à jour
-CMD npx prisma db push && node .output/server/index.mjs
+CMD yarn prisma migrate deploy && node .output/server/index.mjs

@@ -1,59 +1,113 @@
-# Nuxt Minimal Starter
+# Mon Cheptel — Guide de développement
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Nuxt 4 + Prisma + PostgreSQL, avec Docker pour la base de données.
 
-## Setup
+## Prérequis
 
-Make sure to install dependencies:
+- Docker & Docker Compose
+- Yarn (1.x)
+- PostgreSQL via Docker (service `db`)
+
+## Installation
 
 ```bash
 yarn
 ```
 
-## Development Server
+Prisma est épinglé en 6.19.2. Évite de passer à Prisma 7 pour le moment (comportement différent sur `DATABASE_URL`).
 
-Start the development server on `http://localhost:3000`:
+## Environnements et variables
 
-```bash
-yarn dev
-```
+- Dev: `.env` (déjà présent)
+  - Exemple attendu:
+    ```bash
+    DATABASE_URL="postgresql://cheptel_admin:cheptel_password@localhost:5432/cheptel_db"
+    NUXT_PUBLIC_API_BASE="/api"
+    ```
+- Prod: `.env.production` (à créer pour l’usage avec `docker-compose.prod.yml`)
+  - Exemple:
+    ```bash
+    DATABASE_URL="postgresql://user_prod:password_prod@db:5432/cheptel_db"
+    NUXT_SECRET="<valeur-aléatoire-robuste>"
+    NUXT_PUBLIC_API_BASE="/api"
+    ```
 
-## Production
+## Base de données (Docker)
 
-Build the application for production:
+- Démarrer la base en local (dev):
+  ```bash
+  docker compose up -d db
+  ```
+- Arrêter/Nettoyer:
+  ```bash
+  docker compose down
+  ```
 
-```bash
-yarn build
-```
+## Prisma (migrations, seed, studio)
 
-Locally preview production build:
+- Vérifier la version:
+  ```bash
+  yarn prisma -v
+  ```
+- Appliquer les migrations (prod/dev DB déjà démarrée):
+  ```bash
+  yarn prisma migrate deploy
+  ```
+- Créer une migration (développement, après modifications du schéma):
+  ```bash
+  yarn prisma migrate dev --name <nom>
+  ```
+- Générer le client Prisma (si nécessaire):
+  ```bash
+  yarn prisma generate
+  ```
+- Seed de la base:
+  ```bash
+  yarn prisma db seed
+  ```
+- Studio (UI de la DB):
+  ```bash
+  yarn prisma studio
+  ```
 
-```bash
-yarn preview
-```
+## Développement (Nuxt)
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- Lancer le serveur dev (`http://localhost:3000`):
+  ```bash
+  yarn dev
+  ```
 
-# Générer le client Prisma (après changement du schema.prisma)
+## Production (Docker Compose)
 
-npx prisma generate
+- **Build et push l'image vers GHCR** (GitHub Container Registry):
+  ```bash
+  docker build -t ghcr.io/vincmgn/mon-cheptel:latest .
+  docker push ghcr.io/vincmgn/mon-cheptel:latest
+  ```
+  
+- **Déployer sur le serveur** (avec Traefik + Portainer):
+  ```bash
+  docker compose --env-file .env.production -f docker-compose.prod.yml up -d
+  ```
 
-# Créer une migration et l'appliquer (dev)
+- **Remarques importantes**:
+  - Le Dockerfile utilise `yarn prisma` pour forcer Prisma 6.19.2 (éviter Prisma 7)
+  - Les migrations sont exécutées automatiquement au démarrage (`yarn prisma migrate deploy`)
+  - Le service `app` expose le port 3000, Traefik route vers `mon-cheptel.vincentmagnien.com`
+  - Assure-toi que `.env.production` contient `DATABASE_URL` avec l'hôte `db` (réseau interne)
 
-npx prisma migrate dev --name init
+## Dépannage
 
-# Pousser le schéma directement (prototypage, sans migration)
+- Prisma 7 vs 6: si un message indique que `datasource.url` n’est plus supporté, tu es probablement sur Prisma 7. Reste en 6:
+  ```bash
+  yarn add -D prisma@6.19.2
+  yarn add @prisma/client@6.19.2
+  yarn prisma -v
+  ```
+- Image GHCR invalide: le nom doit être en minuscules et réel. En local, préfère `docker-compose.yml` sans le fichier prod.
 
-npx prisma db push
+## Référence rapide
 
-# Ouvrir l'interface graphique pour voir/éditer les données
-
-npx prisma studio
-
-# Remplir la base de données avec des données de test (Seed)
-
-npx prisma db seed
-
-```
-
-```
+- DB (dev): `docker compose up -d db` / `docker compose down`
+- Migrations (dev/prod): `yarn prisma migrate deploy`
+- Dev server: `yarn dev`
