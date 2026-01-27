@@ -1,19 +1,9 @@
-import { createConfigForNuxt } from '@nuxt/eslint'
+// @ts-check
+import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
 
 export default createConfigForNuxt({
-  features: {
-    // Activer le support de TypeScript
-    typescript: true,
-    // Stylistic rules (indentation, quotes, etc.)
-    stylistic: true,
+  rules: {
+    // Autoriser console.log en dev
+    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
   },
 })
-  .append(
-    // Règles personnalisées si nécessaire
-    {
-      rules: {
-        // Exemple: autoriser console.log en dev
-        'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-      },
-    },
-  )

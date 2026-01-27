@@ -47,7 +47,7 @@ async function main() {
     },
   });
 
-  const pen2 = await prisma.pen.create({
+  const _pen2 = await prisma.pen.create({
     data: {
       name: "Box A2",
       buildingId: batimentNord.id,
@@ -68,7 +68,7 @@ async function main() {
     },
   });
 
-  const bullCesar = await prisma.bull.create({
+  const _bullCesar = await prisma.bull.create({
     data: {
       name: "César",
     },

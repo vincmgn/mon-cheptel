@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
       },
     });
     return bull;
-  } catch (error) {
+  } catch {
     throw createError({
       statusCode: 400,
       statusMessage: "Erreur lors de la création du taureau",

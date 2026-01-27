@@ -7,9 +7,9 @@
 
             <!-- Global Search Bar -->
             <div class="relative max-w-2xl">
-                <UInput icon="i-heroicons-magnifying-glass-20-solid" size="xl" color="white" :trailing="false"
-                    placeholder="Rechercher un animal (n°), un bâtiment, un taureau..." class="w-full"
-                    :ui="{ icon: { trailing: { pointer: '' } } }">
+                <UInput
+icon="i-heroicons-magnifying-glass-20-solid" size="xl" color="neutral" :trailing="false"
+                    placeholder="Rechercher un animal (n°), un bâtiment, un taureau..." class="w-full">
                     <template #trailing>
                         <div class="flex items-center gap-1">
                             <UKbd>⌘</UKbd>
@@ -32,7 +32,8 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 <div class="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
-                                    <UIcon name="i-heroicons-home-modern"
+                                    <UIcon
+name="i-heroicons-home-modern"
                                         class="w-8 h-8 text-blue-600 dark:text-blue-400" />
                                 </div>
                                 <div>
@@ -40,7 +41,8 @@
                                     <span class="text-xs text-blue-600 dark:text-blue-400 font-medium">Structure</span>
                                 </div>
                             </div>
-                            <UIcon name="i-heroicons-arrow-right"
+                            <UIcon
+name="i-heroicons-arrow-right"
                                 class="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
                         </div>
                     </template>
@@ -49,8 +51,8 @@
                     </p>
                     <template #footer>
                         <div class="flex gap-2">
-                            <UBadge color="gray" variant="soft" size="xs">Bâtiments</UBadge>
-                            <UBadge color="gray" variant="soft" size="xs">Cases</UBadge>
+                            <UBadge color="neutral" variant="soft" size="xs">Bâtiments</UBadge>
+                            <UBadge color="neutral" variant="soft" size="xs">Cases</UBadge>
                         </div>
                     </template>
                 </UCard>
@@ -65,7 +67,8 @@
                             <div class="flex items-center gap-3">
                                 <div class="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl">
                                     <!-- Custom icon representation for Bull if standard not available, using shield/alert style or gender-male -->
-                                    <UIcon name="i-mdi-gender-male"
+                                    <UIcon
+name="i-mdi-gender-male"
                                         class="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
                                 </div>
                                 <div>
@@ -74,7 +77,8 @@
                                         class="text-xs text-indigo-600 dark:text-indigo-400 font-medium">Reproduction</span>
                                 </div>
                             </div>
-                            <UIcon name="i-heroicons-arrow-right"
+                            <UIcon
+name="i-heroicons-arrow-right"
                                 class="w-5 h-5 text-gray-400 group-hover:text-indigo-500 transition-colors" />
                         </div>
                     </template>
@@ -101,7 +105,8 @@
                                     <span class="text-xs text-rose-600 dark:text-rose-400 font-medium">Troupeau</span>
                                 </div>
                             </div>
-                            <UIcon name="i-heroicons-arrow-right"
+                            <UIcon
+name="i-heroicons-arrow-right"
                                 class="w-5 h-5 text-gray-400 group-hover:text-rose-500 transition-colors" />
                         </div>
                     </template>
@@ -110,8 +115,8 @@
                     </p>
                     <template #footer>
                         <div class="flex gap-2">
-                            <UBadge color="gray" variant="soft" size="xs">Saillies</UBadge>
-                            <UBadge color="gray" variant="soft" size="xs">Prophylaxie</UBadge>
+                            <UBadge color="neutral" variant="soft" size="xs">Saillies</UBadge>
+                            <UBadge color="neutral" variant="soft" size="xs">Prophylaxie</UBadge>
                         </div>
                     </template>
                 </UCard>

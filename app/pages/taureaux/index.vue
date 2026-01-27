@@ -38,7 +38,7 @@ const saveBull = async () => {
       <template #name-data="{ row }">
         <span class="font-bold text-primary">{{ row.name }}</span>
       </template>
-      <template #actions-data="{ row }">
+      <template #actions-data>
         <UButton color="gray" variant="ghost" icon="i-lucide-eye" />
       </template>
     </UTable>
