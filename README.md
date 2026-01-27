@@ -111,3 +111,18 @@ Prisma est épinglé en 6.19.2. Évite de passer à Prisma 7 pour le moment (com
 - DB (dev): `docker compose up -d db` / `docker compose down`
 - Migrations (dev/prod): `yarn prisma migrate deploy`
 - Dev server: `yarn dev`
+- Lint + typecheck + build: `yarn validate`
+
+## CI/CD Pipeline
+
+Le workflow `.github/workflows/deploy.yml` automatise:
+
+1. **Validate** (~1 min): Lint, typecheck, build check
+2. **Build & Push** (~7-8 min): Docker multi-stage build vers GHCR avec caching
+3. **Deploy** (~5s): Mise à jour Portainer stack
+
+Optimisations implémentées:
+- **Dockerfile multi-stage**: node:20-alpine (petit, rapide)
+- **Docker layer caching**: RUN commands fusionnées, dépendances avant le code
+- **GHA cache**: Réutilisation des layers entre builds (~30-40% gain après 1er run)
+- **Pas de Prisma CLI en prod**: Migrations lancées avant le déploiement

@@ -1,52 +1,41 @@
 # 1. Étape de Build
-FROM node:20-slim AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
 # Activation de corepack pour yarn
 RUN corepack enable
 
-# Copie des fichiers de dépendances
+# Copie des fichiers de dépendances (avant le reste = meilleur cache)
 COPY package.json yarn.lock ./
 COPY prisma ./prisma/
 
-# Installation avec cache mount pour accélérer les rebuilds
+# Installation + Prisma generate (une seule RUN pour réduire les layers)
 RUN --mount=type=cache,target=/root/.yarn \
-    yarn install --frozen-lockfile
+    yarn install --frozen-lockfile && \
+    yarn prisma generate
 
-# Prisma generate
-RUN yarn prisma generate
-
-# Copie du reste et Build
+# Copie du reste du code
 COPY . .
+
+# Build Nuxt
 RUN yarn build
 
-# 2. Étape de Production (Image légère)
-FROM node:20-slim AS runner
-
-# Installation d'OpenSSL (requis par Prisma)
-RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+# 2. Étape de Production (Image ultra-légère)
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-RUN corepack enable
-
-# Copie du build depuis l'étape précédente
+# Copie uniquement le build + prisma (pas de node_modules entier)
 COPY --from=builder /app/.output ./.output
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/yarn.lock ./yarn.lock
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
-# Installer uniquement Prisma CLI (plus léger que tout réinstaller)
-RUN yarn add -D --ignore-scripts prisma@6.19.2
-
-# Variable pour dire à Nuxt d'écouter sur le bon port
-ENV PORT=3000
-ENV NODE_ENV=production
+# Variables d'environnement
+ENV PORT=3000 \
+    NODE_ENV=production
 
 EXPOSE 3000
 
-# Commande de démarrage avec migrations
-CMD yarn prisma migrate deploy && node .output/server/index.mjs
+# Démarrage du serveur (pas de migrations ici pour être plus rapide au startup)
+CMD node .output/server/index.mjs
