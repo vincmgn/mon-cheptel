@@ -3,7 +3,8 @@ services:
     image: ghcr.io/vincmgn/mon-cheptel:latest
     restart: always
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       DATABASE_URL: ${DATABASE_URL}
       NUXT_SECRET: ${NUXT_SECRET}
@@ -28,6 +29,11 @@ services:
       - pg_prod_data:/var/lib/postgresql/data
     networks:
       - mon-cheptel
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user_prod -d cheptel_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   pg_prod_data:

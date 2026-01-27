@@ -21,6 +21,9 @@ RUN yarn build
 # 2. Étape de Production (Image légère)
 FROM node:20-slim AS runner
 
+# Installation d'OpenSSL (requis par Prisma)
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Copie du build depuis l'étape précédente
