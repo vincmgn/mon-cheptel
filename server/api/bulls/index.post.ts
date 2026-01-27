@@ -1,5 +1,5 @@
-export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
+export default defineEventHandler(async event => {
+  const body = await readBody(event)
 
   try {
     const bull = await prisma.bull.create({
@@ -11,12 +11,12 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
-    });
-    return bull;
+    })
+    return bull
   } catch {
     throw createError({
       statusCode: 400,
-      statusMessage: "Erreur lors de la création du taureau",
-    });
+      statusMessage: 'Erreur lors de la création du taureau',
+    })
   }
-});
+})

@@ -12,11 +12,11 @@ services:
       - traefik
       - mon-cheptel
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.mon-cheptel.rule=Host(`mon-cheptel.vincentmagnien.com`)"
-      - "traefik.http.routers.mon-cheptel.entrypoints=websecure"
-      - "traefik.http.services.mon-cheptel.loadbalancer.server.port=3000"
-      - "traefik.http.routers.mon-cheptel.tls.certresolver=letsencryptresolver"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.mon-cheptel.rule=Host(`mon-cheptel.vincentmagnien.com`)'
+      - 'traefik.http.routers.mon-cheptel.entrypoints=websecure'
+      - 'traefik.http.services.mon-cheptel.loadbalancer.server.port=3000'
+      - 'traefik.http.routers.mon-cheptel.tls.certresolver=letsencryptresolver'
 
   db:
     image: postgres:15-alpine
@@ -30,14 +30,14 @@ services:
     networks:
       - mon-cheptel
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user_prod -d cheptel_db"]
+      test: ['CMD-SHELL', 'pg_isready -U user_prod -d cheptel_db']
       interval: 5s
       timeout: 5s
       retries: 5
 
 volumes:
   pg_prod_data:
-  
+
 networks:
   mon-cheptel:
   traefik:

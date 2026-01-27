@@ -10,8 +10,10 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "typecheck": "nuxt typecheck",
-    "validate": "yarn lint && yarn typecheck && yarn build"
+    "validate": "yarn format:check && yarn lint && yarn typecheck && yarn build"
   },
   "dependencies": {
     "@prisma/client": "6.19.2",
@@ -29,6 +31,8 @@
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@types/node": "^25.0.10",
     "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.1",
     "prisma": "6.19.2",
     "tsx": "^4.21.0"
   },

@@ -1,0 +1,21 @@
+# Dependencies
+node_modules
+.yarn
+
+# Build outputs
+dist
+.output
+.nuxt
+
+# Prisma
+prisma/migrations
+
+# Lockfiles
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+
+# Misc
+.git
+.env
+.env.*

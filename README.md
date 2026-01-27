@@ -84,8 +84,8 @@ Prisma est épinglé en 6.19.2. Évite de passer à Prisma 7 pour le moment (com
   docker build -t ghcr.io/vincmgn/mon-cheptel:latest .
   docker push ghcr.io/vincmgn/mon-cheptel:latest
   ```
-  
 - **Déployer sur le serveur** (avec Traefik + Portainer):
+
   ```bash
   docker compose --env-file .env.production -f docker-compose.prod.yml up -d
   ```
@@ -122,6 +122,7 @@ Le workflow `.github/workflows/deploy.yml` automatise:
 3. **Deploy** (~5s): Mise à jour Portainer stack
 
 Optimisations implémentées:
+
 - **Dockerfile multi-stage**: node:20-alpine (petit, rapide)
 - **Docker layer caching**: RUN commands fusionnées, dépendances avant le code
 - **GHA cache**: Réutilisation des layers entre builds (~30-40% gain après 1er run)

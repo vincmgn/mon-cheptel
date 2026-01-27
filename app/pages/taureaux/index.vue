@@ -6,14 +6,14 @@ const newBull = ref({ name: '', comment: '' })
 const columns = [
   { key: 'name', label: 'Nom', id: 'name' },
   { key: 'createdAt', label: 'Ajouté le', id: 'createdAt' },
-  { key: 'actions', label: 'Actions', id: 'actions' }
+  { key: 'actions', label: 'Actions', id: 'actions' },
 ]
 
 const saveBull = async () => {
   try {
     await $fetch('/api/bulls', {
       method: 'POST',
-      body: newBull.value
+      body: newBull.value,
     })
     isOpen.value = false
     newBull.value = { name: '', comment: '' }
@@ -31,7 +31,11 @@ const saveBull = async () => {
         <UIcon name="i-lucide-shield-check" class="text-primary" />
         Gestion des Taureaux
       </h1>
-      <UButton icon="i-lucide-plus" label="Nouveau Taureau" @click="isOpen = true" />
+      <UButton
+        icon="i-lucide-plus"
+        label="Nouveau Taureau"
+        @click="isOpen = true"
+      />
     </div>
 
     <UTable :rows="bulls" :columns="columns">

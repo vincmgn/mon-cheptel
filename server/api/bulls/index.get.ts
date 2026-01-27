@@ -4,7 +4,7 @@ export default defineEventHandler(async () => {
       comments: true,
     },
     orderBy: {
-      name: "asc",
+      name: 'asc',
     },
-  });
-});
+  })
+})
