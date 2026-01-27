@@ -72,20 +72,34 @@ jobs:
       - name: Redeploy Portainer stack with updated compose
         run: |
           set -e
-          # 1. Obtenir le JWT de Portainer
-          JWT=$(curl -s -X POST "${{ secrets.DOCKER_PORTAINER_URL }}/api/auth" \
+          # 1. Obtenir le JWT de Portainer (fail fast en cas d'erreur)
+          JWT=$(curl -s -f -X POST "${{ secrets.DOCKER_PORTAINER_URL }}/api/auth" \
             -H "Content-Type: application/json" \
             -d "{\"username\": \"${{ secrets.DOCKER_PORTAINER_USER }}\", \"password\": \"${{ secrets.DOCKER_PORTAINER_PASSWORD }}\"}" | jq -r .jwt)
 
           # 2. Récupérer l'ID de la stack
-          STACK_ID=$(curl -s -H "Authorization: Bearer $JWT" "${{ secrets.DOCKER_PORTAINER_URL }}/api/stacks" | \
+          STACK_ID=$(curl -s -f -H "Authorization: Bearer $JWT" "${{ secrets.DOCKER_PORTAINER_URL }}/api/stacks" | \
             jq -r ".[] | select(.Name == \"${{ secrets.PORTAINER_STACK_NAME }}\") | .Id")
 
           # 3. Lire le contenu du docker-compose et préparer le payload JSON
           STACK_FILE_CONTENT=$(jq -Rs . < docker-compose.prod.yml)
 
           # 4. Mettre à jour la stack via l'endpoint d'update (avec redeploy)
-          curl -s -X POST "${{ secrets.DOCKER_PORTAINER_URL }}/api/stacks/$STACK_ID/update?endpointId=1" \
+          echo "Updating stack $STACK_ID..."
+          # On capture le code HTTP et le corps de réponse
+          HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.DOCKER_PORTAINER_URL }}/api/stacks/$STACK_ID/update?endpointId=1" \
             -H "Authorization: Bearer $JWT" \
             -H "Content-Type: application/json" \
-            -d "{\"stackFileContent\": $STACK_FILE_CONTENT, \"env\": [], \"prune\": true, \"pullImage\": true}"
+            -d "{\"stackFileContent\": $STACK_FILE_CONTENT, \"env\": [], \"prune\": true, \"pullImage\": true}")
+
+          HTTP_BODY=$(echo "$HTTP_RESPONSE" | head -n -1)
+          HTTP_STATUS=$(echo "$HTTP_RESPONSE" | tail -n 1)
+
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Error updating stack (HTTP $HTTP_STATUS):"
+            echo "$HTTP_BODY"
+            exit 1
+          else
+            echo "Stack update initiated successfully:"
+            echo "$HTTP_BODY"
+          fi
