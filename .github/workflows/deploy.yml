@@ -87,7 +87,8 @@ jobs:
           # 4. Mettre à jour la stack via l'endpoint d'update (avec redeploy)
           echo "Updating stack $STACK_ID..."
           # On capture le code HTTP et le corps de réponse
-          HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.DOCKER_PORTAINER_URL }}/api/stacks/$STACK_ID/update?endpointId=1" \
+          # NOTE: On utilise PUT /api/stacks/{id} au lieu de POST /api/stacks/{id}/update qui n'existe plus/pas
+          HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "${{ secrets.DOCKER_PORTAINER_URL }}/api/stacks/$STACK_ID?endpointId=1" \
             -H "Authorization: Bearer $JWT" \
             -H "Content-Type: application/json" \
             -d "{\"stackFileContent\": $STACK_FILE_CONTENT, \"env\": [], \"prune\": true, \"pullImage\": true}")
