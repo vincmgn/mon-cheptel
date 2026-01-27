@@ -10,8 +10,11 @@ RUN corepack enable
 COPY package.json yarn.lock ./
 COPY prisma ./prisma/
 
-# Installation avec Prisma generate (force version 6.19.2)
-RUN yarn install --frozen-lockfile
+# Installation avec cache mount pour accélérer les rebuilds
+RUN --mount=type=cache,target=/root/.yarn \
+    yarn install --frozen-lockfile
+
+# Prisma generate
 RUN yarn prisma generate
 
 # Copie du reste et Build
@@ -26,10 +29,18 @@ RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists
 
 WORKDIR /app
 
+RUN corepack enable
+
 # Copie du build depuis l'étape précédente
 COPY --from=builder /app/.output ./.output
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/yarn.lock ./yarn.lock
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+
+# Installer uniquement Prisma CLI (plus léger que tout réinstaller)
+RUN yarn add -D --ignore-scripts prisma@6.19.2
 
 # Variable pour dire à Nuxt d'écouter sur le bon port
 ENV PORT=3000
@@ -37,9 +48,5 @@ ENV NODE_ENV=production
 
 EXPOSE 3000
 
-# Installation de Prisma CLI en production (version lockée)
-RUN corepack enable && yarn add -D prisma@6.19.2
-
-# Commande de démarrage
-# On lance les migrations Prisma avant de démarrer pour être sûr que la DB est à jour
+# Commande de démarrage avec migrations
 CMD yarn prisma migrate deploy && node .output/server/index.mjs
