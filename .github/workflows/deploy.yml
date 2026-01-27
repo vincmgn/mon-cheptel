@@ -88,7 +88,7 @@ jobs:
           echo "Updating stack $STACK_ID..."
           # On capture le code HTTP et le corps de réponse
           # NOTE: On utilise PUT /api/stacks/{id} au lieu de POST /api/stacks/{id}/update qui n'existe plus/pas
-          HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "${{ secrets.DOCKER_PORTAINER_URL }}/api/stacks/$STACK_ID?endpointId=1" \
+          HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "${{ secrets.DOCKER_PORTAINER_URL }}/api/stacks/$STACK_ID?endpointId=2" \
             -H "Authorization: Bearer $JWT" \
             -H "Content-Type: application/json" \
             -d "{\"stackFileContent\": $STACK_FILE_CONTENT, \"env\": [], \"prune\": true, \"pullImage\": true}")
