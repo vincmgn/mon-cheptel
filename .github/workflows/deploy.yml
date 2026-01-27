@@ -66,8 +66,9 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: Update Portainer Stack
+      - name: Redeploy Portainer stack with updated compose
         run: |
+          set -e
           # 1. Obtenir le JWT de Portainer
           JWT=$(curl -s -X POST "${{ secrets.DOCKER_PORTAINER_URL }}/api/auth" \
             -H "Content-Type: application/json" \
@@ -77,8 +78,11 @@ jobs:
           STACK_ID=$(curl -s -H "Authorization: Bearer $JWT" "${{ secrets.DOCKER_PORTAINER_URL }}/api/stacks" | \
             jq -r ".[] | select(.Name == \"${{ secrets.PORTAINER_STACK_NAME }}\") | .Id")
 
-          # 3. Forcer le pull de la nouvelle image et relancer
-          curl -s -X PUT "${{ secrets.DOCKER_PORTAINER_URL }}/api/stacks/$STACK_ID?endpointId=1" \
+          # 3. Lire le contenu du docker-compose et préparer le payload JSON
+          STACK_FILE_CONTENT=$(jq -Rs . < docker-compose.prod.yml)
+
+          # 4. Mettre à jour la stack via l'endpoint d'update (avec redeploy)
+          curl -s -X POST "${{ secrets.DOCKER_PORTAINER_URL }}/api/stacks/$STACK_ID/update?endpointId=1" \
             -H "Authorization: Bearer $JWT" \
             -H "Content-Type: application/json" \
-            -d "{\"pullImage\": true, \"prune\": true}"
+            -d "{\"stackFileContent\": $STACK_FILE_CONTENT, \"env\": [], \"prune\": true, \"pullImage\": true}"
