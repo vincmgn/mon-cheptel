@@ -1,0 +1,86 @@
+openapi: 3.0.0
+info:
+  title: Mon Cheptel API
+  version: 1.0.0
+  description: API pour gérer son cheptel
+
+servers:
+  - url: https://mon-cheptel.vincentmagnien.com/api/v1
+    description: Production
+  - url: http://localhost:3000/api/v1
+    description: Development
+
+paths:
+  /bulls:
+    get:
+      summary: Récupérer la liste des taureaux
+      tags:
+        - Bulls
+      responses:
+        '200':
+          description: Liste des taureaux
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Bull'
+    post:
+      summary: Créer un nouveau taureau
+      tags:
+        - Bulls
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nom du taureau
+                comment:
+                  type: string
+                  description: Commentaire initial
+              required:
+                - name
+                - comment
+      responses:
+        '201':
+          description: Taureau créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bull'
+        '400':
+          description: Erreur lors de la création
+
+components:
+  schemas:
+    Bull:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+      required:
+        - id
+        - name
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
