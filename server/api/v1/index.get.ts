@@ -8,6 +8,7 @@ export default defineEventHandler(async () => {
       db: 'up',
       version: 'v1',
       endpoints: {
+        docs: '/api/docs',
         bulls: {
           list: 'GET /api/v1/bulls',
           create: 'POST /api/v1/bulls',
