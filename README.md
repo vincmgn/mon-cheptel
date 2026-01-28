@@ -1,6 +1,6 @@
 # Mon Cheptel — Guide de développement
 
-Nuxt 4 + Prisma + PostgreSQL, avec Docker pour la base de données.
+Nuxt 4 + Prisma + PostgreSQL + Docker
 
 ## Prérequis
 
@@ -14,23 +14,7 @@ Nuxt 4 + Prisma + PostgreSQL, avec Docker pour la base de données.
 yarn
 ```
 
-Prisma est épinglé en 6.19.2. Évite de passer à Prisma 7 pour le moment (comportement différent sur `DATABASE_URL`).
-
-## Environnements et variables
-
-- Dev: `.env` (déjà présent)
-  - Exemple attendu:
-    ```bash
-    DATABASE_URL="postgresql://cheptel_admin:cheptel_password@localhost:5432/cheptel_db"
-    NUXT_PUBLIC_API_BASE="/api"
-    ```
-- Prod: `.env.production` (à créer pour l’usage avec `docker-compose.prod.yml`)
-  - Exemple:
-    ```bash
-    DATABASE_URL="postgresql://user_prod:password_prod@db:5432/cheptel_db"
-    NUXT_SECRET="<valeur-aléatoire-robuste>"
-    NUXT_PUBLIC_API_BASE="/api"
-    ```
+Prisma est épinglé en 6.19.2. Évite de passer à Prisma 7 pour le moment (différent sur `DATABASE_URL`).
 
 ## Base de données (Docker)
 
