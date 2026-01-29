@@ -29,7 +29,6 @@
     "@nuxt/eslint": "^1.13.0",
     "@nuxt/ui": "^4.4.0",
     "@nuxtjs/tailwindcss": "^6.14.0",
-    "@scalar/nuxt": "^0.5.56",
     "@types/node": "^25.0.10",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
