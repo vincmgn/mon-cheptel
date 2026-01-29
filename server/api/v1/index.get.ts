@@ -8,11 +8,7 @@ export default defineEventHandler(async () => {
       db: 'up',
       version: 'v1',
       endpoints: {
-        docs: '/api/docs',
-        bulls: {
-          list: 'GET /api/v1/bulls',
-          create: 'POST /api/v1/bulls',
-        },
+        // docs: '/api/docs',
       },
       timestamp: new Date().toISOString(),
     }
@@ -22,10 +18,7 @@ export default defineEventHandler(async () => {
       db: 'error',
       message: error instanceof Error ? error.message : 'Erreur DB',
       endpoints: {
-        bulls: {
-          list: 'GET /api/v1/bulls',
-          create: 'POST /api/v1/bulls',
-        },
+        // docs: '/api/docs',
       },
       timestamp: new Date().toISOString(),
     }
