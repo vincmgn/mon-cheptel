@@ -1,0 +1,286 @@
+@baseUrl = http://localhost:3000/api/v1
+
+# ═══════════════════════════════════════════
+# HEALTH CHECK
+# ═══════════════════════════════════════════
+
+### Status API v1
+GET {{baseUrl}}
+
+# ═══════════════════════════════════════════
+# LOCATIONS
+# ═══════════════════════════════════════════
+
+### Liste toutes les locations
+GET {{baseUrl}}/locations
+
+### Créer une location
+POST {{baseUrl}}/locations
+Content-Type: application/json
+
+{
+  "name": "Ferme Principale"
+}
+
+### Détail d'une location
+GET {{baseUrl}}/locations/1
+
+### Modifier une location
+PUT {{baseUrl}}/locations/1
+Content-Type: application/json
+
+{
+  "name": "Ferme Secondaire"
+}
+
+### Supprimer une location
+DELETE {{baseUrl}}/locations/1
+
+# ═══════════════════════════════════════════
+# BUILDINGS
+# ═══════════════════════════════════════════
+
+### Liste tous les bâtiments
+GET {{baseUrl}}/buildings
+
+### Créer un bâtiment
+POST {{baseUrl}}/buildings
+Content-Type: application/json
+
+{
+  "name": "Étable Nord",
+  "locationId": 1
+}
+
+### Détail d'un bâtiment
+GET {{baseUrl}}/buildings/1
+
+### Modifier un bâtiment
+PUT {{baseUrl}}/buildings/1
+Content-Type: application/json
+
+{
+  "name": "Étable Nord - Rénové"
+}
+
+### Supprimer un bâtiment
+DELETE {{baseUrl}}/buildings/1
+
+# ═══════════════════════════════════════════
+# PENS (Box / Enclos)
+# ═══════════════════════════════════════════
+
+### Liste tous les enclos
+GET {{baseUrl}}/pens
+
+### Créer un enclos
+POST {{baseUrl}}/pens
+Content-Type: application/json
+
+{
+  "name": "Box A1",
+  "buildingId": 1
+}
+
+### Détail d'un enclos
+GET {{baseUrl}}/pens/1
+
+### Modifier un enclos
+PUT {{baseUrl}}/pens/1
+Content-Type: application/json
+
+{
+  "name": "Box A1 - Agrandi"
+}
+
+### Supprimer un enclos
+DELETE {{baseUrl}}/pens/1
+
+# ═══════════════════════════════════════════
+# COWS (Vaches)
+# ═══════════════════════════════════════════
+
+### Liste toutes les vaches
+GET {{baseUrl}}/cows
+
+### Créer une vache
+POST {{baseUrl}}/cows
+Content-Type: application/json
+
+{
+  "officialId": "FR1234567890",
+  "penId": 1,
+  "prophylaxis": false
+}
+
+### Détail d'une vache (avec veaux, saillies, commentaires)
+GET {{baseUrl}}/cows/1
+
+### Modifier une vache
+PUT {{baseUrl}}/cows/1
+Content-Type: application/json
+
+{
+  "prophylaxis": true
+}
+
+### Déplacer une vache dans un autre enclos
+PUT {{baseUrl}}/cows/1
+Content-Type: application/json
+
+{
+  "penId": 2
+}
+
+### Supprimer une vache
+DELETE {{baseUrl}}/cows/1
+
+# ═══════════════════════════════════════════
+# CALVES (Veaux)
+# ═══════════════════════════════════════════
+
+### Liste tous les veaux
+GET {{baseUrl}}/calves
+
+### Créer un veau
+POST {{baseUrl}}/calves
+Content-Type: application/json
+
+{
+  "sex": "F",
+  "birthDate": "2025-01-15T00:00:00.000Z",
+  "cowId": 1
+}
+
+### Détail d'un veau
+GET {{baseUrl}}/calves/1
+
+### Modifier un veau
+PUT {{baseUrl}}/calves/1
+Content-Type: application/json
+
+{
+  "sex": "M"
+}
+
+### Supprimer un veau
+DELETE {{baseUrl}}/calves/1
+
+# ═══════════════════════════════════════════
+# BULLS (Taureaux)
+# ═══════════════════════════════════════════
+
+### Liste tous les taureaux
+GET {{baseUrl}}/bulls
+
+### Créer un taureau
+POST {{baseUrl}}/bulls
+Content-Type: application/json
+
+{
+  "name": "Hercule"
+}
+
+### Détail d'un taureau (avec saillies et commentaires)
+GET {{baseUrl}}/bulls/1
+
+### Modifier un taureau
+PUT {{baseUrl}}/bulls/1
+Content-Type: application/json
+
+{
+  "name": "Hercule II"
+}
+
+### Supprimer un taureau
+DELETE {{baseUrl}}/bulls/1
+
+# ═══════════════════════════════════════════
+# BREEDINGS (Saillies)
+# ═══════════════════════════════════════════
+
+### Liste toutes les saillies
+GET {{baseUrl}}/breedings
+
+### Créer une saillie avec taureau connu (bullId)
+POST {{baseUrl}}/breedings
+Content-Type: application/json
+
+{
+  "cowId": 1,
+  "bullId": 1,
+  "date": "2025-03-10T00:00:00.000Z",
+  "isMaybe": false
+}
+
+### Créer une saillie avec taureau inconnu (bullName)
+POST {{baseUrl}}/breedings
+Content-Type: application/json
+
+{
+  "cowId": 2,
+  "bullName": "Taureau extérieur",
+  "isMaybe": true
+}
+
+### Détail d'une saillie
+GET {{baseUrl}}/breedings/1
+
+### Modifier une saillie
+PUT {{baseUrl}}/breedings/1
+Content-Type: application/json
+
+{
+  "isMaybe": false
+}
+
+### Supprimer une saillie
+DELETE {{baseUrl}}/breedings/1
+
+# ═══════════════════════════════════════════
+# COMMENTS (Commentaires)
+# ═══════════════════════════════════════════
+
+### Liste tous les commentaires
+GET {{baseUrl}}/comments
+
+### Commenter une vache
+POST {{baseUrl}}/comments
+Content-Type: application/json
+
+{
+  "content": "Vache en bonne santé, vaccination faite",
+  "cowId": 1
+}
+
+### Commenter un veau
+POST {{baseUrl}}/comments
+Content-Type: application/json
+
+{
+  "content": "Veau en pleine forme",
+  "calfId": 1
+}
+
+### Commenter un taureau
+POST {{baseUrl}}/comments
+Content-Type: application/json
+
+{
+  "content": "Taureau très actif cette semaine",
+  "bullId": 1
+}
+
+### Détail d'un commentaire
+GET {{baseUrl}}/comments/1
+
+### Modifier un commentaire
+PUT {{baseUrl}}/comments/1
+Content-Type: application/json
+
+{
+  "content": "Commentaire mis à jour"
+}
+
+### Supprimer un commentaire
+DELETE {{baseUrl}}/comments/1

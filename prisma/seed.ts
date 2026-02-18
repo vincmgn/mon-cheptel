@@ -5,15 +5,8 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('Start seeding ...')
 
-  // Nettoyage de la base de données (ordre inverse des dépendances)
-  await prisma.comment.deleteMany()
-  await prisma.breeding.deleteMany()
-  await prisma.calf.deleteMany()
-  await prisma.cow.deleteMany()
-  await prisma.bull.deleteMany()
-  await prisma.pen.deleteMany()
-  await prisma.building.deleteMany()
-  await prisma.location.deleteMany()
+  // Nettoyage de la base de données + reset des séquences d'IDs
+  await prisma.$executeRaw`TRUNCATE TABLE "Comment", "Breeding", "Calf", "Cow", "Bull", "Pen", "Building", "Location" RESTART IDENTITY CASCADE`
 
   console.log('Database cleaned.')
 
