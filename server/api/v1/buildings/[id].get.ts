@@ -14,7 +14,8 @@ export default defineEventHandler(async event => {
     },
   })
 
-  if (!building) throw createError({ statusCode: 404, message: 'Bâtiment introuvable' })
+  if (!building)
+    throw createError({ statusCode: 404, message: 'Bâtiment introuvable' })
 
   return { success: true, data: building }
 })

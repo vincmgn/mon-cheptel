@@ -7,11 +7,13 @@ export default defineEventHandler(async event => {
   const body = await readBody(event)
 
   const existing = await prisma.cow.findUnique({ where: { id } })
-  if (!existing) throw createError({ statusCode: 404, message: 'Vache introuvable' })
+  if (!existing)
+    throw createError({ statusCode: 404, message: 'Vache introuvable' })
 
   if (body.penId) {
     const penExists = await prisma.pen.findUnique({ where: { id: body.penId } })
-    if (!penExists) throw createError({ statusCode: 404, message: 'Box/Enclos introuvable' })
+    if (!penExists)
+      throw createError({ statusCode: 404, message: 'Box/Enclos introuvable' })
   }
 
   const cow = await prisma.cow.update({
@@ -19,7 +21,9 @@ export default defineEventHandler(async event => {
     data: {
       ...(body.officialId ? { officialId: body.officialId.trim() } : {}),
       ...(body.penId ? { penId: body.penId } : {}),
-      ...(body.prophylaxis !== undefined ? { prophylaxis: body.prophylaxis } : {}),
+      ...(body.prophylaxis !== undefined
+        ? { prophylaxis: body.prophylaxis }
+        : {}),
     },
     include: {
       pen: { include: { building: { include: { location: true } } } },

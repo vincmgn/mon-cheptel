@@ -15,7 +15,8 @@ export default defineEventHandler(async event => {
     },
   })
 
-  if (!bull) throw createError({ statusCode: 404, message: 'Taureau introuvable' })
+  if (!bull)
+    throw createError({ statusCode: 404, message: 'Taureau introuvable' })
 
   return { success: true, data: bull }
 })

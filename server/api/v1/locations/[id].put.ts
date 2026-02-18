@@ -6,11 +6,15 @@ export default defineEventHandler(async event => {
 
   const body = await readBody(event)
   if (!body?.name?.trim()) {
-    throw createError({ statusCode: 400, message: 'Le champ "name" est requis' })
+    throw createError({
+      statusCode: 400,
+      message: 'Le champ "name" est requis',
+    })
   }
 
   const existing = await prisma.location.findUnique({ where: { id } })
-  if (!existing) throw createError({ statusCode: 404, message: 'Location introuvable' })
+  if (!existing)
+    throw createError({ statusCode: 404, message: 'Location introuvable' })
 
   const location = await prisma.location.update({
     where: { id },

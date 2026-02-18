@@ -5,7 +5,8 @@ export default defineEventHandler(async event => {
   if (isNaN(id)) throw createError({ statusCode: 400, message: 'ID invalide' })
 
   const existing = await prisma.location.findUnique({ where: { id } })
-  if (!existing) throw createError({ statusCode: 404, message: 'Location introuvable' })
+  if (!existing)
+    throw createError({ statusCode: 404, message: 'Location introuvable' })
 
   await prisma.location.delete({ where: { id } })
 

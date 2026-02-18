@@ -5,7 +5,8 @@ export default defineEventHandler(async event => {
   if (isNaN(id)) throw createError({ statusCode: 400, message: 'ID invalide' })
 
   const existing = await prisma.bull.findUnique({ where: { id } })
-  if (!existing) throw createError({ statusCode: 404, message: 'Taureau introuvable' })
+  if (!existing)
+    throw createError({ statusCode: 404, message: 'Taureau introuvable' })
 
   await prisma.bull.delete({ where: { id } })
 

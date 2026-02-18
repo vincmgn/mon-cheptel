@@ -5,7 +5,8 @@ export default defineEventHandler(async event => {
   if (isNaN(id)) throw createError({ statusCode: 400, message: 'ID invalide' })
 
   const existing = await prisma.comment.findUnique({ where: { id } })
-  if (!existing) throw createError({ statusCode: 404, message: 'Commentaire introuvable' })
+  if (!existing)
+    throw createError({ statusCode: 404, message: 'Commentaire introuvable' })
 
   await prisma.comment.delete({ where: { id } })
 

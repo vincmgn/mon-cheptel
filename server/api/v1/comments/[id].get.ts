@@ -9,7 +9,8 @@ export default defineEventHandler(async event => {
     include: { cow: true, calf: true, bull: true },
   })
 
-  if (!comment) throw createError({ statusCode: 404, message: 'Commentaire introuvable' })
+  if (!comment)
+    throw createError({ statusCode: 404, message: 'Commentaire introuvable' })
 
   return { success: true, data: comment }
 })

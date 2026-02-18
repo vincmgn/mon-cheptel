@@ -5,7 +5,8 @@ export default defineEventHandler(async event => {
   if (isNaN(id)) throw createError({ statusCode: 400, message: 'ID invalide' })
 
   const existing = await prisma.calf.findUnique({ where: { id } })
-  if (!existing) throw createError({ statusCode: 404, message: 'Veau introuvable' })
+  if (!existing)
+    throw createError({ statusCode: 404, message: 'Veau introuvable' })
 
   await prisma.calf.delete({ where: { id } })
 

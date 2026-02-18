@@ -6,11 +6,15 @@ export default defineEventHandler(async event => {
 
   const body = await readBody(event)
   if (!body?.content?.trim()) {
-    throw createError({ statusCode: 400, message: 'Le champ "content" est requis' })
+    throw createError({
+      statusCode: 400,
+      message: 'Le champ "content" est requis',
+    })
   }
 
   const existing = await prisma.comment.findUnique({ where: { id } })
-  if (!existing) throw createError({ statusCode: 404, message: 'Commentaire introuvable' })
+  if (!existing)
+    throw createError({ statusCode: 404, message: 'Commentaire introuvable' })
 
   const comment = await prisma.comment.update({
     where: { id },

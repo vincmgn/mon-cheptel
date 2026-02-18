@@ -4,7 +4,10 @@ export default defineEventHandler(async event => {
   const body = await readBody(event)
 
   if (!body?.content?.trim()) {
-    throw createError({ statusCode: 400, message: 'Le champ "content" est requis' })
+    throw createError({
+      statusCode: 400,
+      message: 'Le champ "content" est requis',
+    })
   }
   if (!body.cowId && !body.calfId && !body.bullId) {
     throw createError({
@@ -15,15 +18,22 @@ export default defineEventHandler(async event => {
 
   if (body.cowId) {
     const cowExists = await prisma.cow.findUnique({ where: { id: body.cowId } })
-    if (!cowExists) throw createError({ statusCode: 404, message: 'Vache introuvable' })
+    if (!cowExists)
+      throw createError({ statusCode: 404, message: 'Vache introuvable' })
   }
   if (body.calfId) {
-    const calfExists = await prisma.calf.findUnique({ where: { id: body.calfId } })
-    if (!calfExists) throw createError({ statusCode: 404, message: 'Veau introuvable' })
+    const calfExists = await prisma.calf.findUnique({
+      where: { id: body.calfId },
+    })
+    if (!calfExists)
+      throw createError({ statusCode: 404, message: 'Veau introuvable' })
   }
   if (body.bullId) {
-    const bullExists = await prisma.bull.findUnique({ where: { id: body.bullId } })
-    if (!bullExists) throw createError({ statusCode: 404, message: 'Taureau introuvable' })
+    const bullExists = await prisma.bull.findUnique({
+      where: { id: body.bullId },
+    })
+    if (!bullExists)
+      throw createError({ statusCode: 404, message: 'Taureau introuvable' })
   }
 
   const comment = await prisma.comment.create({

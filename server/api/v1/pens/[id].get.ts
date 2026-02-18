@@ -14,7 +14,8 @@ export default defineEventHandler(async event => {
     },
   })
 
-  if (!pen) throw createError({ statusCode: 404, message: 'Box/Enclos introuvable' })
+  if (!pen)
+    throw createError({ statusCode: 404, message: 'Box/Enclos introuvable' })
 
   return { success: true, data: pen }
 })

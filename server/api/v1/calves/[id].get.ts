@@ -7,7 +7,11 @@ export default defineEventHandler(async event => {
   const calf = await prisma.calf.findUnique({
     where: { id },
     include: {
-      cow: { include: { pen: { include: { building: { include: { location: true } } } } } },
+      cow: {
+        include: {
+          pen: { include: { building: { include: { location: true } } } },
+        },
+      },
       comments: { orderBy: { createdAt: 'desc' } },
     },
   })

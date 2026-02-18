@@ -7,11 +7,15 @@ export default defineEventHandler(async event => {
   const body = await readBody(event)
 
   const existing = await prisma.breeding.findUnique({ where: { id } })
-  if (!existing) throw createError({ statusCode: 404, message: 'Saillie introuvable' })
+  if (!existing)
+    throw createError({ statusCode: 404, message: 'Saillie introuvable' })
 
   if (body.bullId) {
-    const bullExists = await prisma.bull.findUnique({ where: { id: body.bullId } })
-    if (!bullExists) throw createError({ statusCode: 404, message: 'Taureau introuvable' })
+    const bullExists = await prisma.bull.findUnique({
+      where: { id: body.bullId },
+    })
+    if (!bullExists)
+      throw createError({ statusCode: 404, message: 'Taureau introuvable' })
   }
 
   const breeding = await prisma.breeding.update({

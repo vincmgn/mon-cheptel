@@ -7,10 +7,14 @@ export default defineEventHandler(async event => {
   const body = await readBody(event)
 
   const existing = await prisma.calf.findUnique({ where: { id } })
-  if (!existing) throw createError({ statusCode: 404, message: 'Veau introuvable' })
+  if (!existing)
+    throw createError({ statusCode: 404, message: 'Veau introuvable' })
 
   if (body.sex && !['M', 'F'].includes(body.sex)) {
-    throw createError({ statusCode: 400, message: 'Le champ "sex" doit être M ou F' })
+    throw createError({
+      statusCode: 400,
+      message: 'Le champ "sex" doit être M ou F',
+    })
   }
 
   const calf = await prisma.calf.update({

@@ -4,7 +4,10 @@ export default defineEventHandler(async event => {
   const body = await readBody(event)
 
   if (!body?.name?.trim()) {
-    throw createError({ statusCode: 400, message: 'Le champ "name" est requis' })
+    throw createError({
+      statusCode: 400,
+      message: 'Le champ "name" est requis',
+    })
   }
 
   const bull = await prisma.bull.create({

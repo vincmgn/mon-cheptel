@@ -17,7 +17,8 @@ export default defineEventHandler(async event => {
     },
   })
 
-  if (!location) throw createError({ statusCode: 404, message: 'Location introuvable' })
+  if (!location)
+    throw createError({ statusCode: 404, message: 'Location introuvable' })
 
   return { success: true, data: location }
 })

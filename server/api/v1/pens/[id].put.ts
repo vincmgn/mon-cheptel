@@ -6,15 +6,22 @@ export default defineEventHandler(async event => {
 
   const body = await readBody(event)
   if (!body?.name?.trim()) {
-    throw createError({ statusCode: 400, message: 'Le champ "name" est requis' })
+    throw createError({
+      statusCode: 400,
+      message: 'Le champ "name" est requis',
+    })
   }
 
   const existing = await prisma.pen.findUnique({ where: { id } })
-  if (!existing) throw createError({ statusCode: 404, message: 'Box/Enclos introuvable' })
+  if (!existing)
+    throw createError({ statusCode: 404, message: 'Box/Enclos introuvable' })
 
   if (body.buildingId) {
-    const buildingExists = await prisma.building.findUnique({ where: { id: body.buildingId } })
-    if (!buildingExists) throw createError({ statusCode: 404, message: 'Bâtiment introuvable' })
+    const buildingExists = await prisma.building.findUnique({
+      where: { id: body.buildingId },
+    })
+    if (!buildingExists)
+      throw createError({ statusCode: 404, message: 'Bâtiment introuvable' })
   }
 
   const pen = await prisma.pen.update({
