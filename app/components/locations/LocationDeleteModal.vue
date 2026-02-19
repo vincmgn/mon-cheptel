@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { Location } from '~~/types'
-import { FetchError } from 'ofetch'
 
 const props = defineProps<{
   open: boolean
@@ -24,15 +23,9 @@ async function confirmDelete() {
     toast.add({ title: 'Location supprimée', color: 'success' })
     emit('deleted')
   } catch (e) {
-    let message = 'Une erreur est survenue'
-    if (e instanceof FetchError) {
-      message = e.data?.message ?? message
-    } else if (e instanceof Error) {
-      message = e.message
-    }
     toast.add({
       title: 'Impossible de supprimer',
-      description: message,
+      description: getErrorMessage(e),
       color: 'error',
     })
   } finally {

@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { validateLocationName } from '~/utils/validators'
-import { FetchError } from 'ofetch'
 
 const _props = defineProps<{
   open: boolean
@@ -30,15 +29,9 @@ async function onCreateSubmit() {
     emit('created')
     createState.name = ''
   } catch (e) {
-    let message = 'Une erreur est survenue'
-    if (e instanceof FetchError) {
-      message = e.data?.message ?? message
-    } else if (e instanceof Error) {
-      message = e.message
-    }
     toast.add({
       title: 'Erreur',
-      description: message,
+      description: getErrorMessage(e),
       color: 'error',
     })
   } finally {
