@@ -4,11 +4,11 @@ export default defineEventHandler(async event => {
   const id = parseInt(getRouterParam(event, 'id') ?? '')
   if (isNaN(id)) throw createError({ statusCode: 400, message: 'ID invalide' })
 
-  const existing = await prisma.comment.findUnique({ where: { id } })
+  const existing = await prisma.note.findUnique({ where: { id } })
   if (!existing)
-    throw createError({ statusCode: 404, message: 'Commentaire introuvable' })
+    throw createError({ statusCode: 404, message: 'Note introuvable' })
 
-  await prisma.comment.delete({ where: { id } })
+  await prisma.note.delete({ where: { id } })
 
-  return { success: true, message: 'Commentaire supprimé' }
+  return { success: true, message: 'Note supprimée' }
 })

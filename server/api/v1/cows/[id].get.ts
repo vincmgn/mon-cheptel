@@ -8,9 +8,9 @@ export default defineEventHandler(async event => {
     where: { id },
     include: {
       pen: { include: { building: { include: { location: true } } } },
-      calves: { include: { _count: { select: { comments: true } } } },
+      calves: { include: { _count: { select: { notes: true } } } },
       breedings: { include: { bull: true }, orderBy: { date: 'desc' } },
-      comments: { orderBy: { createdAt: 'desc' } },
+      notes: { orderBy: { createdAt: 'desc' } },
     },
   })
 

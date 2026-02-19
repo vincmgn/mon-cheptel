@@ -4,7 +4,7 @@ export default defineEventHandler(async () => {
   const cows = await prisma.cow.findMany({
     include: {
       pen: { include: { building: { include: { location: true } } } },
-      _count: { select: { calves: true, breedings: true, comments: true } },
+      _count: { select: { calves: true, breedings: true, notes: true } },
     },
     orderBy: { createdAt: 'desc' },
   })

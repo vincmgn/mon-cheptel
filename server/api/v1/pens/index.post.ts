@@ -22,20 +22,6 @@ export default defineEventHandler(async event => {
   if (!buildingExists)
     throw createError({ statusCode: 404, message: 'Bâtiment introuvable' })
 
-  const existingPen = await prisma.pen.findFirst({
-    where: {
-      name: body.name.trim(),
-      buildingId: body.buildingId,
-    },
-  })
-
-  if (existingPen) {
-    throw createError({
-      statusCode: 409,
-      message: `Un enclos avec le nom "${body.name.trim()}" existe déjà dans ce bâtiment`,
-    })
-  }
-
   const pen = await prisma.pen.create({
     data: { name: body.name.trim(), buildingId: body.buildingId },
     include: { building: { include: { location: true } } },

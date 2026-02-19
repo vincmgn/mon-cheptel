@@ -1,7 +1,7 @@
 import { prisma } from '../../../utils/prisma'
 
 export default defineEventHandler(async () => {
-  const comments = await prisma.comment.findMany({
+  const notes = await prisma.note.findMany({
     include: {
       cow: true,
       calf: true,
@@ -9,5 +9,5 @@ export default defineEventHandler(async () => {
     },
     orderBy: { createdAt: 'desc' },
   })
-  return { success: true, data: comments }
+  return { success: true, data: notes }
 })
