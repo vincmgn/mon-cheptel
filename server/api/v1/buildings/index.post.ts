@@ -22,6 +22,20 @@ export default defineEventHandler(async event => {
   if (!locationExists)
     throw createError({ statusCode: 404, message: 'Location introuvable' })
 
+  const existingBuilding = await prisma.building.findFirst({
+    where: {
+      name: body.name.trim(),
+      locationId: body.locationId,
+    },
+  })
+
+  if (existingBuilding) {
+    throw createError({
+      statusCode: 409,
+      message: `Un bâtiment avec le nom "${body.name.trim()}" existe déjà dans cette location`,
+    })
+  }
+
   const building = await prisma.building.create({
     data: { name: body.name.trim(), locationId: body.locationId },
     include: { location: true },

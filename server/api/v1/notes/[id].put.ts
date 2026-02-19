@@ -12,15 +12,15 @@ export default defineEventHandler(async event => {
     })
   }
 
-  const existing = await prisma.comment.findUnique({ where: { id } })
+  const existing = await prisma.note.findUnique({ where: { id } })
   if (!existing)
-    throw createError({ statusCode: 404, message: 'Commentaire introuvable' })
+    throw createError({ statusCode: 404, message: 'Note introuvable' })
 
-  const comment = await prisma.comment.update({
+  const note = await prisma.note.update({
     where: { id },
     data: { content: body.content.trim() },
     include: { cow: true, calf: true, bull: true },
   })
 
-  return { success: true, data: comment }
+  return { success: true, data: note }
 })

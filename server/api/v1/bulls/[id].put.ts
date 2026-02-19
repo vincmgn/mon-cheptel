@@ -16,10 +16,22 @@ export default defineEventHandler(async event => {
   if (!existing)
     throw createError({ statusCode: 404, message: 'Taureau introuvable' })
 
-  const bull = await prisma.bull.update({
-    where: { id },
-    data: { name: body.name.trim() },
-  })
+  try {
+    const bull = await prisma.bull.update({
+      where: { id },
+      data: { name: body.name.trim() },
+    })
 
-  return { success: true, data: bull }
+    return { success: true, data: bull }
+  }
+  catch (error: any) {
+    // Erreur de contrainte d'unicité Prisma
+    if (error.code === 'P2002') {
+      throw createError({
+        statusCode: 409,
+        message: `Un taureau avec le nom "${body.name.trim()}" existe déjà`,
+      })
+    }
+    throw error
+  }
 })

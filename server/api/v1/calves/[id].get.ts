@@ -12,7 +12,7 @@ export default defineEventHandler(async event => {
           pen: { include: { building: { include: { location: true } } } },
         },
       },
-      comments: { orderBy: { createdAt: 'desc' } },
+      notes: { orderBy: { createdAt: 'desc' } },
     },
   })
 

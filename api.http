@@ -1,14 +1,14 @@
 @baseUrl = http://localhost:3000/api/v1
 
 # ═══════════════════════════════════════════
-# HEALTH CHECK
+# HEALTH CHECK : OK
 # ═══════════════════════════════════════════
 
 ### Status API v1
 GET {{baseUrl}}
 
 # ═══════════════════════════════════════════
-# LOCATIONS
+# LOCATIONS : OK
 # ═══════════════════════════════════════════
 
 ### Liste toutes les locations
@@ -19,25 +19,25 @@ POST {{baseUrl}}/locations
 Content-Type: application/json
 
 {
-  "name": "Ferme Principale"
+  "name": "Ferme Principale 4"
 }
 
 ### Détail d'une location
 GET {{baseUrl}}/locations/1
 
 ### Modifier une location
-PUT {{baseUrl}}/locations/1
+PUT {{baseUrl}}/locations/4
 Content-Type: application/json
 
 {
-  "name": "Ferme Secondaire"
+  "name": "Ferme Secondaire 2"
 }
 
 ### Supprimer une location
-DELETE {{baseUrl}}/locations/1
+DELETE {{baseUrl}}/locations/4
 
 # ═══════════════════════════════════════════
-# BUILDINGS
+# BUILDINGS : OK
 # ═══════════════════════════════════════════
 
 ### Liste tous les bâtiments
@@ -48,26 +48,26 @@ POST {{baseUrl}}/buildings
 Content-Type: application/json
 
 {
-  "name": "Étable Nord",
-  "locationId": 1
+  "name": "Étable Nord 2",
+  "locationId": 2
 }
 
 ### Détail d'un bâtiment
-GET {{baseUrl}}/buildings/1
+GET {{baseUrl}}/buildings/5
 
 ### Modifier un bâtiment
-PUT {{baseUrl}}/buildings/1
+PUT {{baseUrl}}/buildings/5
 Content-Type: application/json
 
 {
-  "name": "Étable Nord - Rénové"
+  "name": "Étable Sud"
 }
 
 ### Supprimer un bâtiment
 DELETE {{baseUrl}}/buildings/1
 
 # ═══════════════════════════════════════════
-# PENS (Box / Enclos)
+# PENS (Box / Enclos) : OK
 # ═══════════════════════════════════════════
 
 ### Liste tous les enclos
@@ -78,15 +78,15 @@ POST {{baseUrl}}/pens
 Content-Type: application/json
 
 {
-  "name": "Box A1",
-  "buildingId": 1
+  "name": "Box A2",
+  "buildingId": 2
 }
 
 ### Détail d'un enclos
 GET {{baseUrl}}/pens/1
 
 ### Modifier un enclos
-PUT {{baseUrl}}/pens/1
+PUT {{baseUrl}}/pens/3
 Content-Type: application/json
 
 {
@@ -94,10 +94,10 @@ Content-Type: application/json
 }
 
 ### Supprimer un enclos
-DELETE {{baseUrl}}/pens/1
+DELETE {{baseUrl}}/pens/5
 
 # ═══════════════════════════════════════════
-# COWS (Vaches)
+# COWS (Vaches) : OK
 # ═══════════════════════════════════════════
 
 ### Liste toutes les vaches
@@ -108,16 +108,16 @@ POST {{baseUrl}}/cows
 Content-Type: application/json
 
 {
-  "officialId": "FR1234567890",
-  "penId": 1,
+  "officialId": "FR-1234567891",
+  "penId": 2,
   "prophylaxis": false
 }
 
-### Détail d'une vache (avec veaux, saillies, commentaires)
-GET {{baseUrl}}/cows/1
+### Détail d'une vache (avec veaux, saillies, notes)
+GET {{baseUrl}}/cows/2
 
 ### Modifier une vache
-PUT {{baseUrl}}/cows/1
+PUT {{baseUrl}}/cows/2
 Content-Type: application/json
 
 {
@@ -125,18 +125,18 @@ Content-Type: application/json
 }
 
 ### Déplacer une vache dans un autre enclos
-PUT {{baseUrl}}/cows/1
+PUT {{baseUrl}}/cows/3
 Content-Type: application/json
 
 {
-  "penId": 2
+  "penId": 1
 }
 
 ### Supprimer une vache
-DELETE {{baseUrl}}/cows/1
+DELETE {{baseUrl}}/cows/4
 
 # ═══════════════════════════════════════════
-# CALVES (Veaux)
+# CALVES (Veaux) : OK
 # ═══════════════════════════════════════════
 
 ### Liste tous les veaux
@@ -156,18 +156,19 @@ Content-Type: application/json
 GET {{baseUrl}}/calves/1
 
 ### Modifier un veau
-PUT {{baseUrl}}/calves/1
+PUT {{baseUrl}}/calves/2
 Content-Type: application/json
 
 {
-  "sex": "M"
+  "sex": "M",
+  "birthDate": "2025-02-01T00:00:00.000Z"
 }
 
 ### Supprimer un veau
-DELETE {{baseUrl}}/calves/1
+DELETE {{baseUrl}}/calves/2
 
 # ═══════════════════════════════════════════
-# BULLS (Taureaux)
+# BULLS (Taureaux) : OK
 # ═══════════════════════════════════════════
 
 ### Liste tous les taureaux
@@ -178,14 +179,14 @@ POST {{baseUrl}}/bulls
 Content-Type: application/json
 
 {
-  "name": "Hercule"
+  "name": "Salamèche"
 }
 
-### Détail d'un taureau (avec saillies et commentaires)
-GET {{baseUrl}}/bulls/1
+### Détail d'un taureau (avec saillies et notes)
+GET {{baseUrl}}/bulls/4
 
 ### Modifier un taureau
-PUT {{baseUrl}}/bulls/1
+PUT {{baseUrl}}/bulls/4
 Content-Type: application/json
 
 {
@@ -193,10 +194,10 @@ Content-Type: application/json
 }
 
 ### Supprimer un taureau
-DELETE {{baseUrl}}/bulls/1
+DELETE {{baseUrl}}/bulls/4
 
 # ═══════════════════════════════════════════
-# BREEDINGS (Saillies)
+# BREEDINGS (Saillies) : OK
 # ═══════════════════════════════════════════
 
 ### Liste toutes les saillies
@@ -207,10 +208,10 @@ POST {{baseUrl}}/breedings
 Content-Type: application/json
 
 {
-  "cowId": 1,
-  "bullId": 1,
+  "cowId": 10,
+  "bullId": 2,
   "date": "2025-03-10T00:00:00.000Z",
-  "isMaybe": false
+  "isMaybe": true
 }
 
 ### Créer une saillie avec taureau inconnu (bullName)
@@ -218,43 +219,46 @@ POST {{baseUrl}}/breedings
 Content-Type: application/json
 
 {
-  "cowId": 2,
+  "cowId": 3,
   "bullName": "Taureau extérieur",
   "isMaybe": true
 }
 
 ### Détail d'une saillie
-GET {{baseUrl}}/breedings/1
+GET {{baseUrl}}/breedings/3
 
 ### Modifier une saillie
-PUT {{baseUrl}}/breedings/1
+PUT {{baseUrl}}/breedings/3
 Content-Type: application/json
 
 {
-  "isMaybe": false
+  "bullId": 1,
+  "bullName": null,
+  "isMaybe": false,
+  "date": "2025-03-15T00:00:00.000Z"
 }
 
 ### Supprimer une saillie
-DELETE {{baseUrl}}/breedings/1
+DELETE {{baseUrl}}/breedings/5
 
 # ═══════════════════════════════════════════
-# COMMENTS (Commentaires)
+# NOTES : OK
 # ═══════════════════════════════════════════
 
-### Liste tous les commentaires
-GET {{baseUrl}}/comments
+### Liste toutes les notes
+GET {{baseUrl}}/notes
 
-### Commenter une vache
-POST {{baseUrl}}/comments
+### Ajouter une note sur une vache
+POST {{baseUrl}}/notes
 Content-Type: application/json
 
 {
   "content": "Vache en bonne santé, vaccination faite",
-  "cowId": 1
+  "cowId": 3
 }
 
-### Commenter un veau
-POST {{baseUrl}}/comments
+### Ajouter une note sur un veau
+POST {{baseUrl}}/notes
 Content-Type: application/json
 
 {
@@ -262,25 +266,25 @@ Content-Type: application/json
   "calfId": 1
 }
 
-### Commenter un taureau
-POST {{baseUrl}}/comments
+### Ajouter une note sur un taureau
+POST {{baseUrl}}/notes
 Content-Type: application/json
 
 {
   "content": "Taureau très actif cette semaine",
-  "bullId": 1
+  "bullId": 2
 }
 
-### Détail d'un commentaire
-GET {{baseUrl}}/comments/1
+### Détail d'une note
+GET {{baseUrl}}/notes/1
 
-### Modifier un commentaire
-PUT {{baseUrl}}/comments/1
+### Modifier une note
+PUT {{baseUrl}}/notes/1
 Content-Type: application/json
 
 {
-  "content": "Commentaire mis à jour"
+  "content": "Note mise à jour"
 }
 
-### Supprimer un commentaire
-DELETE {{baseUrl}}/comments/1
+### Supprimer une note
+DELETE {{baseUrl}}/notes/1

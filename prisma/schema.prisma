@@ -35,7 +35,7 @@ model Cow {
   penId       Int
   pen         Pen        @relation(fields: [penId], references: [id])
   prophylaxis Boolean    @default(false)
-  comments    Comment[]
+  notes       Note[]
   breedings   Breeding[]
   calves      Calf[]
   createdAt   DateTime   @default(now())
@@ -47,13 +47,13 @@ model Calf {
   birthDate  DateTime  @default(now())
   cowId      Int
   cow        Cow       @relation(fields: [cowId], references: [id])
-  comments   Comment[]
+  notes      Note[]
 }
 
 model Bull { 
   id        Int        @id @default(autoincrement())
   name      String     @unique
-  comments  Comment[]  
+  notes     Note[]  
   breedings Breeding[] 
   createdAt DateTime   @default(now())
 }
@@ -69,7 +69,7 @@ model Breeding {
   bullName String? 
 }
 
-model Comment {
+model Note {
   id        Int      @id @default(autoincrement())
   content   String
   createdAt DateTime @default(now())

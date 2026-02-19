@@ -16,12 +16,30 @@ export default defineEventHandler(async event => {
   if (!existing)
     throw createError({ statusCode: 404, message: 'Box/Enclos introuvable' })
 
+  const buildingId = body.buildingId || existing.buildingId
+
   if (body.buildingId) {
     const buildingExists = await prisma.building.findUnique({
       where: { id: body.buildingId },
     })
     if (!buildingExists)
       throw createError({ statusCode: 404, message: 'Bâtiment introuvable' })
+  }
+
+  // Vérifier qu'aucun autre pen n'a le même nom dans ce bâtiment
+  const existingWithSameName = await prisma.pen.findFirst({
+    where: {
+      name: body.name.trim(),
+      buildingId,
+      NOT: { id },
+    },
+  })
+
+  if (existingWithSameName) {
+    throw createError({
+      statusCode: 409,
+      message: `Un enclos avec le nom "${body.name.trim()}" existe déjà dans ce bâtiment`,
+    })
   }
 
   const pen = await prisma.pen.update({

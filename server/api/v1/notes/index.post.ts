@@ -36,7 +36,7 @@ export default defineEventHandler(async event => {
       throw createError({ statusCode: 404, message: 'Taureau introuvable' })
   }
 
-  const comment = await prisma.comment.create({
+  const note = await prisma.note.create({
     data: {
       content: body.content.trim(),
       cowId: body.cowId ?? null,
@@ -47,5 +47,5 @@ export default defineEventHandler(async event => {
   })
 
   setResponseStatus(event, 201)
-  return { success: true, data: comment }
+  return { success: true, data: note }
 })

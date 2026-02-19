@@ -11,7 +11,7 @@ export default defineEventHandler(async event => {
         include: { cow: true },
         orderBy: { date: 'desc' },
       },
-      comments: { orderBy: { createdAt: 'desc' } },
+      notes: { orderBy: { createdAt: 'desc' } },
     },
   })
 

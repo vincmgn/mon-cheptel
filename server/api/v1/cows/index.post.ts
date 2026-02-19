@@ -20,17 +20,29 @@ export default defineEventHandler(async event => {
   if (!penExists)
     throw createError({ statusCode: 404, message: 'Box/Enclos introuvable' })
 
-  const cow = await prisma.cow.create({
-    data: {
-      officialId: body.officialId.trim(),
-      penId: body.penId,
-      prophylaxis: body.prophylaxis ?? false,
-    },
-    include: {
-      pen: { include: { building: { include: { location: true } } } },
-    },
-  })
+  try {
+    const cow = await prisma.cow.create({
+      data: {
+        officialId: body.officialId.trim(),
+        penId: body.penId,
+        prophylaxis: body.prophylaxis ?? false,
+      },
+      include: {
+        pen: { include: { building: { include: { location: true } } } },
+      },
+    })
 
-  setResponseStatus(event, 201)
-  return { success: true, data: cow }
+    setResponseStatus(event, 201)
+    return { success: true, data: cow }
+  }
+  catch (error: any) {
+    // Erreur de contrainte d'unicité Prisma
+    if (error.code === 'P2002') {
+      throw createError({
+        statusCode: 409,
+        message: `Une vache avec l'identifiant "${body.officialId.trim()}" existe déjà`,
+      })
+    }
+    throw error
+  }
 })

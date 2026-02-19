@@ -15,7 +15,7 @@ export default defineEventHandler(async () => {
         calves: '/api/v1/calves',
         bulls: '/api/v1/bulls',
         breedings: '/api/v1/breedings',
-        comments: '/api/v1/comments',
+        notes: '/api/v1/notes',
       },
       timestamp: new Date().toISOString(),
     }
