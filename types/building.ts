@@ -1,5 +1,4 @@
 import type { Location } from './location'
-import type { Pen } from './pen'
 
 // Type de base
 export interface Building {

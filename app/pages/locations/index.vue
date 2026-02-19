@@ -32,7 +32,6 @@ function openDelete(location: Location) {
   deleteTarget.value = location
   isDeleteOpen.value = true
 }
-
 </script>
 
 <template>
@@ -48,9 +47,7 @@ function openDelete(location: Location) {
       <div>
         <h1 class="text-2xl font-bold">Locations</h1>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-          {{ locations.length }} location{{
-            locations.length !== 1 ? 's' : ''
-          }}
+          {{ locations.length }} location{{ locations.length !== 1 ? 's' : '' }}
         </p>
       </div>
     </div>
@@ -108,7 +105,7 @@ function openDelete(location: Location) {
             <UButton
               icon="i-lucide-pencil"
               color="neutral"
-               variant="subtle"
+              variant="subtle"
               size="md"
               aria-label="Modifier"
               @click="openEdit(location)"
@@ -116,7 +113,7 @@ function openDelete(location: Location) {
             <UButton
               icon="i-lucide-trash-2"
               color="error"
-               variant="subtle"
+              variant="subtle"
               size="md"
               aria-label="Supprimer"
               @click="openDelete(location)"
@@ -163,12 +160,26 @@ function openDelete(location: Location) {
     <ButtonNew @click="isCreateOpen = true" />
 
     <!-- Create Modal -->
-    <LocationCreateModal :open="isCreateOpen" @created="refresh" @close="isCreateOpen = false" />
+    <LocationCreateModal
+      :open="isCreateOpen"
+      @created="refresh"
+      @close="isCreateOpen = false"
+    />
 
     <!-- Edit Modal -->
-    <LocationEditModal :open="isEditOpen" :location="editTarget" @updated="refresh" @close="isEditOpen = false" />
+    <LocationEditModal
+      :open="isEditOpen"
+      :location="editTarget"
+      @updated="refresh"
+      @close="isEditOpen = false"
+    />
 
     <!-- Delete Modal -->
-    <LocationDeleteModal :open="isDeleteOpen" :location="deleteTarget" @deleted="refresh" @close="isDeleteOpen = false" />
+    <LocationDeleteModal
+      :open="isDeleteOpen"
+      :location="deleteTarget"
+      @deleted="refresh"
+      @close="isDeleteOpen = false"
+    />
   </UContainer>
 </template>

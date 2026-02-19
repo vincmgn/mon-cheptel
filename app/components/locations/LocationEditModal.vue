@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import type { Location } from '~~/types';
+import type { Location } from '~~/types'
 import { validateLocationName } from '~/utils/validators'
+import { FetchError } from 'ofetch'
 
 const props = defineProps<{
   open: boolean
@@ -8,23 +9,25 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'updated'): void
-  (e: 'close'): void
+  (e: 'updated' | 'close'): void
 }>()
 
 const editState = reactive({ name: '' })
 const isEditing = ref(false)
 const toast = useToast()
 
-watch(() => props.open, (isOpen) => {
-  if (isOpen && props.location) {
-    editState.name = props.location.name
+watch(
+  () => props.open,
+  isOpen => {
+    if (isOpen && props.location) {
+      editState.name = props.location.name
+    }
   }
-})
+)
 
 async function onEditSubmit() {
   if (!props.location) return
-  isEditing.value = true;
+  isEditing.value = true
   try {
     await $fetch(`/api/v1/locations/${props.location.id}`, {
       method: 'PUT',
@@ -32,10 +35,16 @@ async function onEditSubmit() {
     })
     toast.add({ title: 'Location mise à jour', color: 'success' })
     emit('updated')
-  } catch (e: unknown) {
+  } catch (e) {
+    let message = 'Une erreur est survenue'
+    if (e instanceof FetchError) {
+      message = e.data?.message ?? message
+    } else if (e instanceof Error) {
+      message = e.message
+    }
     toast.add({
       title: 'Erreur',
-      description: e.data?.message ?? 'Une erreur est survenue',
+      description: message,
       color: 'error',
     })
   } finally {
@@ -47,9 +56,19 @@ async function onEditSubmit() {
 
 <template>
   <div>
-    <UModal :open="open" title="Modifier la location" @update:open="emit('close')">
+    <UModal
+      :open="open"
+      title="Modifier la location"
+      @update:open="emit('close')"
+    >
       <template #body>
-        <UForm :validate="validateLocationName" :state="editState" :validate-on="[]" class="space-y-4" @submit="onEditSubmit">
+        <UForm
+          :validate="validateLocationName"
+          :state="editState"
+          :validate-on="[]"
+          class="space-y-4"
+          @submit="onEditSubmit"
+        >
           <UFormField label="Nom" name="name" required>
             <UInput v-model="editState.name" class="w-full" />
           </UFormField>

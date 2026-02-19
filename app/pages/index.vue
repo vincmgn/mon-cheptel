@@ -74,7 +74,9 @@ const loading = computed(() => status.value === 'pending')
                 Emplacements géographiques
               </p>
             </div>
-            <div class="p-2.5 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
+            <div
+              class="p-2.5 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center"
+            >
               <UIcon name="i-lucide-map-pin" class="size-6 text-primary" />
             </div>
           </div>
@@ -98,7 +100,9 @@ const loading = computed(() => status.value === 'pending')
               Structures et installations
             </p>
           </div>
-          <div class="p-2.5 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center">
+          <div
+            class="p-2.5 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center"
+          >
             <UIcon name="i-lucide-building-2" class="size-6 text-amber-500" />
           </div>
         </div>
@@ -121,7 +125,9 @@ const loading = computed(() => status.value === 'pending')
               Espaces d'hébergement
             </p>
           </div>
-          <div class="p-2.5 rounded-xl bg-green-500/10 dark:bg-green-500/20 flex items-center justify-center">
+          <div
+            class="p-2.5 rounded-xl bg-green-500/10 dark:bg-green-500/20 flex items-center justify-center"
+          >
             <UIcon name="i-lucide-layout-grid" class="size-6 text-green-500" />
           </div>
         </div>
@@ -144,7 +150,9 @@ const loading = computed(() => status.value === 'pending')
               Femelles reproductrices
             </p>
           </div>
-          <div class="p-2.5 rounded-xl bg-orange-500/10 dark:bg-orange-500/20 flex items-center justify-center">
+          <div
+            class="p-2.5 rounded-xl bg-orange-500/10 dark:bg-orange-500/20 flex items-center justify-center"
+          >
             <UIcon name="i-lucide-beef" class="size-6 text-orange-500" />
           </div>
         </div>
@@ -167,7 +175,9 @@ const loading = computed(() => status.value === 'pending')
               Mâles reproducteurs
             </p>
           </div>
-          <div class="p-2.5 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 flex items-center justify-center">
+          <div
+            class="p-2.5 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 flex items-center justify-center"
+          >
             <UIcon name="i-lucide-shield" class="size-6 text-rose-500" />
           </div>
         </div>
@@ -190,7 +200,9 @@ const loading = computed(() => status.value === 'pending')
               Nouveau-nés du troupeau
             </p>
           </div>
-          <div class="p-2.5 rounded-xl bg-violet-500/10 dark:bg-violet-500/20 flex items-center justify-center">
+          <div
+            class="p-2.5 rounded-xl bg-violet-500/10 dark:bg-violet-500/20 flex items-center justify-center"
+          >
             <UIcon name="i-lucide-baby" class="size-6 text-violet-500" />
           </div>
         </div>
@@ -213,7 +225,9 @@ const loading = computed(() => status.value === 'pending')
               Reproductions enregistrées
             </p>
           </div>
-          <div class="p-2.5 rounded-xl bg-pink-500/10 dark:bg-pink-500/20 flex items-center justify-center">
+          <div
+            class="p-2.5 rounded-xl bg-pink-500/10 dark:bg-pink-500/20 flex items-center justify-center"
+          >
             <UIcon name="i-lucide-heart" class="size-6 text-pink-500" />
           </div>
         </div>
@@ -236,7 +250,9 @@ const loading = computed(() => status.value === 'pending')
               Observations et remarques
             </p>
           </div>
-          <div class="p-2.5 rounded-xl bg-slate-500/10 dark:bg-slate-500/20 flex items-center justify-center">
+          <div
+            class="p-2.5 rounded-xl bg-slate-500/10 dark:bg-slate-500/20 flex items-center justify-center"
+          >
             <UIcon name="i-lucide-sticky-note" class="size-6 text-slate-500" />
           </div>
         </div>

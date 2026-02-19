@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import type { Location } from '~~/types';
+import type { Location } from '~~/types'
+import { FetchError } from 'ofetch'
 
 const props = defineProps<{
   open: boolean
@@ -7,8 +8,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'deleted'): void
-  (e: 'close'): void
+  (e: 'deleted' | 'close'): void
 }>()
 
 const isDeleting = ref(false)
@@ -23,10 +23,16 @@ async function confirmDelete() {
     })
     toast.add({ title: 'Location supprimée', color: 'success' })
     emit('deleted')
-  } catch (e: unknown) {
+  } catch (e) {
+    let message = 'Une erreur est survenue'
+    if (e instanceof FetchError) {
+      message = e.data?.message ?? message
+    } else if (e instanceof Error) {
+      message = e.message
+    }
     toast.add({
       title: 'Impossible de supprimer',
-      description: e.data?.message ?? 'Une erreur est survenue',
+      description: message,
       color: 'error',
     })
   } finally {
@@ -36,10 +42,13 @@ async function confirmDelete() {
 }
 </script>
 
-
 <template>
   <div>
-    <UModal :open="open" title="Supprimer la location" @update:open="emit('close')">
+    <UModal
+      :open="open"
+      title="Supprimer la location"
+      @update:open="emit('close')"
+    >
       <template #body>
         <p class="text-gray-700 dark:text-gray-300">
           Êtes-vous sûr de vouloir supprimer
@@ -61,6 +70,5 @@ async function confirmDelete() {
     </UModal>
   </div>
 </template>
-
 
 <style></style>

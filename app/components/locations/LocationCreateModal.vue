@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { validateLocationName } from '~/utils/validators'
+import { FetchError } from 'ofetch'
 
-const props = defineProps<{
+const _props = defineProps<{
   open: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'created'): void
-  (e: 'close'): void
+  (e: 'created' | 'close'): void
 }>()
 
 const createState = reactive({ name: '' })
@@ -29,10 +29,16 @@ async function onCreateSubmit() {
     toast.add({ title: 'Location créée', color: 'success' })
     emit('created')
     createState.name = ''
-  } catch (e: unknown) {
+  } catch (e) {
+    let message = 'Une erreur est survenue'
+    if (e instanceof FetchError) {
+      message = e.data?.message ?? message
+    } else if (e instanceof Error) {
+      message = e.message
+    }
     toast.add({
       title: 'Erreur',
-      description: e.message ?? 'Une erreur est survenue',
+      description: message,
       color: 'error',
     })
   } finally {
@@ -40,17 +46,31 @@ async function onCreateSubmit() {
     closeModal()
   }
 }
-
 </script>
 
 <template>
   <div>
-    <UModal :open="open" title="Nouvelle location " description="Ajoutez un nouvel emplacement à votre cheptel."
-      @update:open="closeModal">
+    <UModal
+      :open="open"
+      title="Nouvelle location "
+      description="Ajoutez un nouvel emplacement à votre cheptel."
+      @update:open="closeModal"
+    >
       <template #body>
-        <UForm :validate="validateLocationName" :state="createState" :validate-on="[]" class="space-y-4" @submit="onCreateSubmit">
+        <UForm
+          :validate="validateLocationName"
+          :state="createState"
+          :validate-on="[]"
+          class="space-y-4"
+          @submit="onCreateSubmit"
+        >
           <UFormField label="Nom" name="name" required>
-            <UInput v-model="createState.name" placeholder="Ex: Ferme Nord" autofocus class="w-full" />
+            <UInput
+              v-model="createState.name"
+              placeholder="Ex: Ferme Nord"
+              autofocus
+              class="w-full"
+            />
           </UFormField>
           <div class="flex justify-end gap-2 pt-2">
             <UButton color="neutral" variant="outline" @click="closeModal">
