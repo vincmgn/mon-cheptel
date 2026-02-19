@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { getErrorMessage } from '~/utils/error'
 import type { Location } from '~~/types'
 
 const props = defineProps<{

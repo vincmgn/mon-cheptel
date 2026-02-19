@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { getErrorMessage } from '~/utils/error'
 import { validateLocationName } from '~/utils/validators'
 
 const _props = defineProps<{

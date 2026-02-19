@@ -6,7 +6,10 @@ import { FetchError } from 'ofetch'
  * - Error standard JS → utilise e.message
  * - Autre → message de fallback
  */
-export function getErrorMessage(e: unknown, fallback = 'Une erreur est survenue'): string {
+export function getErrorMessage(
+  e: unknown,
+  fallback = 'Une erreur est survenue'
+): string {
   if (e instanceof FetchError) {
     return e.data?.message ?? fallback
   }

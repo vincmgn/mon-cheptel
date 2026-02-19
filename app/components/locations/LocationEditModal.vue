@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { Location } from '~~/types'
 import { validateLocationName } from '~/utils/validators'
+import { getErrorMessage } from '~/utils/error'
 
 const props = defineProps<{
   open: boolean
