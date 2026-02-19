@@ -108,13 +108,13 @@ POST {{baseUrl}}/cows
 Content-Type: application/json
 
 {
-  "officialId": "FR1234567890",
+  "officialId": "FR-1234567890",
   "penId": 1,
   "prophylaxis": false
 }
 
 ### Détail d'une vache (avec veaux, saillies, commentaires)
-GET {{baseUrl}}/cows/1
+GET {{baseUrl}}/cows/2
 
 ### Modifier une vache
 PUT {{baseUrl}}/cows/1
@@ -125,15 +125,15 @@ Content-Type: application/json
 }
 
 ### Déplacer une vache dans un autre enclos
-PUT {{baseUrl}}/cows/1
+PUT {{baseUrl}}/cows/3
 Content-Type: application/json
 
 {
-  "penId": 2
+  "penId": 3
 }
 
 ### Supprimer une vache
-DELETE {{baseUrl}}/cows/1
+DELETE {{baseUrl}}/cows/4
 
 # ═══════════════════════════════════════════
 # CALVES (Veaux)

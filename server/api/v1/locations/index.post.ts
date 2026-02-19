@@ -10,6 +10,17 @@ export default defineEventHandler(async event => {
     })
   }
 
+  const existingLocation = await prisma.location.findFirst({
+    where: { name: body.name.trim() },
+  })
+
+  if (existingLocation) {
+    throw createError({
+      statusCode: 409,
+      message: `Une location avec le nom "${body.name.trim()}" existe déjà`,
+    })
+  }
+
   const location = await prisma.location.create({
     data: { name: body.name.trim() },
   })
