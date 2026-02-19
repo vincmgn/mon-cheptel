@@ -1,10 +1,14 @@
-import type { Note } from './note'
-import type { Breeding } from './breeding'
-
+// Type de base
 export interface Bull {
   id: number
   name: string
-  notes: Note[]
-  breedings: Breeding[]
-  createdAt: Date
+  createdAt: string
+}
+
+// Pour GET /bulls (liste)
+export interface BullWithCount extends Bull {
+  _count: {
+    breedings: number
+    notes: number
+  }
 }
