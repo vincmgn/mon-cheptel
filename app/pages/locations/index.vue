@@ -1,22 +1,11 @@
 <script setup lang="ts">
 import type { FormError } from '@nuxt/ui'
+import type { Location } from '@types/location'
 
-interface Building {
-  id: number
-  name: string
-  locationId: number
-  _count: { pens: number }
-}
-
-interface Location {
-  id: number
-  name: string
-  buildings: Building[]
-}
-
-const { data, refresh, status } = await useFetch<{ success: boolean; data: Location[] }>(
-  '/api/v1/locations',
-)
+const { data, refresh, status } = await useFetch<{
+  success: boolean
+  data: Location[]
+}>('/api/v1/locations')
 const locations = computed(() => data.value?.data ?? [])
 
 const toast = useToast()
@@ -27,7 +16,8 @@ const createState = reactive({ name: '' })
 const isCreating = ref(false)
 
 function validateName(state: { name: string }): FormError[] {
-  if (!state.name.trim()) return [{ name: 'name', message: 'Le nom est requis' }]
+  if (!state.name.trim())
+    return [{ name: 'name', message: 'Le nom est requis' }]
   return []
 }
 
@@ -42,7 +32,7 @@ async function onCreateSubmit() {
     isCreateOpen.value = false
     createState.name = ''
     await refresh()
-  } catch (e: any) {
+  } catch (e: unknown) {
     toast.add({
       title: 'Erreur',
       description: e.data?.message ?? 'Une erreur est survenue',
@@ -76,7 +66,7 @@ async function onEditSubmit() {
     toast.add({ title: 'Location mise à jour', color: 'success' })
     isEditOpen.value = false
     await refresh()
-  } catch (e: any) {
+  } catch (e: unknown) {
     toast.add({
       title: 'Erreur',
       description: e.data?.message ?? 'Une erreur est survenue',
@@ -101,12 +91,14 @@ async function confirmDelete() {
   if (!deleteTarget.value) return
   isDeleting.value = true
   try {
-    await $fetch(`/api/v1/locations/${deleteTarget.value.id}`, { method: 'DELETE' })
+    await $fetch(`/api/v1/locations/${deleteTarget.value.id}`, {
+      method: 'DELETE',
+    })
     toast.add({ title: 'Location supprimée', color: 'success' })
     isDeleteOpen.value = false
     deleteTarget.value = null
     await refresh()
-  } catch (e: any) {
+  } catch (e: unknown) {
     toast.add({
       title: 'Impossible de supprimer',
       description: e.data?.message ?? 'Une erreur est survenue',
@@ -123,21 +115,31 @@ async function confirmDelete() {
     <!-- Header -->
     <div class="flex items-center justify-between mb-8">
       <div class="flex items-center gap-3">
-        <NuxtLink to="/" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+        <NuxtLink
+          to="/"
+          class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+        >
           <UIcon name="i-lucide-arrow-left" class="size-5" />
         </NuxtLink>
         <div>
           <h1 class="text-2xl font-bold">Locations</h1>
           <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            {{ locations.length }} location{{ locations.length !== 1 ? 's' : '' }}
+            {{ locations.length }} location{{
+              locations.length !== 1 ? 's' : ''
+            }}
           </p>
         </div>
       </div>
-      <UButton icon="i-lucide-plus" @click="isCreateOpen = true">Nouvelle location</UButton>
+      <UButton icon="i-lucide-plus" @click="isCreateOpen = true"
+        >Nouvelle location</UButton
+      >
     </div>
 
     <!-- Loading skeletons -->
-    <div v-if="status === 'pending'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div
+      v-if="status === 'pending'"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+    >
       <div
         v-for="i in 3"
         :key="i"
@@ -150,9 +152,14 @@ async function confirmDelete() {
       v-else-if="locations.length === 0"
       class="text-center py-20 text-gray-400 dark:text-gray-500"
     >
-      <UIcon name="i-lucide-map-pin-off" class="size-12 mx-auto mb-4 opacity-50" />
+      <UIcon
+        name="i-lucide-map-pin-off"
+        class="size-12 mx-auto mb-4 opacity-50"
+      />
       <p class="text-lg font-medium">Aucune location</p>
-      <p class="text-sm mt-1">Créez votre premier emplacement pour commencer.</p>
+      <p class="text-sm mt-1">
+        Créez votre premier emplacement pour commencer.
+      </p>
       <UButton class="mt-6" icon="i-lucide-plus" @click="isCreateOpen = true">
         Nouvelle location
       </UButton>
@@ -160,14 +167,22 @@ async function confirmDelete() {
 
     <!-- Card grid -->
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <UCard v-for="location in locations" :key="location.id" class="flex flex-col">
+      <UCard
+        v-for="location in locations"
+        :key="location.id"
+        class="flex flex-col"
+      >
         <!-- Card header -->
         <div class="flex items-start justify-between">
           <div class="flex items-center gap-2 min-w-0">
-            <div class="p-2 rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0">
+            <div
+              class="p-2 rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0"
+            >
               <UIcon name="i-lucide-map-pin" class="size-4 text-primary" />
             </div>
-            <h3 class="font-semibold text-base truncate">{{ location.name }}</h3>
+            <h3 class="font-semibold text-base truncate">
+              {{ location.name }}
+            </h3>
           </div>
           <div class="flex gap-1 ml-2 shrink-0">
             <UButton
@@ -191,7 +206,9 @@ async function confirmDelete() {
 
         <!-- Buildings list -->
         <div class="mt-4 flex-1">
-          <p class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2">
+          <p
+            class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2"
+          >
             {{ location.buildings.length }}
             {{ location.buildings.length !== 1 ? 'bâtiments' : 'bâtiment' }}
           </p>
@@ -201,8 +218,13 @@ async function confirmDelete() {
               :key="building.id"
               class="flex items-center justify-between text-sm"
             >
-              <span class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
-                <UIcon name="i-lucide-building-2" class="size-3.5 text-gray-400 shrink-0" />
+              <span
+                class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300"
+              >
+                <UIcon
+                  name="i-lucide-building-2"
+                  class="size-3.5 text-gray-400 shrink-0"
+                />
                 {{ building.name }}
               </span>
               <UBadge color="neutral" variant="subtle" size="xs">
@@ -239,7 +261,11 @@ async function confirmDelete() {
             />
           </UFormField>
           <div class="flex justify-end gap-2 pt-2">
-            <UButton color="neutral" variant="outline" @click="isCreateOpen = false">
+            <UButton
+              color="neutral"
+              variant="outline"
+              @click="isCreateOpen = false"
+            >
               Annuler
             </UButton>
             <UButton type="submit" :loading="isCreating">Créer</UButton>
@@ -261,7 +287,11 @@ async function confirmDelete() {
             <UInput v-model="editState.name" class="w-full" />
           </UFormField>
           <div class="flex justify-end gap-2 pt-2">
-            <UButton color="neutral" variant="outline" @click="isEditOpen = false">
+            <UButton
+              color="neutral"
+              variant="outline"
+              @click="isEditOpen = false"
+            >
               Annuler
             </UButton>
             <UButton type="submit" :loading="isEditing">Enregistrer</UButton>
@@ -278,11 +308,15 @@ async function confirmDelete() {
           <strong>{{ deleteTarget?.name }}</strong> ?
         </p>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-          Cette action est irréversible. La suppression échouera si des bâtiments sont encore
-          associés à cette location.
+          Cette action est irréversible. La suppression échouera si des
+          bâtiments sont encore associés à cette location.
         </p>
         <div class="flex justify-end gap-2 mt-6">
-          <UButton color="neutral" variant="outline" @click="isDeleteOpen = false">
+          <UButton
+            color="neutral"
+            variant="outline"
+            @click="isDeleteOpen = false"
+          >
             Annuler
           </UButton>
           <UButton color="error" :loading="isDeleting" @click="confirmDelete">
