@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import type { FormError } from '@nuxt/ui'
-import type { Location } from '@types/location'
+import type { Location } from '~/types'
 
-const { data, refresh, status } = await useFetch<{
-  success: boolean
-  data: Location[]
-}>('/api/v1/locations')
+const { data, refresh, status } = await useFetch<{ success: boolean; data: Location[] }>(
+  '/api/v1/locations',
+)
 const locations = computed(() => data.value?.data ?? [])
 
 const toast = useToast()

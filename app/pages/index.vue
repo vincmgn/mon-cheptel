@@ -1,17 +1,9 @@
 <script setup lang="ts">
-interface ApiList<T> {
-  success: boolean
-  data: T[]
-}
-
-interface LocationWithBuildings {
-  id: number
-  buildings: { id: number }[]
-}
+import type { ApiList, Location } from '~/types'
 
 const { data, status } = await useAsyncData('dashboard', () =>
   Promise.all([
-    $fetch<ApiList<LocationWithBuildings>>('/api/v1/locations'),
+    $fetch<ApiList<Location>>('/api/v1/locations'),
     $fetch<ApiList<unknown>>('/api/v1/cows'),
     $fetch<ApiList<unknown>>('/api/v1/calves'),
     $fetch<ApiList<unknown>>('/api/v1/bulls'),
