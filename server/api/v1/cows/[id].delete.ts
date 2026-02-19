@@ -4,7 +4,10 @@ export default defineEventHandler(async event => {
   const id = parseInt(getRouterParam(event, 'id') ?? '')
   if (isNaN(id)) throw createError({ statusCode: 400, message: 'ID invalide' })
 
-  const existing = await prisma.cow.findUnique({ where: { id }, include: { calves: true, breedings: true } })
+  const existing = await prisma.cow.findUnique({
+    where: { id },
+    include: { calves: true, breedings: true },
+  })
   if (!existing)
     throw createError({ statusCode: 404, message: 'Vache introuvable' })
 

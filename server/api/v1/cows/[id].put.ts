@@ -32,10 +32,8 @@ export default defineEventHandler(async event => {
     })
 
     return { success: true, data: cow }
-  }
-  catch (error: any) {
-    // Erreur de contrainte d'unicité Prisma pour officialId
-    if (error.code === 'P2002') {
+  } catch (error: unknown) {
+    if ((error as { code?: string }).code === 'P2002') {
       throw createError({
         statusCode: 409,
         message: `Une vache avec l'identifiant "${body.officialId?.trim()}" existe déjà`,

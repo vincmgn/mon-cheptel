@@ -9,8 +9,7 @@ export default defineEventHandler(async event => {
     include: { cow: true, calf: true, bull: true },
   })
 
-  if (!note)
-    throw createError({ statusCode: 404, message: 'Note introuvable' })
+  if (!note) throw createError({ statusCode: 404, message: 'Note introuvable' })
 
   return { success: true, data: note }
 })

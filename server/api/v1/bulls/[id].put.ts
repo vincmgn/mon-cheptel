@@ -23,10 +23,8 @@ export default defineEventHandler(async event => {
     })
 
     return { success: true, data: bull }
-  }
-  catch (error: any) {
-    // Erreur de contrainte d'unicité Prisma
-    if (error.code === 'P2002') {
+  } catch (error: unknown) {
+    if ((error as { code?: string }).code === 'P2002') {
       throw createError({
         statusCode: 409,
         message: `Un taureau avec le nom "${body.name.trim()}" existe déjà`,
