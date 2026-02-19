@@ -1,7 +1,3 @@
 <script setup lang="ts">
-import HelloWorld from '~/components/hello-world.vue'
+await navigateTo('/locations')
 </script>
-
-<template>
-  <HelloWorld />
-</template>
