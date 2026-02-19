@@ -153,6 +153,13 @@ function openDelete(location: Location) {
             Aucun bâtiment associé
           </p>
         </div>
+        <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+          <NuxtLink :to="`/locations/${location.id}`">
+            <UBadge color="primary" variant="subtle" class="cursor-pointer">
+              Voir les bâtiments →
+            </UBadge>
+          </NuxtLink>
+        </div>
       </UCard>
     </div>
 
