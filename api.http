@@ -53,7 +53,7 @@ Content-Type: application/json
 }
 
 ### Détail d'un bâtiment
-GET {{baseUrl}}/buildings/5
+GET {{baseUrl}}/buildings/2
 
 ### Modifier un bâtiment
 PUT {{baseUrl}}/buildings/5

@@ -16,11 +16,10 @@ export default defineEventHandler(async event => {
   if (!existing)
     throw createError({ statusCode: 404, message: 'Location introuvable' })
 
-  // Vérifier qu'aucune autre location n'a le même nom
   const existingWithSameName = await prisma.location.findFirst({
     where: {
       name: body.name.trim(),
-      NOT: { id }, // Exclure la location actuelle
+      NOT: { id },
     },
   })
 
