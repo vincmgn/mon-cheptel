@@ -15,7 +15,9 @@ const toast = useToast()
 
 watch(
   () => props.open,
-  isOpen => { if (!isOpen) name.value = '' }
+  isOpen => {
+    if (!isOpen) name.value = ''
+  }
 )
 
 async function onSubmit() {
@@ -29,7 +31,11 @@ async function onSubmit() {
     emit('created')
     name.value = ''
   } catch (e) {
-    toast.add({ title: 'Erreur', description: getErrorMessage(e), color: 'error' })
+    toast.add({
+      title: 'Erreur',
+      description: getErrorMessage(e),
+      color: 'error',
+    })
   } finally {
     isCreating.value = false
     emit('close')
@@ -43,11 +49,23 @@ async function onSubmit() {
       <template #body>
         <div class="space-y-4">
           <UFormField label="Nom" required>
-            <UInput v-model="name" placeholder="Ex: Tornado" autofocus class="w-full" />
+            <UInput
+              v-model="name"
+              placeholder="Ex: Tornado"
+              autofocus
+              class="w-full"
+            />
           </UFormField>
           <div class="flex justify-end gap-2 pt-2">
-            <UButton color="neutral" variant="outline" @click="emit('close')">Annuler</UButton>
-            <UButton :loading="isCreating" :disabled="!name.trim()" @click="onSubmit">Créer</UButton>
+            <UButton color="neutral" variant="outline" @click="emit('close')"
+              >Annuler</UButton
+            >
+            <UButton
+              :loading="isCreating"
+              :disabled="!name.trim()"
+              @click="onSubmit"
+              >Créer</UButton
+            >
           </div>
         </div>
       </template>

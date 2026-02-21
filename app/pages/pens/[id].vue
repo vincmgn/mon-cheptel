@@ -38,7 +38,9 @@ function openDelete(cow: Cow) {
       <div class="flex items-end justify-between">
         <CowHeader :pen="pen" />
         <div class="mb-8">
-          <UButton icon="i-lucide-plus" @click="isCreateOpen = true">Ajouter une vache</UButton>
+          <UButton icon="i-lucide-plus" @click="isCreateOpen = true">
+            Nouvelle vache
+          </UButton>
         </div>
       </div>
 
@@ -55,13 +57,17 @@ function openDelete(cow: Cow) {
         <UCard v-for="cow in pen.cows" :key="cow.id" class="flex flex-col">
           <div class="flex items-start justify-between">
             <div class="flex items-center gap-2 min-w-0">
-              <div class="p-2 rounded-lg bg-orange-500/10 dark:bg-orange-500/20 shrink-0 flex items-center justify-center">
+              <div
+                class="p-2 rounded-lg bg-orange-500/10 dark:bg-orange-500/20 shrink-0 flex items-center justify-center">
                 <UIcon name="i-lucide-beef" class="size-5 text-orange-500" />
               </div>
-              <h3 class="font-semibold text-base truncate">🐄 {{ cow.officialId }}</h3>
+              <h3 class="font-semibold text-base truncate">
+                🐄 {{ cow.officialId }}
+              </h3>
             </div>
             <div class="flex gap-1 ml-2 shrink-0">
-              <UButton icon="i-lucide-trash-2" color="error" variant="subtle" size="md" aria-label="Supprimer" @click="openDelete(cow)" />
+              <UButton icon="i-lucide-trash-2" color="error" variant="subtle" size="md" aria-label="Supprimer"
+                @click="openDelete(cow)" />
             </div>
           </div>
           <CowCard :cow="cow" />

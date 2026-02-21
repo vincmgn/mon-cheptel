@@ -22,7 +22,13 @@ defineEmits<{
       <p class="text-xs text-gray-400 mb-0.5">Taureaux</p>
       <div class="flex items-center gap-2">
         <h1 class="text-2xl font-bold">🐂 {{ bull.name }}</h1>
-        <UButton icon="i-lucide-pencil" color="neutral" variant="ghost" size="sm" @click="$emit('edit')" />
+        <UButton
+          icon="i-lucide-pencil"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          @click="$emit('edit')"
+        />
       </div>
     </div>
   </div>

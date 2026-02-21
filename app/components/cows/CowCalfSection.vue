@@ -35,7 +35,11 @@ async function addCalf() {
     isOpen.value = false
     emit('refresh')
   } catch (e) {
-    toast.add({ title: 'Erreur', description: getErrorMessage(e), color: 'error' })
+    toast.add({
+      title: 'Erreur',
+      description: getErrorMessage(e),
+      color: 'error',
+    })
   } finally {
     isAdding.value = false
   }
@@ -50,14 +54,22 @@ async function deleteCalf(id: number) {
     await $fetch(`/api/v1/calves/${id}`, { method: 'DELETE' })
     emit('refresh')
   } catch (e) {
-    toast.add({ title: 'Erreur', description: getErrorMessage(e), color: 'error' })
+    toast.add({
+      title: 'Erreur',
+      description: getErrorMessage(e),
+      color: 'error',
+    })
   } finally {
     isDeletingId.value = null
   }
 }
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })
+  return new Date(dateStr).toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  })
 }
 </script>
 
@@ -65,10 +77,15 @@ function formatDate(dateStr: string) {
   <section>
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg font-semibold">🐃 Veaux</h2>
-      <UButton size="sm" icon="i-lucide-plus" @click="openModal">Ajouter</UButton>
+      <UButton size="sm" icon="i-lucide-plus" @click="openModal"
+        >Ajouter</UButton
+      >
     </div>
 
-    <div v-if="!cow.calves.length" class="text-sm text-gray-400 dark:text-gray-500 italic py-4 text-center">
+    <div
+      v-if="!cow.calves.length"
+      class="text-sm text-gray-400 dark:text-gray-500 italic py-4 text-center"
+    >
       Aucun veau enregistré
     </div>
     <ul v-else class="space-y-2">
@@ -79,12 +96,20 @@ function formatDate(dateStr: string) {
       >
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2">
-            <span class="font-medium text-sm">{{ calf.sex === 'M' ? '♂ Mâle' : '♀ Femelle' }}</span>
-            <UBadge :color="calf.sex === 'M' ? 'primary' : 'error'" variant="subtle" size="sm">
+            <span class="font-medium text-sm">{{
+              calf.sex === 'M' ? '♂ Mâle' : '♀ Femelle'
+            }}</span>
+            <UBadge
+              :color="calf.sex === 'M' ? 'primary' : 'error'"
+              variant="subtle"
+              size="sm"
+            >
               {{ calf.sex }}
             </UBadge>
           </div>
-          <p class="text-xs text-gray-400 mt-0.5">Né(e) le {{ formatDate(calf.birthDate) }}</p>
+          <p class="text-xs text-gray-400 mt-0.5">
+            Né(e) le {{ formatDate(calf.birthDate) }}
+          </p>
         </div>
         <UButton
           icon="i-lucide-trash-2"
@@ -123,7 +148,9 @@ function formatDate(dateStr: string) {
             <UInput v-model="birthDate" type="date" class="w-full" />
           </UFormField>
           <div class="flex justify-end gap-2 pt-2">
-            <UButton color="neutral" variant="outline" @click="isOpen = false">Annuler</UButton>
+            <UButton color="neutral" variant="outline" @click="isOpen = false"
+              >Annuler</UButton
+            >
             <UButton :loading="isAdding" @click="addCalf">Ajouter</UButton>
           </div>
         </div>

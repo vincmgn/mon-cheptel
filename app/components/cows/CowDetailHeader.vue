@@ -22,7 +22,11 @@ async function toggleProphylaxis() {
     })
     emit('refresh')
   } catch (e) {
-    toast.add({ title: 'Erreur', description: getErrorMessage(e), color: 'error' })
+    toast.add({
+      title: 'Erreur',
+      description: getErrorMessage(e),
+      color: 'error',
+    })
   } finally {
     isToggling.value = false
   }
@@ -39,11 +43,17 @@ async function toggleProphylaxis() {
     </NuxtLink>
     <div class="flex-1 min-w-0">
       <p class="text-xs text-gray-400 mb-0.5 truncate">
-        <NuxtLink :to="`/locations/${cow.pen.building.location.id}`" class="hover:underline">
+        <NuxtLink
+          :to="`/locations/${cow.pen.building.location.id}`"
+          class="hover:underline"
+        >
           {{ cow.pen.building.location.name }}
         </NuxtLink>
         ›
-        <NuxtLink :to="`/buildings/${cow.pen.building.id}`" class="hover:underline">
+        <NuxtLink
+          :to="`/buildings/${cow.pen.building.id}`"
+          class="hover:underline"
+        >
           {{ cow.pen.building.name }}
         </NuxtLink>
         ›
@@ -60,7 +70,9 @@ async function toggleProphylaxis() {
           @click="toggleProphylaxis"
         >
           <UIcon
-            :name="cow.prophylaxis ? 'i-lucide-shield-check' : 'i-lucide-shield'"
+            :name="
+              cow.prophylaxis ? 'i-lucide-shield-check' : 'i-lucide-shield'
+            "
             class="size-3 mr-1"
           />
           {{ cow.prophylaxis ? 'Prophylaxie ✓' : 'Prophylaxie' }}

@@ -27,7 +27,11 @@ async function addNote() {
     content.value = ''
     emit('refresh')
   } catch (e) {
-    toast.add({ title: 'Erreur', description: getErrorMessage(e), color: 'error' })
+    toast.add({
+      title: 'Erreur',
+      description: getErrorMessage(e),
+      color: 'error',
+    })
   } finally {
     isAdding.value = false
   }
@@ -39,14 +43,22 @@ async function deleteNote(note: Note) {
     await $fetch(`/api/v1/notes/${note.id}`, { method: 'DELETE' })
     emit('refresh')
   } catch (e) {
-    toast.add({ title: 'Erreur', description: getErrorMessage(e), color: 'error' })
+    toast.add({
+      title: 'Erreur',
+      description: getErrorMessage(e),
+      color: 'error',
+    })
   } finally {
     isDeletingId.value = null
   }
 }
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })
+  return new Date(dateStr).toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  })
 }
 </script>
 
@@ -61,10 +73,18 @@ function formatDate(dateStr: string) {
         class="flex-1"
         @keydown.enter="addNote"
       />
-      <UButton icon="i-lucide-send" :loading="isAdding" :disabled="!content.trim()" @click="addNote" />
+      <UButton
+        icon="i-lucide-send"
+        :loading="isAdding"
+        :disabled="!content.trim()"
+        @click="addNote"
+      />
     </div>
 
-    <div v-if="!notes.length" class="text-sm text-gray-400 dark:text-gray-500 italic py-2">
+    <div
+      v-if="!notes.length"
+      class="text-sm text-gray-400 dark:text-gray-500 italic py-2"
+    >
       Aucun commentaire
     </div>
     <ul v-else class="space-y-2">
@@ -75,7 +95,9 @@ function formatDate(dateStr: string) {
       >
         <div class="flex-1 min-w-0">
           <p class="text-sm">{{ note.content }}</p>
-          <p class="text-xs text-gray-400 mt-1">{{ formatDate(note.createdAt) }}</p>
+          <p class="text-xs text-gray-400 mt-1">
+            {{ formatDate(note.createdAt) }}
+          </p>
         </div>
         <UButton
           icon="i-lucide-trash-2"

@@ -17,7 +17,9 @@ const toast = useToast()
 
 watch(
   () => props.open,
-  isOpen => { if (isOpen && props.pen) name.value = props.pen.name }
+  isOpen => {
+    if (isOpen && props.pen) name.value = props.pen.name
+  }
 )
 
 async function onSubmit() {
@@ -31,7 +33,11 @@ async function onSubmit() {
     toast.add({ title: 'Case modifiée', color: 'success' })
     emit('updated')
   } catch (e) {
-    toast.add({ title: 'Erreur', description: getErrorMessage(e), color: 'error' })
+    toast.add({
+      title: 'Erreur',
+      description: getErrorMessage(e),
+      color: 'error',
+    })
   } finally {
     isEditing.value = false
     emit('close')
@@ -48,8 +54,15 @@ async function onSubmit() {
             <UInput v-model="name" class="w-full" />
           </UFormField>
           <div class="flex justify-end gap-2 pt-2">
-            <UButton color="neutral" variant="outline" @click="emit('close')">Annuler</UButton>
-            <UButton :loading="isEditing" :disabled="!name.trim()" @click="onSubmit">Enregistrer</UButton>
+            <UButton color="neutral" variant="outline" @click="emit('close')"
+              >Annuler</UButton
+            >
+            <UButton
+              :loading="isEditing"
+              :disabled="!name.trim()"
+              @click="onSubmit"
+              >Enregistrer</UButton
+            >
           </div>
         </div>
       </template>

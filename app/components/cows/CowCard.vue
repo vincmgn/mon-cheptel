@@ -21,7 +21,9 @@ defineEmits<{
         {{ cow._count.calves }} veau{{ cow._count.calves !== 1 ? 'x' : '' }}
       </UBadge>
       <UBadge color="neutral" variant="subtle">
-        {{ cow._count.breedings }} saillie{{ cow._count.breedings !== 1 ? 's' : '' }}
+        {{ cow._count.breedings }} saillie{{
+          cow._count.breedings !== 1 ? 's' : ''
+        }}
       </UBadge>
     </div>
     <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">

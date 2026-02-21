@@ -22,7 +22,11 @@ async function confirmDelete() {
     toast.add({ title: 'Vache supprimée', color: 'success' })
     emit('deleted')
   } catch (e) {
-    toast.add({ title: 'Impossible de supprimer', description: getErrorMessage(e), color: 'error' })
+    toast.add({
+      title: 'Impossible de supprimer',
+      description: getErrorMessage(e),
+      color: 'error',
+    })
   } finally {
     isDeleting.value = false
     emit('close')
@@ -32,17 +36,26 @@ async function confirmDelete() {
 
 <template>
   <div>
-    <UModal :open="open" title="Supprimer la vache" @update:open="emit('close')">
+    <UModal
+      :open="open"
+      title="Supprimer la vache"
+      @update:open="emit('close')"
+    >
       <template #body>
         <p class="text-gray-700 dark:text-gray-300">
-          Êtes-vous sûr de vouloir supprimer <strong>{{ cow?.officialId }}</strong> ?
+          Êtes-vous sûr de vouloir supprimer
+          <strong>{{ cow?.officialId }}</strong> ?
         </p>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
           Supprimez d'abord ses saillies et veaux depuis la fiche vache.
         </p>
         <div class="flex justify-end gap-2 mt-6">
-          <UButton color="neutral" variant="outline" @click="emit('close')">Annuler</UButton>
-          <UButton color="error" :loading="isDeleting" @click="confirmDelete">Supprimer</UButton>
+          <UButton color="neutral" variant="outline" @click="emit('close')"
+            >Annuler</UButton
+          >
+          <UButton color="error" :loading="isDeleting" @click="confirmDelete"
+            >Supprimer</UButton
+          >
         </div>
       </template>
     </UModal>

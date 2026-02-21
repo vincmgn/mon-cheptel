@@ -16,7 +16,10 @@ defineProps<{
     </NuxtLink>
     <div>
       <p class="text-xs text-gray-400 mb-0.5">
-        <NuxtLink :to="`/locations/${pen.building.location.id}`" class="hover:underline">
+        <NuxtLink
+          :to="`/locations/${pen.building.location.id}`"
+          class="hover:underline"
+        >
           {{ pen.building.location.name }}
         </NuxtLink>
         ›

@@ -9,6 +9,12 @@ export interface ApiList<T = unknown> extends ApiResponse<T[]> {
   data: T[]
 }
 
+export interface Stats {
+  cows: number
+  calves: number
+  bulls: number
+}
+
 export * from './location'
 export * from './building'
 export * from './pen'

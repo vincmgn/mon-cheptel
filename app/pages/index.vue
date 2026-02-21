@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { ApiList, ApiResponse } from '~~/types'
+import Hero from '~/components/index/Hero.vue'
+import type { ApiList, ApiResponse, Stats } from '~~/types'
 
 const { data: statsData } = await useAsyncData('dashboard-stats', () =>
   Promise.all([
@@ -22,11 +23,35 @@ const stats = computed(() => {
 // Search
 const searchQuery = ref('')
 const searchResults = ref<{
-  cows: Array<{ id: number; officialId: string; pen: { building: { location: { id: number; name: string }; id: number; name: string }; id: number; name: string } }>
+  cows: Array<{
+    id: number
+    officialId: string
+    pen: {
+      building: {
+        location: { id: number; name: string }
+        id: number
+        name: string
+      }
+      id: number
+      name: string
+    }
+  }>
   bulls: Array<{ id: number; name: string }>
   locations: Array<{ id: number; name: string }>
-  buildings: Array<{ id: number; name: string; location: { id: number; name: string } }>
-  pens: Array<{ id: number; name: string; building: { id: number; name: string; location: { id: number; name: string } } }>
+  buildings: Array<{
+    id: number
+    name: string
+    location: { id: number; name: string }
+  }>
+  pens: Array<{
+    id: number
+    name: string
+    building: {
+      id: number
+      name: string
+      location: { id: number; name: string }
+    }
+  }>
 } | null>(null)
 const isSearching = ref(false)
 let searchTimer: ReturnType<typeof setTimeout> | null = null
@@ -40,7 +65,9 @@ watch(searchQuery, q => {
   searchTimer = setTimeout(async () => {
     isSearching.value = true
     try {
-      const res = await $fetch<ApiResponse<typeof searchResults.value>>(`/api/v1/search?q=${encodeURIComponent(q.trim())}`)
+      const res = await $fetch<ApiResponse<typeof searchResults.value>>(
+        `/api/v1/search?q=${encodeURIComponent(q.trim())}`
+      )
       searchResults.value = res.data ?? null
     } finally {
       isSearching.value = false
@@ -51,7 +78,14 @@ watch(searchQuery, q => {
 const hasResults = computed(() => {
   if (!searchResults.value) return false
   const r = searchResults.value
-  return r.cows.length + r.bulls.length + r.locations.length + r.buildings.length + r.pens.length > 0
+  return (
+    r.cows.length +
+      r.bulls.length +
+      r.locations.length +
+      r.buildings.length +
+      r.pens.length >
+    0
+  )
 })
 
 function clearSearch() {
@@ -63,12 +97,7 @@ function clearSearch() {
 <template>
   <UContainer class="py-16 max-w-2xl">
     <!-- Hero -->
-    <div class="text-center mb-12">
-      <h1 class="text-4xl font-bold mb-2">Mon Cheptel</h1>
-      <p class="text-gray-500 dark:text-gray-400">
-        {{ stats.cows }} vaches · {{ stats.calves }} veaux · {{ stats.bulls }} taureaux
-      </p>
-    </div>
+    <Hero :stats="stats" />
 
     <!-- Search bar -->
     <div class="relative mb-10">
@@ -97,17 +126,29 @@ function clearSearch() {
         class="absolute top-full left-0 right-0 mt-1 z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden"
       >
         <div v-if="isSearching" class="p-4 text-center text-gray-400 text-sm">
-          <UIcon name="i-lucide-loader-circle" class="size-4 animate-spin inline mr-2" />
+          <UIcon
+            name="i-lucide-loader-circle"
+            class="size-4 animate-spin inline mr-2"
+          />
           Recherche…
         </div>
-        <div v-else-if="!hasResults" class="p-4 text-center text-gray-400 text-sm">
+        <div
+          v-else-if="!hasResults"
+          class="p-4 text-center text-gray-400 text-sm"
+        >
           Aucun résultat pour « {{ searchQuery }} »
         </div>
-        <div v-else class="divide-y divide-gray-100 dark:divide-gray-800 max-h-80 overflow-y-auto">
+        <div
+          v-else
+          class="divide-y divide-gray-100 dark:divide-gray-800 max-h-80 overflow-y-auto"
+        >
           <!-- Vaches -->
           <template v-if="searchResults?.cows.length">
             <div class="px-3 pt-2 pb-1">
-              <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Vaches</span>
+              <span
+                class="text-xs font-semibold text-gray-400 uppercase tracking-wide"
+                >Vaches</span
+              >
             </div>
             <NuxtLink
               v-for="cow in searchResults.cows"
@@ -116,11 +157,15 @@ function clearSearch() {
               class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               @click="clearSearch"
             >
-              <UIcon name="i-lucide-beef" class="size-4 text-orange-500 shrink-0" />
+              <UIcon
+                name="i-lucide-beef"
+                class="size-4 text-orange-500 shrink-0"
+              />
               <div class="min-w-0">
                 <p class="font-medium text-sm">🐄 {{ cow.officialId }}</p>
                 <p class="text-xs text-gray-400 truncate">
-                  {{ cow.pen.building.location.name }} › {{ cow.pen.building.name }} › {{ cow.pen.name }}
+                  {{ cow.pen.building.location.name }} ›
+                  {{ cow.pen.building.name }} › {{ cow.pen.name }}
                 </p>
               </div>
             </NuxtLink>
@@ -129,7 +174,10 @@ function clearSearch() {
           <!-- Taureaux -->
           <template v-if="searchResults?.bulls.length">
             <div class="px-3 pt-2 pb-1">
-              <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Taureaux</span>
+              <span
+                class="text-xs font-semibold text-gray-400 uppercase tracking-wide"
+                >Taureaux</span
+              >
             </div>
             <NuxtLink
               v-for="bull in searchResults.bulls"
@@ -138,7 +186,10 @@ function clearSearch() {
               class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               @click="clearSearch"
             >
-              <UIcon name="i-lucide-shield" class="size-4 text-rose-500 shrink-0" />
+              <UIcon
+                name="i-lucide-shield"
+                class="size-4 text-rose-500 shrink-0"
+              />
               <p class="font-medium text-sm">🐂 {{ bull.name }}</p>
             </NuxtLink>
           </template>
@@ -146,7 +197,10 @@ function clearSearch() {
           <!-- Lieux -->
           <template v-if="searchResults?.locations.length">
             <div class="px-3 pt-2 pb-1">
-              <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Lieux</span>
+              <span
+                class="text-xs font-semibold text-gray-400 uppercase tracking-wide"
+                >Lieux</span
+              >
             </div>
             <NuxtLink
               v-for="loc in searchResults.locations"
@@ -155,7 +209,10 @@ function clearSearch() {
               class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               @click="clearSearch"
             >
-              <UIcon name="i-lucide-map-pin" class="size-4 text-primary shrink-0" />
+              <UIcon
+                name="i-lucide-map-pin"
+                class="size-4 text-primary shrink-0"
+              />
               <p class="font-medium text-sm">{{ loc.name }}</p>
             </NuxtLink>
           </template>
@@ -163,7 +220,10 @@ function clearSearch() {
           <!-- Bâtiments -->
           <template v-if="searchResults?.buildings.length">
             <div class="px-3 pt-2 pb-1">
-              <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Bâtiments</span>
+              <span
+                class="text-xs font-semibold text-gray-400 uppercase tracking-wide"
+                >Bâtiments</span
+              >
             </div>
             <NuxtLink
               v-for="building in searchResults.buildings"
@@ -172,10 +232,15 @@ function clearSearch() {
               class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               @click="clearSearch"
             >
-              <UIcon name="i-lucide-building-2" class="size-4 text-amber-500 shrink-0" />
+              <UIcon
+                name="i-lucide-building-2"
+                class="size-4 text-amber-500 shrink-0"
+              />
               <div class="min-w-0">
                 <p class="font-medium text-sm">{{ building.name }}</p>
-                <p class="text-xs text-gray-400">{{ building.location.name }}</p>
+                <p class="text-xs text-gray-400">
+                  {{ building.location.name }}
+                </p>
               </div>
             </NuxtLink>
           </template>
@@ -183,7 +248,10 @@ function clearSearch() {
           <!-- Cases -->
           <template v-if="searchResults?.pens.length">
             <div class="px-3 pt-2 pb-1">
-              <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Cases</span>
+              <span
+                class="text-xs font-semibold text-gray-400 uppercase tracking-wide"
+                >Cases</span
+              >
             </div>
             <NuxtLink
               v-for="pen in searchResults.pens"
@@ -192,10 +260,15 @@ function clearSearch() {
               class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               @click="clearSearch"
             >
-              <UIcon name="i-lucide-layout-grid" class="size-4 text-green-500 shrink-0" />
+              <UIcon
+                name="i-lucide-layout-grid"
+                class="size-4 text-green-500 shrink-0"
+              />
               <div class="min-w-0">
                 <p class="font-medium text-sm">{{ pen.name }}</p>
-                <p class="text-xs text-gray-400">{{ pen.building.location.name }} › {{ pen.building.name }}</p>
+                <p class="text-xs text-gray-400">
+                  {{ pen.building.location.name }} › {{ pen.building.name }}
+                </p>
               </div>
             </NuxtLink>
           </template>
@@ -206,7 +279,9 @@ function clearSearch() {
     <!-- Main entry cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <NuxtLink to="/locations" class="group">
-        <UCard class="h-full transition-all group-hover:shadow-md cursor-pointer">
+        <UCard
+          class="h-full transition-all group-hover:shadow-md cursor-pointer"
+        >
           <div class="flex items-center gap-4">
             <div class="p-3 rounded-xl bg-primary/10 dark:bg-primary/20">
               <UIcon name="i-lucide-map-pin" class="size-8 text-primary" />
@@ -225,7 +300,9 @@ function clearSearch() {
       </NuxtLink>
 
       <NuxtLink to="/bulls" class="group">
-        <UCard class="h-full transition-all group-hover:shadow-md cursor-pointer">
+        <UCard
+          class="h-full transition-all group-hover:shadow-md cursor-pointer"
+        >
           <div class="flex items-center gap-4">
             <div class="p-3 rounded-xl bg-rose-500/10 dark:bg-rose-500/20">
               <UIcon name="i-lucide-shield" class="size-8 text-rose-500" />

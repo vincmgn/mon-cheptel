@@ -31,7 +31,11 @@ function openEdit() {
 <template>
   <UContainer class="py-10 max-w-3xl">
     <div v-if="status === 'pending'" class="space-y-4">
-      <div v-for="i in 3" :key="i" class="h-24 rounded-xl animate-pulse bg-gray-100 dark:bg-gray-800" />
+      <div
+        v-for="i in 3"
+        :key="i"
+        class="h-24 rounded-xl animate-pulse bg-gray-100 dark:bg-gray-800"
+      />
     </div>
 
     <template v-else-if="bull">
@@ -39,10 +43,19 @@ function openEdit() {
 
       <div class="space-y-10">
         <BullBreedingHistory :breedings="bull.breedings" />
-        <BullNoteSection :notes="bull.notes" :bull-id="bull.id" @refresh="refresh" />
+        <BullNoteSection
+          :notes="bull.notes"
+          :bull-id="bull.id"
+          @refresh="refresh"
+        />
       </div>
     </template>
 
-    <BullEditModal :open="isEditOpen" :bull="editTarget" @updated="refresh" @close="isEditOpen = false" />
+    <BullEditModal
+      :open="isEditOpen"
+      :bull="editTarget"
+      @updated="refresh"
+      @close="isEditOpen = false"
+    />
   </UContainer>
 </template>

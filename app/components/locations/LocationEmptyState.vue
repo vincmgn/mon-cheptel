@@ -7,7 +7,10 @@ defineEmits<{
 <template>
   <div>
     <div class="text-center py-20 text-gray-400 dark:text-gray-500">
-      <UIcon name="i-lucide-map-pin-off" class="size-12 mx-auto mb-4 opacity-50" />
+      <UIcon
+        name="i-lucide-map-pin-off"
+        class="size-12 mx-auto mb-4 opacity-50"
+      />
       <p class="text-lg font-medium">Aucune location</p>
       <p class="text-sm mt-1">
         Créez votre premier emplacement pour commencer.
@@ -18,4 +21,3 @@ defineEmits<{
     </div>
   </div>
 </template>
-

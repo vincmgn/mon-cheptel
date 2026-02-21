@@ -17,7 +17,9 @@ defineProps<{
     <div>
       <h1 class="text-2xl font-bold">{{ location.name }}</h1>
       <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-        {{ location.buildings.length }} bâtiment{{ location.buildings.length !== 1 ? 's' : '' }}
+        {{ location.buildings.length }} bâtiment{{
+          location.buildings.length !== 1 ? 's' : ''
+        }}
       </p>
     </div>
   </div>

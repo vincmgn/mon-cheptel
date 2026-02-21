@@ -6,7 +6,11 @@ defineProps<{
 }>()
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })
+  return new Date(dateStr).toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  })
 }
 </script>
 
@@ -14,7 +18,10 @@ function formatDate(dateStr: string) {
   <section>
     <h2 class="text-lg font-semibold mb-4">📅 Historique des saillies</h2>
 
-    <div v-if="!breedings.length" class="text-sm text-gray-400 dark:text-gray-500 italic py-4 text-center">
+    <div
+      v-if="!breedings.length"
+      class="text-sm text-gray-400 dark:text-gray-500 italic py-4 text-center"
+    >
       Aucune saillie enregistrée
     </div>
     <ul v-else class="space-y-2">
@@ -27,15 +34,25 @@ function formatDate(dateStr: string) {
           <div class="flex items-center gap-2 flex-wrap">
             <span class="font-medium text-sm">
               🐄
-              <NuxtLink :to="`/cows/${breeding.cow.id}`" class="hover:underline">
+              <NuxtLink
+                :to="`/cows/${breeding.cow.id}`"
+                class="hover:underline"
+              >
                 {{ breeding.cow.officialId }}
               </NuxtLink>
             </span>
-            <UBadge v-if="breeding.isMaybe" color="warning" variant="subtle" size="sm">
+            <UBadge
+              v-if="breeding.isMaybe"
+              color="warning"
+              variant="subtle"
+              size="sm"
+            >
               Peut-être ?
             </UBadge>
           </div>
-          <p class="text-xs text-gray-400 mt-0.5">{{ formatDate(breeding.date) }}</p>
+          <p class="text-xs text-gray-400 mt-0.5">
+            {{ formatDate(breeding.date) }}
+          </p>
         </div>
       </li>
     </ul>

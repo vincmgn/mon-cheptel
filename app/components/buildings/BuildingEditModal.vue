@@ -17,7 +17,9 @@ const toast = useToast()
 
 watch(
   () => props.open,
-  isOpen => { if (isOpen && props.building) name.value = props.building.name }
+  isOpen => {
+    if (isOpen && props.building) name.value = props.building.name
+  }
 )
 
 async function onSubmit() {
@@ -31,7 +33,11 @@ async function onSubmit() {
     toast.add({ title: 'Bâtiment modifié', color: 'success' })
     emit('updated')
   } catch (e) {
-    toast.add({ title: 'Erreur', description: getErrorMessage(e), color: 'error' })
+    toast.add({
+      title: 'Erreur',
+      description: getErrorMessage(e),
+      color: 'error',
+    })
   } finally {
     isEditing.value = false
     emit('close')
@@ -41,15 +47,26 @@ async function onSubmit() {
 
 <template>
   <div>
-    <UModal :open="open" title="Modifier le bâtiment" @update:open="emit('close')">
+    <UModal
+      :open="open"
+      title="Modifier le bâtiment"
+      @update:open="emit('close')"
+    >
       <template #body>
         <div class="space-y-4">
           <UFormField label="Nom" required>
             <UInput v-model="name" class="w-full" />
           </UFormField>
           <div class="flex justify-end gap-2 pt-2">
-            <UButton color="neutral" variant="outline" @click="emit('close')">Annuler</UButton>
-            <UButton :loading="isEditing" :disabled="!name.trim()" @click="onSubmit">Enregistrer</UButton>
+            <UButton color="neutral" variant="outline" @click="emit('close')"
+              >Annuler</UButton
+            >
+            <UButton
+              :loading="isEditing"
+              :disabled="!name.trim()"
+              @click="onSubmit"
+              >Enregistrer</UButton
+            >
           </div>
         </div>
       </template>

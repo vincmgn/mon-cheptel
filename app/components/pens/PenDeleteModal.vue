@@ -22,7 +22,11 @@ async function confirmDelete() {
     toast.add({ title: 'Case supprimée', color: 'success' })
     emit('deleted')
   } catch (e) {
-    toast.add({ title: 'Impossible de supprimer', description: getErrorMessage(e), color: 'error' })
+    toast.add({
+      title: 'Impossible de supprimer',
+      description: getErrorMessage(e),
+      color: 'error',
+    })
   } finally {
     isDeleting.value = false
     emit('close')
@@ -41,8 +45,12 @@ async function confirmDelete() {
           La suppression échouera si des vaches sont encore dans cette case.
         </p>
         <div class="flex justify-end gap-2 mt-6">
-          <UButton color="neutral" variant="outline" @click="emit('close')">Annuler</UButton>
-          <UButton color="error" :loading="isDeleting" @click="confirmDelete">Supprimer</UButton>
+          <UButton color="neutral" variant="outline" @click="emit('close')"
+            >Annuler</UButton
+          >
+          <UButton color="error" :loading="isDeleting" @click="confirmDelete"
+            >Supprimer</UButton
+          >
         </div>
       </template>
     </UModal>

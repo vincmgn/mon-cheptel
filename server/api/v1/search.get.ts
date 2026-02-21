@@ -51,5 +51,8 @@ export default defineEventHandler(async event => {
     }),
   ])
 
-  return { success: true, data: { cows, bulls, locations, buildings, pens, calves } }
+  return {
+    success: true,
+    data: { cows, bulls, locations, buildings, pens, calves },
+  }
 })
