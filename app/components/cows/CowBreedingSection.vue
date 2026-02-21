@@ -17,7 +17,7 @@ const toast = useToast()
 const isOpen = ref(false)
 const date = ref(new Date().toISOString().split('T')[0])
 const bullType = ref<'existing' | 'external'>('existing')
-const bullId = ref<number | null>(null)
+const bullId = ref<number | undefined>(undefined)
 const bullName = ref('')
 const isMaybe = ref(false)
 const isAdding = ref(false)
@@ -29,7 +29,7 @@ const bullOptions = computed(() =>
 function openModal() {
   date.value = new Date().toISOString().split('T')[0]
   bullType.value = 'existing'
-  bullId.value = props.bulls[0]?.id ?? null
+  bullId.value = props.bulls[0]?.id
   bullName.value = ''
   isMaybe.value = false
   isOpen.value = true

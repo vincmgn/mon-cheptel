@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import type { Stats } from '~~/types';
+import type { Stats } from '~~/types'
 
 const props = defineProps<{
   stats: Stats
 }>()
-
 </script>
 
 <template>
@@ -12,8 +11,8 @@ const props = defineProps<{
     <div class="text-center mb-12">
       <h1 class="text-4xl font-bold mb-2">Mon Cheptel</h1>
       <p class="text-gray-500 dark:text-gray-400">
-        {{ stats.cows }} vaches · {{ stats.calves }} veaux ·
-        {{ stats.bulls }} taureaux
+        {{ props.stats.cows }} vaches · {{ props.stats.calves }} veaux ·
+        {{ props.stats.bulls }} taureaux
       </p>
     </div>
   </div>
