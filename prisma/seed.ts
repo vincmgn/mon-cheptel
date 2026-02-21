@@ -5,15 +5,8 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('Start seeding ...')
 
-  // Nettoyage de la base de données (ordre inverse des dépendances)
-  await prisma.comment.deleteMany()
-  await prisma.breeding.deleteMany()
-  await prisma.calf.deleteMany()
-  await prisma.cow.deleteMany()
-  await prisma.bull.deleteMany()
-  await prisma.pen.deleteMany()
-  await prisma.building.deleteMany()
-  await prisma.location.deleteMany()
+  // Nettoyage de la base de données + reset des séquences d'IDs
+  await prisma.$executeRaw`TRUNCATE TABLE "Note", "Breeding", "Calf", "Cow", "Bull", "Pen", "Building", "Location" RESTART IDENTITY CASCADE`
 
   console.log('Database cleaned.')
 
@@ -80,7 +73,7 @@ async function main() {
       officialId: 'FR-1234567890',
       penId: pen1.id,
       prophylaxis: true,
-      comments: {
+      notes: {
         create: {
           content: 'Vache très docile.',
         },
@@ -128,7 +121,7 @@ async function main() {
       sex: 'F',
       birthDate: new Date('2024-12-25'),
       cowId: cowRosie.id,
-      comments: {
+      notes: {
         create: {
           content: 'Né à Noël, en bonne santé.',
         },

@@ -8,7 +8,14 @@ export default defineEventHandler(async () => {
       db: 'up',
       version: 'v1',
       endpoints: {
-        // docs: '/api/docs',
+        locations: '/api/v1/locations',
+        buildings: '/api/v1/buildings',
+        pens: '/api/v1/pens',
+        cows: '/api/v1/cows',
+        calves: '/api/v1/calves',
+        bulls: '/api/v1/bulls',
+        breedings: '/api/v1/breedings',
+        notes: '/api/v1/notes',
       },
       timestamp: new Date().toISOString(),
     }
@@ -17,9 +24,7 @@ export default defineEventHandler(async () => {
       ok: false,
       db: 'error',
       message: error instanceof Error ? error.message : 'Erreur DB',
-      endpoints: {
-        // docs: '/api/docs',
-      },
+      endpoints: {},
       timestamp: new Date().toISOString(),
     }
   }
