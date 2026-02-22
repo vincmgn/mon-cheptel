@@ -57,32 +57,37 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <div
-    class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4"
-  >
-    <div class="w-full max-w-sm">
-      <HeadApp />
+  <div class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950 px-4">
+    <div class="flex-1 flex items-center justify-center">
+      <div class="w-full max-w-sm">
+        <HeadApp />
 
-      <UAuthForm
-        :key="formKey"
-        title="Connexion"
-        :fields="fields"
-        :schema="schema"
-        :submit="{ label: 'Se connecter' }"
-        @submit="onSubmit"
-      >
-        <template #description>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            Pas encore de compte ?
-            <NuxtLink
-              to="/register"
-              class="text-primary font-medium hover:underline"
-            >
-              Créer un compte
-            </NuxtLink>
-          </p>
-        </template>
-      </UAuthForm>
+        <UAuthForm
+          :key="formKey"
+          title="Connexion"
+          :fields="fields"
+          :schema="schema"
+          :submit="{ label: 'Se connecter' }"
+          @submit="onSubmit"
+        >
+          <template #description>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Pas encore de compte ?
+              <NuxtLink
+                to="/register"
+                class="text-primary font-medium hover:underline"
+              >
+                Créer un compte
+              </NuxtLink>
+            </p>
+          </template>
+        </UAuthForm>
+      </div>
     </div>
+    <footer
+      class="py-6 flex items-center justify-center border-t border-gray-200 dark:border-gray-800"
+    >
+      <SharedThemeSwitcher />
+    </footer>
   </div>
 </template>

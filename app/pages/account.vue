@@ -21,9 +21,9 @@ const { user } = useUserSession()
     </div>
 
     <div class="flex flex-col gap-6">
-      <AccountThemeCard />
       <AccountFarmNameCard />
       <AccountPasswordCard />
+      <AccountThemeCard />
     </div>
   </UContainer>
 </template>

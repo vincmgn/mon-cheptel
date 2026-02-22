@@ -45,7 +45,6 @@ async function logout() {
         </h2>
       </div>
       <div class="flex items-center gap-2">
-        <SharedThemeSwitcher />
         <UDropdownMenu
           :items="[
             [
