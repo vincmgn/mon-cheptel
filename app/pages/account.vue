@@ -116,7 +116,7 @@ async function updatePassword() {
         </template>
 
         <form class="flex flex-col gap-4" @submit.prevent="updateFarmName">
-          <UFormField label="Nom de l'exploitation" :error="farmNameError">
+          <UFormField label="Nom de l'exploitation" :error="farmNameError || undefined">
             <UInput
               v-model="farmName"
               placeholder="Mon exploitation"
@@ -151,7 +151,7 @@ async function updatePassword() {
         </template>
 
         <form class="flex flex-col gap-4" @submit.prevent="updatePassword">
-          <UFormField label="Mot de passe actuel" :error="passwordError">
+          <UFormField label="Mot de passe actuel" :error="passwordError || undefined">
             <UInput
               v-model="currentPassword"
               type="password"
@@ -164,7 +164,7 @@ async function updatePassword() {
 
           <UFormField
             label="Nouveau mot de passe"
-            :error="passwordTooShort ? 'Minimum 8 caractères' : ''"
+            :error="passwordTooShort ? 'Minimum 8 caractères' : undefined"
           >
             <UInput
               v-model="newPassword"
@@ -178,9 +178,7 @@ async function updatePassword() {
 
           <UFormField
             label="Confirmer le nouveau mot de passe"
-            :error="
-              passwordMismatch ? 'Les mots de passe ne correspondent pas' : ''
-            "
+            :error="passwordMismatch ? 'Les mots de passe ne correspondent pas' : undefined"
           >
             <UInput
               v-model="confirmPassword"
