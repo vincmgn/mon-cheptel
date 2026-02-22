@@ -4,8 +4,12 @@ import { z } from 'zod'
 definePageMeta({ layout: false })
 
 const schema = z.object({
-  username: z.string().min(4, 'Au moins 4 caractères'),
-  password: z.string().min(4, 'Au moins 4 caractères'),
+  username: z.coerce
+    .string()
+    .refine(val => val === '' || val.length >= 4, 'Au moins 4 caractères'),
+  password: z.coerce
+    .string()
+    .refine(val => val === '' || val.length >= 4, 'Au moins 4 caractères'),
 })
 
 const fields = [

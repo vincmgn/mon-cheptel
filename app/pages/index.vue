@@ -47,14 +47,21 @@ async function logout() {
       <UDropdownMenu
         :items="[
           [{ label: 'Mon compte', icon: 'i-lucide-settings', to: '/account' }],
-          [{ label: 'Déconnexion', icon: 'i-lucide-log-out', color: 'error', onSelect: logout }],
+          [
+            {
+              label: 'Déconnexion',
+              icon: 'i-lucide-log-out',
+              color: 'error',
+              onSelect: logout,
+            },
+          ],
         ]"
       >
         <UButton
           icon="i-lucide-user"
           color="neutral"
-          variant="ghost"
-          size="sm"
+          variant="outline"
+          size="md"
         />
       </UDropdownMenu>
     </div>

@@ -21,9 +21,12 @@ async function updateFarmName() {
     })
     await refreshSession()
     toast.add({ title: "Nom d'exploitation mis à jour", color: 'success' })
-  } catch (err: any) {
-    farmNameError.value = err?.data?.message ?? 'Une erreur est survenue'
-  } finally {
+  } catch (e) {
+    toast.add({
+      title: "Erreur lors de la mise à jour du nom d'exploitation",
+      description: getErrorMessage(e),
+      color: 'error',
+    })
     farmNameLoading.value = false
   }
 }
@@ -36,7 +39,9 @@ const passwordLoading = ref(false)
 const passwordError = ref('')
 
 const passwordMismatch = computed(
-  () => confirmPassword.value.length > 0 && newPassword.value !== confirmPassword.value
+  () =>
+    confirmPassword.value.length > 0 &&
+    newPassword.value !== confirmPassword.value
 )
 const passwordTooShort = computed(
   () => newPassword.value.length > 0 && newPassword.value.length < 8
@@ -70,8 +75,12 @@ async function updatePassword() {
     newPassword.value = ''
     confirmPassword.value = ''
     toast.add({ title: 'Mot de passe mis à jour', color: 'success' })
-  } catch (err: any) {
-    passwordError.value = err?.data?.message ?? 'Une erreur est survenue'
+  } catch (e) {
+    toast.add({
+      title: 'Erreur lors de la mise à jour du mot de passe',
+      description: getErrorMessage(e),
+      color: 'error',
+    })
   } finally {
     passwordLoading.value = false
   }
@@ -107,10 +116,7 @@ async function updatePassword() {
         </template>
 
         <form class="flex flex-col gap-4" @submit.prevent="updateFarmName">
-          <UFormField
-            label="Nom de l'exploitation"
-            :error="farmNameError"
-          >
+          <UFormField label="Nom de l'exploitation" :error="farmNameError">
             <UInput
               v-model="farmName"
               placeholder="Mon exploitation"
@@ -120,7 +126,8 @@ async function updatePassword() {
           </UFormField>
 
           <p class="text-xs text-gray-400 dark:text-gray-500">
-            Le nom doit être unique. La mise à jour est refusée s'il est déjà utilisé.
+            Le nom doit être unique. La mise à jour est refusée s'il est déjà
+            utilisé.
           </p>
 
           <div class="flex justify-end">
@@ -171,7 +178,9 @@ async function updatePassword() {
 
           <UFormField
             label="Confirmer le nouveau mot de passe"
-            :error="passwordMismatch ? 'Les mots de passe ne correspondent pas' : ''"
+            :error="
+              passwordMismatch ? 'Les mots de passe ne correspondent pas' : ''
+            "
           >
             <UInput
               v-model="confirmPassword"
@@ -188,7 +197,13 @@ async function updatePassword() {
               type="submit"
               label="Changer le mot de passe"
               :loading="passwordLoading"
-              :disabled="!currentPassword || !newPassword || !confirmPassword || passwordMismatch || passwordTooShort"
+              :disabled="
+                !currentPassword ||
+                !newPassword ||
+                !confirmPassword ||
+                passwordMismatch ||
+                passwordTooShort
+              "
             />
           </div>
         </form>
