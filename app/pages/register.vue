@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { z } from 'zod'
+import type { FormSubmitEvent } from '@nuxt/ui'
 
 definePageMeta({ layout: false })
 
@@ -42,14 +43,15 @@ const fields = [
 const error = ref<string | null>(null)
 const { fetch: refreshSession } = useUserSession()
 
-async function onSubmit(event: {
-  data: { username: string; password: string; farmName: string }
-}) {
+type Schema = z.output<typeof schema>
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function onSubmit(event: any) {
   error.value = null
   try {
     await $fetch('/api/auth/register', {
       method: 'POST',
-      body: event.data,
+      body: (event as FormSubmitEvent<Schema>).data,
     })
     await refreshSession()
     await navigateTo('/')
