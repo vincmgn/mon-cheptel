@@ -8,16 +8,16 @@ definePageMeta({ layout: false })
 const schema = z.object({
   username: z
     .string()
-    .refine(val => val === '' || val.length >= 4, 'Au moins 4 caractères'),
+    .optional()
+    .refine(val => !val || val.length >= 4, 'Au moins 4 caractères'),
   password: z
     .string()
-    .refine(val => val === '' || val.length >= 4, 'Au moins 4 caractères'),
+    .optional()
+    .refine(val => !val || val.length >= 4, 'Au moins 4 caractères'),
   farmName: z
     .string()
-    .refine(
-      val => val === '' || val.trim().length >= 4,
-      'Au moins 4 caractères'
-    ),
+    .optional()
+    .refine(val => !val || val.trim().length >= 4, 'Au moins 4 caractères'),
 })
 
 const fields = [
