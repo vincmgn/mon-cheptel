@@ -26,7 +26,7 @@ async function onCreateSubmit() {
       method: 'POST',
       body: { name: createState.name.trim() },
     })
-    toast.add({ title: 'Location créée', color: 'success' })
+    toast.add({ title: 'Lieu créé', color: 'success' })
     emit('created')
     createState.name = ''
   } catch (e) {
@@ -46,7 +46,7 @@ async function onCreateSubmit() {
   <div>
     <UModal
       :open="open"
-      title="Nouvelle location "
+      title="Nouveau lieu"
       description="Ajoutez un nouvel emplacement à votre cheptel."
       @update:open="closeModal"
     >

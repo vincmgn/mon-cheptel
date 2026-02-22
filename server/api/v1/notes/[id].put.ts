@@ -39,7 +39,8 @@ export default defineEventHandler(async event => {
 
   const isOwner =
     (existing.cow && existing.cow.pen.building.location.userId === userId) ||
-    (existing.calf && existing.calf.cow.pen.building.location.userId === userId) ||
+    (existing.calf &&
+      existing.calf.cow.pen.building.location.userId === userId) ||
     (existing.bull && existing.bull.userId === userId)
 
   if (!isOwner)

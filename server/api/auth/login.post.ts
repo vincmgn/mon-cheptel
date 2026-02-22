@@ -31,5 +31,8 @@ export default defineEventHandler(async event => {
     { maxAge: 60 * 60 * 24 * 30 }
   )
 
-  return { success: true, data: { username: user.username, farmName: user.farmName } }
+  return {
+    success: true,
+    data: { username: user.username, farmName: user.farmName },
+  }
 })

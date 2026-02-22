@@ -21,7 +21,7 @@ async function confirmDelete() {
     await $fetch(`/api/v1/locations/${props.location.id}`, {
       method: 'DELETE',
     })
-    toast.add({ title: 'Location supprimée', color: 'success' })
+    toast.add({ title: 'Lieu supprimé', color: 'success' })
     emit('deleted')
   } catch (e) {
     toast.add({
@@ -38,11 +38,7 @@ async function confirmDelete() {
 
 <template>
   <div>
-    <UModal
-      :open="open"
-      title="Supprimer la location"
-      @update:open="emit('close')"
-    >
+    <UModal :open="open" title="Supprimer le lieu" @update:open="emit('close')">
       <template #body>
         <p class="text-gray-700 dark:text-gray-300">
           Êtes-vous sûr de vouloir supprimer

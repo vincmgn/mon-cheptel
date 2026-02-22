@@ -10,7 +10,9 @@ export default defineEventHandler(async event => {
 
   const existing = await prisma.cow.findUnique({
     where: { id },
-    include: { pen: { include: { building: { include: { location: true } } } } },
+    include: {
+      pen: { include: { building: { include: { location: true } } } },
+    },
   })
   if (!existing)
     throw createError({ statusCode: 404, message: 'Vache introuvable' })

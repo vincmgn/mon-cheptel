@@ -12,7 +12,7 @@ const fields = [
   {
     name: 'username',
     type: 'text',
-    label: 'Nom d\'utilisateur',
+    label: "Nom d'utilisateur",
     placeholder: 'votre-identifiant',
   },
   {
@@ -26,7 +26,9 @@ const fields = [
 const error = ref<string | null>(null)
 const { fetch: refreshSession } = useUserSession()
 
-async function onSubmit(event: { data: { username: string; password: string } }) {
+async function onSubmit(event: {
+  data: { username: string; password: string }
+}) {
   error.value = null
   try {
     await $fetch('/api/auth/login', {
@@ -43,12 +45,16 @@ async function onSubmit(event: { data: { username: string; password: string } })
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4">
+  <div
+    class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4"
+  >
     <div class="w-full max-w-sm">
       <div class="text-center mb-8">
         <UIcon name="i-lucide-beef" class="size-12 text-primary mx-auto mb-3" />
         <h1 class="text-2xl font-bold">Mon Cheptel</h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Gestion de votre élevage</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Gestion de votre élevage
+        </p>
       </div>
 
       <UAuthForm
@@ -61,7 +67,10 @@ async function onSubmit(event: { data: { username: string; password: string } })
         <template #description>
           <p class="text-sm text-gray-500 dark:text-gray-400">
             Pas encore de compte ?
-            <NuxtLink to="/register" class="text-primary font-medium hover:underline">
+            <NuxtLink
+              to="/register"
+              class="text-primary font-medium hover:underline"
+            >
               Créer un compte
             </NuxtLink>
           </p>

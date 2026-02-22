@@ -35,7 +35,9 @@ async function logout() {
     <!-- Header with farm name + logout -->
     <div class="flex items-center justify-between mb-10">
       <div>
-        <p class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">
+        <p
+          class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5"
+        >
           Exploitation
         </p>
         <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">

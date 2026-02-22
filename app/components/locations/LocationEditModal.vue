@@ -33,7 +33,7 @@ async function onEditSubmit() {
       method: 'PUT',
       body: { name: editState.name.trim() },
     })
-    toast.add({ title: 'Location mise à jour', color: 'success' })
+    toast.add({ title: 'Lieu mise à jour', color: 'success' })
     emit('updated')
   } catch (e) {
     toast.add({
@@ -50,11 +50,7 @@ async function onEditSubmit() {
 
 <template>
   <div>
-    <UModal
-      :open="open"
-      title="Modifier la location"
-      @update:open="emit('close')"
-    >
+    <UModal :open="open" title="Modifier le lieu" @update:open="emit('close')">
       <template #body>
         <UForm
           :validate="validateLocationName"

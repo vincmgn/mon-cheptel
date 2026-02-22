@@ -5,13 +5,22 @@ export default defineEventHandler(async event => {
   const body = await readBody(event)
 
   if (!body?.username?.trim()) {
-    throw createError({ statusCode: 400, message: 'Le nom d\'utilisateur est requis' })
+    throw createError({
+      statusCode: 400,
+      message: "Le nom d'utilisateur est requis",
+    })
   }
   if (!body?.password) {
-    throw createError({ statusCode: 400, message: 'Le mot de passe est requis' })
+    throw createError({
+      statusCode: 400,
+      message: 'Le mot de passe est requis',
+    })
   }
   if (!body?.farmName?.trim()) {
-    throw createError({ statusCode: 400, message: 'Le nom de l\'exploitation est requis' })
+    throw createError({
+      statusCode: 400,
+      message: "Le nom de l'exploitation est requis",
+    })
   }
 
   const username = body.username.trim().toLowerCase()
@@ -19,7 +28,7 @@ export default defineEventHandler(async event => {
   if (username.length < 4) {
     throw createError({
       statusCode: 400,
-      message: 'Le nom d\'utilisateur doit faire au moins 4 caractères',
+      message: "Le nom d'utilisateur doit faire au moins 4 caractères",
     })
   }
   if (body.password.length < 4) {
@@ -33,7 +42,7 @@ export default defineEventHandler(async event => {
   if (existing) {
     throw createError({
       statusCode: 409,
-      message: 'Ce nom d\'utilisateur est déjà pris',
+      message: "Ce nom d'utilisateur est déjà pris",
     })
   }
 
@@ -59,5 +68,8 @@ export default defineEventHandler(async event => {
   )
 
   setResponseStatus(event, 201)
-  return { success: true, data: { username: user.username, farmName: user.farmName } }
+  return {
+    success: true,
+    data: { username: user.username, farmName: user.farmName },
+  }
 })
