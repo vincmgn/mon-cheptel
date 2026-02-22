@@ -1,6 +1,8 @@
 import { prisma } from '../../../utils/prisma'
+import { requireUserId } from '../../../utils/auth'
 
 export default defineEventHandler(async event => {
+  const userId = await requireUserId(event)
   const body = await readBody(event)
 
   if (!body?.name?.trim()) {
@@ -11,7 +13,7 @@ export default defineEventHandler(async event => {
   }
 
   const existingLocation = await prisma.location.findFirst({
-    where: { name: body.name.trim() },
+    where: { name: body.name.trim(), userId },
   })
 
   if (existingLocation) {
@@ -22,7 +24,7 @@ export default defineEventHandler(async event => {
   }
 
   const location = await prisma.location.create({
-    data: { name: body.name.trim() },
+    data: { name: body.name.trim(), userId },
   })
 
   setResponseStatus(event, 201)

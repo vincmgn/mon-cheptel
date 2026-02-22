@@ -7,9 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        Int        @id @default(autoincrement())
+  username  String     @unique
+  password  String
+  farmName  String
+  createdAt DateTime   @default(now())
+  locations Location[]
+  bulls     Bull[]
+}
+
 model Location {
   id        Int        @id @default(autoincrement())
   name      String
+  userId    Int?
+  user      User?      @relation(fields: [userId], references: [id])
   buildings Building[]
 }
 
@@ -21,7 +33,7 @@ model Building {
   pens       Pen[]
 }
 
-model Pen { 
+model Pen {
   id         Int      @id @default(autoincrement())
   name       String
   buildingId Int
@@ -41,45 +53,47 @@ model Cow {
   createdAt   DateTime   @default(now())
 }
 
-model Calf { 
+model Calf {
   id         Int       @id @default(autoincrement())
-  sex        String   
+  sex        String
   birthDate  DateTime  @default(now())
   cowId      Int
   cow        Cow       @relation(fields: [cowId], references: [id])
   notes      Note[]
 }
 
-model Bull { 
+model Bull {
   id        Int        @id @default(autoincrement())
   name      String     @unique
-  notes     Note[]  
-  breedings Breeding[] 
+  userId    Int?
+  user      User?      @relation(fields: [userId], references: [id])
+  notes     Note[]
+  breedings Breeding[]
   createdAt DateTime   @default(now())
 }
 
-model Breeding { 
+model Breeding {
   id       Int      @id @default(autoincrement())
   date     DateTime @default(now())
   isMaybe  Boolean  @default(false)
   cowId    Int
   cow      Cow      @relation(fields: [cowId], references: [id])
-  bullId   Int?     
+  bullId   Int?
   bull     Bull?    @relation(fields: [bullId], references: [id])
-  bullName String? 
+  bullName String?
 }
 
 model Note {
   id        Int      @id @default(autoincrement())
   content   String
   createdAt DateTime @default(now())
-  
+
   cowId     Int?
   cow       Cow?     @relation(fields: [cowId], references: [id])
-  
+
   calfId    Int?
   calf      Calf?    @relation(fields: [calfId], references: [id])
-  
+
   bullId    Int?
   bull      Bull?    @relation(fields: [bullId], references: [id])
 }

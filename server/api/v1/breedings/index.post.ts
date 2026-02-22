@@ -1,6 +1,8 @@
 import { prisma } from '../../../utils/prisma'
+import { requireUserId } from '../../../utils/auth'
 
 export default defineEventHandler(async event => {
+  const userId = await requireUserId(event)
   const body = await readBody(event)
 
   if (!body?.cowId) {
@@ -16,9 +18,15 @@ export default defineEventHandler(async event => {
     })
   }
 
-  const cowExists = await prisma.cow.findUnique({ where: { id: body.cowId } })
+  const cowExists = await prisma.cow.findUnique({
+    where: { id: body.cowId },
+    include: { pen: { include: { building: { include: { location: true } } } } },
+  })
   if (!cowExists)
     throw createError({ statusCode: 404, message: 'Vache introuvable' })
+
+  if (cowExists.pen.building.location.userId !== userId)
+    throw createError({ statusCode: 403, message: 'Accès interdit' })
 
   if (body.bullId) {
     const bullExists = await prisma.bull.findUnique({
@@ -26,6 +34,9 @@ export default defineEventHandler(async event => {
     })
     if (!bullExists)
       throw createError({ statusCode: 404, message: 'Taureau introuvable' })
+
+    if (bullExists.userId !== userId)
+      throw createError({ statusCode: 403, message: 'Accès interdit' })
   }
 
   const breeding = await prisma.breeding.create({

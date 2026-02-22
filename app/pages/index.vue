@@ -3,6 +3,8 @@ import Hero from '~/components/index/Hero.vue'
 import SearchBar from '~/components/shared/SearchBar.vue'
 import type { ApiList } from '~~/types'
 
+const { user, clear } = useUserSession()
+
 const { data: statsData } = await useAsyncData('dashboard-stats', () =>
   Promise.all([
     $fetch<ApiList>('/api/v1/cows'),
@@ -20,10 +22,36 @@ const stats = computed(() => {
     bulls: bulls.data.length,
   }
 })
+
+async function logout() {
+  await $fetch('/api/auth/logout', { method: 'POST' })
+  await clear()
+  await navigateTo('/login')
+}
 </script>
 
 <template>
   <UContainer class="py-16 max-w-2xl">
+    <!-- Header with farm name + logout -->
+    <div class="flex items-center justify-between mb-10">
+      <div>
+        <p class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">
+          Exploitation
+        </p>
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
+          {{ user?.farmName }}
+        </h2>
+      </div>
+      <UButton
+        icon="i-lucide-log-out"
+        color="neutral"
+        variant="ghost"
+        size="sm"
+        label="Déconnexion"
+        @click="logout"
+      />
+    </div>
+
     <!-- Hero -->
     <Hero :stats="stats" />
 
