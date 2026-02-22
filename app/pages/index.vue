@@ -44,26 +44,35 @@ async function logout() {
           {{ user?.farmName }}
         </h2>
       </div>
-      <UDropdownMenu
-        :items="[
-          [{ label: 'Mon compte', icon: 'i-lucide-settings', to: '/account' }],
-          [
-            {
-              label: 'Déconnexion',
-              icon: 'i-lucide-log-out',
-              color: 'error',
-              onSelect: logout,
-            },
-          ],
-        ]"
-      >
-        <UButton
-          icon="i-lucide-user"
-          color="neutral"
-          variant="outline"
-          size="md"
-        />
-      </UDropdownMenu>
+      <div class="flex items-center gap-2">
+        <SharedThemeSwitcher />
+        <UDropdownMenu
+          :items="[
+            [
+              {
+                label: 'Mon compte',
+                icon: 'i-lucide-settings',
+                to: '/account',
+              },
+            ],
+            [
+              {
+                label: 'Déconnexion',
+                icon: 'i-lucide-log-out',
+                color: 'error',
+                onSelect: logout,
+              },
+            ],
+          ]"
+        >
+          <UButton
+            icon="i-lucide-user"
+            color="neutral"
+            variant="outline"
+            size="md"
+          />
+        </UDropdownMenu>
+      </div>
     </div>
 
     <!-- Hero -->
