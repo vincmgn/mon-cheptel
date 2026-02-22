@@ -52,10 +52,10 @@ async function onSubmit(event: any) {
       method: 'POST',
       body: (event as FormSubmitEvent<Schema>).data,
     })
-    formKey.value++
     await refreshSession()
     await navigateTo('/')
   } catch (e) {
+    formKey.value++
     toast.add({
       title: 'Erreur lors de la création du compte',
       description: getErrorMessage(e),
