@@ -28,24 +28,27 @@ const fields = [
   },
 ]
 
-const error = ref<string | null>(null)
 const { fetch: refreshSession } = useUserSession()
+const toast = useToast()
+const formKey = ref(0)
 
 type Schema = z.output<typeof schema>
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function onSubmit(event: any) {
-  error.value = null
   try {
     await $fetch('/api/auth/login', {
       method: 'POST',
       body: (event as FormSubmitEvent<Schema>).data,
     })
+    formKey.value++
     await refreshSession()
     await navigateTo('/')
-  } catch (e: unknown) {
-    const err = e as { data?: { message?: string } }
-    error.value = err?.data?.message ?? 'Erreur de connexion'
+  } catch (e) {
+    toast.add({
+      title: 'Erreur de connexion',
+      description: getErrorMessage(e),
+      color: 'error',
+    })
   }
 }
 </script>
@@ -64,6 +67,7 @@ async function onSubmit(event: any) {
       </div>
 
       <UAuthForm
+        :key="formKey"
         title="Connexion"
         :fields="fields"
         :schema="schema"
@@ -80,15 +84,6 @@ async function onSubmit(event: any) {
               Créer un compte
             </NuxtLink>
           </p>
-        </template>
-        <template #footer>
-          <UAlert
-            v-if="error"
-            color="error"
-            variant="soft"
-            :description="error"
-            icon="i-lucide-circle-alert"
-          />
         </template>
       </UAuthForm>
     </div>

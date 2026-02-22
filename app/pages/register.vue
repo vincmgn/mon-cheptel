@@ -14,8 +14,8 @@ const schema = z.object({
   farmName: z.coerce
     .string()
     .refine(
-      val => val === '' || val.length >= 1,
-      "Le nom de l'exploitation est requis"
+      val => val === '' || val.trim().length >= 4,
+      'Au moins 4 caractères'
     ),
 })
 
@@ -40,24 +40,27 @@ const fields = [
   },
 ]
 
-const error = ref<string | null>(null)
 const { fetch: refreshSession } = useUserSession()
+const toast = useToast()
+const formKey = ref(0)
 
 type Schema = z.output<typeof schema>
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function onSubmit(event: any) {
-  error.value = null
   try {
     await $fetch('/api/auth/register', {
       method: 'POST',
       body: (event as FormSubmitEvent<Schema>).data,
     })
+    formKey.value++
     await refreshSession()
     await navigateTo('/')
-  } catch (e: unknown) {
-    const err = e as { data?: { message?: string } }
-    error.value = err?.data?.message ?? 'Erreur lors de la création du compte'
+  } catch (e) {
+    toast.add({
+      title: 'Erreur lors de la création du compte',
+      description: getErrorMessage(e),
+      color: 'error',
+    })
   }
 }
 </script>
@@ -76,6 +79,7 @@ async function onSubmit(event: any) {
       </div>
 
       <UAuthForm
+        :key="formKey"
         title="Créer un compte"
         :fields="fields"
         :schema="schema"
@@ -92,15 +96,6 @@ async function onSubmit(event: any) {
               Se connecter
             </NuxtLink>
           </p>
-        </template>
-        <template #footer>
-          <UAlert
-            v-if="error"
-            color="error"
-            variant="soft"
-            :description="error"
-            icon="i-lucide-circle-alert"
-          />
         </template>
       </UAuthForm>
     </div>
