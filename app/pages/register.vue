@@ -6,13 +6,13 @@ import HeadApp from '~/components/index/HeadApp.vue'
 definePageMeta({ layout: false })
 
 const schema = z.object({
-  username: z.coerce
+  username: z
     .string()
     .refine(val => val === '' || val.length >= 4, 'Au moins 4 caractères'),
-  password: z.coerce
+  password: z
     .string()
     .refine(val => val === '' || val.length >= 4, 'Au moins 4 caractères'),
-  farmName: z.coerce
+  farmName: z
     .string()
     .refine(
       val => val === '' || val.trim().length >= 4,
@@ -47,11 +47,11 @@ const formKey = ref(0)
 
 type Schema = z.output<typeof schema>
 
-async function onSubmit(event: any) {
+async function onSubmit(event: FormSubmitEvent<Schema>) {
   try {
     await $fetch('/api/auth/register', {
       method: 'POST',
-      body: (event as FormSubmitEvent<Schema>).data,
+      body: event.data,
     })
     await refreshSession()
     await navigateTo('/')
