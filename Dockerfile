@@ -29,4 +29,4 @@ ENV PORT=3000 \
 
 EXPOSE 3000
 
-CMD npx prisma migrate deploy && node .output/server/index.mjs
+CMD npx prisma migrate deploy && npx tsx prisma/setup.ts && node .output/server/index.mjs

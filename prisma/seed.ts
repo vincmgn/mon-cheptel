@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcrypt'
 
 const prisma = new PrismaClient()
 
@@ -6,14 +7,25 @@ async function main() {
   console.log('Start seeding ...')
 
   // Nettoyage de la base de données + reset des séquences d'IDs
-  await prisma.$executeRaw`TRUNCATE TABLE "Note", "Breeding", "Calf", "Cow", "Bull", "Pen", "Building", "Location" RESTART IDENTITY CASCADE`
+  await prisma.$executeRaw`TRUNCATE TABLE "Note", "Breeding", "Calf", "Cow", "Bull", "Pen", "Building", "Location", "User" RESTART IDENTITY CASCADE`
 
   console.log('Database cleaned.')
+
+  // 0. Création de l'utilisateur admin
+  const hashed = await bcrypt.hash('admin1234', 10)
+  const admin = await prisma.user.create({
+    data: {
+      username: 'admin',
+      password: hashed,
+      farmName: 'Exploitation Admin',
+    },
+  })
 
   // 1. Création des Locations
   const locationFerme = await prisma.location.create({
     data: {
       name: 'Ferme Principale',
+      userId: admin.id,
     },
   })
 
@@ -58,12 +70,14 @@ async function main() {
   const bullHercule = await prisma.bull.create({
     data: {
       name: 'Hercule',
+      userId: admin.id,
     },
   })
 
   const _bullCesar = await prisma.bull.create({
     data: {
       name: 'César',
+      userId: admin.id,
     },
   })
 
@@ -84,7 +98,7 @@ async function main() {
   const cowPaquerette = await prisma.cow.create({
     data: {
       officialId: 'FR-0987654321',
-      penId: pen1.id, // Même box
+      penId: pen1.id,
       prophylaxis: false,
     },
   })
@@ -109,9 +123,9 @@ async function main() {
   await prisma.breeding.create({
     data: {
       date: new Date('2025-01-15'),
-      isMaybe: true, // Saillie possible
+      isMaybe: true,
       cowId: cowPaquerette.id,
-      bullName: 'Taureau Voisin', // Pas un taureau de notre DB
+      bullName: 'Taureau Voisin',
     },
   })
 
@@ -130,6 +144,7 @@ async function main() {
   })
 
   console.log('Seeding finished.')
+  console.log('👤 Admin: username=admin, password=admin1234')
 }
 
 main()

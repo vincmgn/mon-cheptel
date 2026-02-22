@@ -11,12 +11,12 @@ defineEmits<{
         name="i-lucide-map-pin-off"
         class="size-12 mx-auto mb-4 opacity-50"
       />
-      <p class="text-lg font-medium">Aucune location</p>
+      <p class="text-lg font-medium">Aucun lieu</p>
       <p class="text-sm mt-1">
         Créez votre premier emplacement pour commencer.
       </p>
       <UButton class="mt-6" icon="i-lucide-plus" @click="$emit('click')">
-        Nouvelle location
+        Nouveau lieu
       </UButton>
     </div>
   </div>
