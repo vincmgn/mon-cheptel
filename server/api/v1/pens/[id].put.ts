@@ -1,6 +1,8 @@
 import { prisma } from '../../../utils/prisma'
+import { requireUserId } from '../../../utils/auth'
 
 export default defineEventHandler(async event => {
+  const userId = await requireUserId(event)
   const id = parseInt(getRouterParam(event, 'id') ?? '')
   if (isNaN(id)) throw createError({ statusCode: 400, message: 'ID invalide' })
 
@@ -12,18 +14,28 @@ export default defineEventHandler(async event => {
     })
   }
 
-  const existing = await prisma.pen.findUnique({ where: { id } })
+  const existing = await prisma.pen.findUnique({
+    where: { id },
+    include: { building: { include: { location: true } } },
+  })
   if (!existing)
     throw createError({ statusCode: 404, message: 'Box/Enclos introuvable' })
+
+  if (existing.building.location.userId !== userId)
+    throw createError({ statusCode: 403, message: 'Accès interdit' })
 
   const buildingId = body.buildingId || existing.buildingId
 
   if (body.buildingId) {
     const buildingExists = await prisma.building.findUnique({
       where: { id: body.buildingId },
+      include: { location: true },
     })
     if (!buildingExists)
       throw createError({ statusCode: 404, message: 'Bâtiment introuvable' })
+
+    if (buildingExists.location.userId !== userId)
+      throw createError({ statusCode: 403, message: 'Accès interdit' })
   }
 
   // Vérifier qu'aucun autre pen n'a le même nom dans ce bâtiment

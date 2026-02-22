@@ -8,6 +8,7 @@ services:
     environment:
       DATABASE_URL: ${DATABASE_URL}
       NUXT_SECRET: ${NUXT_SECRET}
+      NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD}
     networks:
       - traefik
       - mon-cheptel

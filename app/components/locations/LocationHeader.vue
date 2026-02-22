@@ -15,10 +15,10 @@ const props = defineProps<{
         <UIcon name="i-lucide-arrow-left" class="size-5" />
       </NuxtLink>
       <div>
-        <h1 class="text-2xl font-bold">Locations</h1>
+        <h1 class="text-2xl font-bold">Lieux</h1>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-          {{ props.locations.length }} location{{
-            props.locations.length !== 1 ? 's' : ''
+          {{ props.locations.length }} lieu{{
+            props.locations.length !== 1 ? 'x' : ''
           }}
         </p>
       </div>

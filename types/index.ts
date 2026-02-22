@@ -47,6 +47,7 @@ export type SearchResults = {
   }>
 }
 
+export * from './user'
 export * from './location'
 export * from './building'
 export * from './pen'

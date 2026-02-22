@@ -1,15 +1,24 @@
 import { prisma } from '../../../utils/prisma'
+import { requireUserId } from '../../../utils/auth'
 
 export default defineEventHandler(async event => {
+  const userId = await requireUserId(event)
   const id = parseInt(getRouterParam(event, 'id') ?? '')
   if (isNaN(id)) throw createError({ statusCode: 400, message: 'ID invalide' })
 
   const existing = await prisma.cow.findUnique({
     where: { id },
-    include: { calves: true, breedings: true },
+    include: {
+      pen: { include: { building: { include: { location: true } } } },
+      calves: true,
+      breedings: true,
+    },
   })
   if (!existing)
     throw createError({ statusCode: 404, message: 'Vache introuvable' })
+
+  if (existing.pen.building.location.userId !== userId)
+    throw createError({ statusCode: 403, message: 'Accès interdit' })
 
   if (existing.calves.length > 0)
     throw createError({

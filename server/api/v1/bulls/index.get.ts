@@ -1,7 +1,11 @@
 import { prisma } from '../../../utils/prisma'
+import { requireUserId } from '../../../utils/auth'
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async event => {
+  const userId = await requireUserId(event)
+
   const bulls = await prisma.bull.findMany({
+    where: { userId },
     include: {
       _count: { select: { breedings: true, notes: true } },
     },

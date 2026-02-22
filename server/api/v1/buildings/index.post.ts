@@ -1,6 +1,8 @@
 import { prisma } from '../../../utils/prisma'
+import { requireUserId } from '../../../utils/auth'
 
 export default defineEventHandler(async event => {
+  const userId = await requireUserId(event)
   const body = await readBody(event)
 
   if (!body?.name?.trim()) {
@@ -21,6 +23,9 @@ export default defineEventHandler(async event => {
   })
   if (!locationExists)
     throw createError({ statusCode: 404, message: 'Location introuvable' })
+
+  if (locationExists.userId !== userId)
+    throw createError({ statusCode: 403, message: 'Accès interdit' })
 
   const existingBuilding = await prisma.building.findFirst({
     where: {

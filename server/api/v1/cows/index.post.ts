@@ -1,6 +1,8 @@
 import { prisma } from '../../../utils/prisma'
+import { requireUserId } from '../../../utils/auth'
 
 export default defineEventHandler(async event => {
+  const userId = await requireUserId(event)
   const body = await readBody(event)
 
   if (!body?.officialId?.trim()) {
@@ -16,9 +18,15 @@ export default defineEventHandler(async event => {
     })
   }
 
-  const penExists = await prisma.pen.findUnique({ where: { id: body.penId } })
+  const penExists = await prisma.pen.findUnique({
+    where: { id: body.penId },
+    include: { building: { include: { location: true } } },
+  })
   if (!penExists)
     throw createError({ statusCode: 404, message: 'Box/Enclos introuvable' })
+
+  if (penExists.building.location.userId !== userId)
+    throw createError({ statusCode: 403, message: 'Accès interdit' })
 
   try {
     const cow = await prisma.cow.create({

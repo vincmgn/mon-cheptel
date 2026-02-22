@@ -1,6 +1,8 @@
 import { prisma } from '../../../utils/prisma'
+import { requireUserId } from '../../../utils/auth'
 
 export default defineEventHandler(async event => {
+  const userId = await requireUserId(event)
   const id = parseInt(getRouterParam(event, 'id') ?? '')
   if (isNaN(id)) throw createError({ statusCode: 400, message: 'ID invalide' })
 
@@ -12,9 +14,15 @@ export default defineEventHandler(async event => {
     })
   }
 
-  const existing = await prisma.building.findUnique({ where: { id } })
+  const existing = await prisma.building.findUnique({
+    where: { id },
+    include: { location: true },
+  })
   if (!existing)
     throw createError({ statusCode: 404, message: 'Bâtiment introuvable' })
+
+  if (existing.location.userId !== userId)
+    throw createError({ statusCode: 403, message: 'Accès interdit' })
 
   const locationId = body.locationId || existing.locationId
 
@@ -24,6 +32,9 @@ export default defineEventHandler(async event => {
     })
     if (!locationExists)
       throw createError({ statusCode: 404, message: 'Location introuvable' })
+
+    if (locationExists.userId !== userId)
+      throw createError({ statusCode: 403, message: 'Accès interdit' })
   }
 
   // Vérifier qu'aucun autre building n'a le même nom dans cette location
