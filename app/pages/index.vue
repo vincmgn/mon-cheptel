@@ -81,7 +81,9 @@ async function logout() {
           class="h-full transition-all group-hover:shadow-md cursor-pointer"
         >
           <div class="flex items-center gap-4">
-            <div class="p-3 rounded-xl bg-primary/10 dark:bg-primary/20">
+            <div
+              class="p-3 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center"
+            >
               <UIcon name="i-lucide-map-pin" class="size-8 text-primary" />
             </div>
             <div>
@@ -102,7 +104,9 @@ async function logout() {
           class="h-full transition-all group-hover:shadow-md cursor-pointer"
         >
           <div class="flex items-center gap-4">
-            <div class="p-3 rounded-xl bg-rose-500/10 dark:bg-rose-500/20">
+            <div
+              class="p-3 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 flex items-center justify-center"
+            >
               <UIcon name="i-lucide-shield" class="size-8 text-rose-500" />
             </div>
             <div>

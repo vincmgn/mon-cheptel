@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { z } from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
+import HeadApp from '~/components/index/HeadApp.vue'
 
 definePageMeta({ layout: false })
 
@@ -70,13 +71,7 @@ async function onSubmit(event: any) {
     class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4"
   >
     <div class="w-full max-w-sm">
-      <div class="text-center mb-8">
-        <UIcon name="i-lucide-beef" class="size-12 text-primary mx-auto mb-3" />
-        <h1 class="text-2xl font-bold">Mon Cheptel</h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Gestion de votre élevage
-        </p>
-      </div>
+      <HeadApp />
 
       <UAuthForm
         :key="formKey"

@@ -93,7 +93,11 @@ async function onSubmit() {
 
       <UFormField
         label="Confirmer le nouveau mot de passe"
-        :error="passwordMismatch ? 'Les mots de passe ne correspondent pas' : undefined"
+        :error="
+          passwordMismatch
+            ? 'Les mots de passe ne correspondent pas'
+            : undefined
+        "
       >
         <UInput
           v-model="confirmPassword"
