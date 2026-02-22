@@ -85,8 +85,10 @@ jobs:
           STACK_FILE_CONTENT=$(jq -Rs . < docker-compose.prod.yml)
 
           # 4. Préparer les variables d'environnement
+          # La DATABASE_URL doit utiliser 'db' comme hostname (nom du service dans docker-compose)
+          DATABASE_URL="postgresql://user_prod:password_prod@db:5432/cheptel_db"
           ENV_VARS=$(jq -n \
-            --arg db_url "${{ secrets.DATABASE_URL }}" \
+            --arg db_url "$DATABASE_URL" \
             --arg nuxt_secret "${{ secrets.NUXT_SECRET }}" \
             '[{name: "DATABASE_URL", value: $db_url}, {name: "NUXT_SECRET", value: $nuxt_secret}]')
 
