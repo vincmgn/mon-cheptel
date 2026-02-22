@@ -84,14 +84,22 @@ jobs:
           # 3. Lire le contenu du docker-compose et préparer le payload JSON
           STACK_FILE_CONTENT=$(jq -Rs . < docker-compose.prod.yml)
 
-          # 4. Mettre à jour la stack via l'endpoint d'update (avec redeploy)
+          # 4. Préparer les variables d'environnement
+          # La DATABASE_URL doit utiliser 'db' comme hostname (nom du service dans docker-compose)
+          DATABASE_URL="postgresql://user_prod:password_prod@db:5432/cheptel_db"
+          ENV_VARS=$(jq -n \
+            --arg db_url "$DATABASE_URL" \
+            --arg nuxt_secret "${{ secrets.NUXT_SECRET }}" \
+            '[{name: "DATABASE_URL", value: $db_url}, {name: "NUXT_SECRET", value: $nuxt_secret}]')
+
+          # 5. Mettre à jour la stack via l'endpoint d'update (avec redeploy)
           echo "Updating stack $STACK_ID..."
           # On capture le code HTTP et le corps de réponse
           # NOTE: On utilise PUT /api/stacks/{id} au lieu de POST /api/stacks/{id}/update qui n'existe plus/pas
           HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "${{ secrets.DOCKER_PORTAINER_URL }}/api/stacks/$STACK_ID?endpointId=2" \
             -H "Authorization: Bearer $JWT" \
             -H "Content-Type: application/json" \
-            -d "{\"stackFileContent\": $STACK_FILE_CONTENT, \"env\": [], \"prune\": true, \"pullImage\": true}")
+            -d "{\"stackFileContent\": $STACK_FILE_CONTENT, \"env\": $ENV_VARS, \"prune\": true, \"pullImage\": true}")
 
           HTTP_BODY=$(echo "$HTTP_RESPONSE" | head -n -1)
           HTTP_STATUS=$(echo "$HTTP_RESPONSE" | tail -n 1)
