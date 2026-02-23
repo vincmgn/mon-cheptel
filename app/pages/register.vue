@@ -67,7 +67,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950 px-4">
+  <div class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950 px-10">
     <div class="flex-1 flex items-center justify-center">
       <div class="w-full max-w-sm">
         <HeadApp />
