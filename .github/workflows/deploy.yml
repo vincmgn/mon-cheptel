@@ -103,7 +103,8 @@ jobs:
           ENV_VARS=$(jq -n \
             --arg db_url "$DATABASE_URL" \
             --arg nuxt_secret "${{ secrets.NUXT_SECRET }}" \
-            '[{name: "DATABASE_URL", value: $db_url}, {name: "NUXT_SECRET", value: $nuxt_secret}]')
+            --arg nuxt_session_password "${{ secrets.NUXT_SESSION_PASSWORD }}" \
+            '[{name: "DATABASE_URL", value: $db_url}, {name: "NUXT_SECRET", value: $nuxt_secret}, {name: "NUXT_SESSION_PASSWORD", value: $nuxt_session_password}]')
 
           # 5. Mettre à jour la stack via l'endpoint d'update (avec redeploy)
           echo "Updating stack $STACK_ID..."
