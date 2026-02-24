@@ -10,6 +10,7 @@ useHead({
 })
 </script>
 <template>
+  <VitePwaManifest />
   <UApp :toaster="toaster">
     <NuxtPage />
   </UApp>
