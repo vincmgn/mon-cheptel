@@ -55,6 +55,7 @@ model Cow {
 
 model Calf {
   id         Int       @id @default(autoincrement())
+  officialId String?   @unique
   sex        String
   birthDate  DateTime  @default(now())
   cowId      Int

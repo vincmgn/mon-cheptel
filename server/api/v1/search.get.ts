@@ -63,10 +63,18 @@ export default defineEventHandler(async event => {
     }),
     prisma.calf.findMany({
       where: {
-        cow: {
-          officialId: { contains: q, mode: 'insensitive' },
-          pen: { building: { location: { userId } } },
-        },
+        OR: [
+          {
+            officialId: { contains: q, mode: 'insensitive' },
+            cow: { pen: { building: { location: { userId } } } },
+          },
+          {
+            cow: {
+              officialId: { contains: q, mode: 'insensitive' },
+              pen: { building: { location: { userId } } },
+            },
+          },
+        ],
       },
       include: { cow: true },
       take: 5,

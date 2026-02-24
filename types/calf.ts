@@ -5,6 +5,7 @@ import type { Building } from './building'
 // Type de base
 export interface Calf {
   id: number
+  officialId: string | null
   sex: string
   birthDate: string
   cowId: number
