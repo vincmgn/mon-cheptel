@@ -36,6 +36,7 @@ export default defineEventHandler(async event => {
     data: {
       ...(body.sex ? { sex: body.sex } : {}),
       ...(body.birthDate ? { birthDate: new Date(body.birthDate) } : {}),
+      ...('officialId' in body ? { officialId: body.officialId || null } : {}),
     },
     include: { cow: true },
   })

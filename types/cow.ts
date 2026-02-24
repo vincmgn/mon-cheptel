@@ -33,6 +33,7 @@ export interface CowDetail extends Cow {
   }
   calves: Array<{
     id: number
+    officialId: string | null
     sex: string
     birthDate: string
     cowId: number
