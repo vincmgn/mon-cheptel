@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="#16a34a"/>
+
+  <!-- Cow head - main circle -->
+  <ellipse cx="256" cy="285" rx="150" ry="135" fill="white"/>
+
+  <!-- Ears -->
+  <ellipse cx="106" cy="210" rx="42" ry="58" fill="white" transform="rotate(-20 106 210)"/>
+  <ellipse cx="406" cy="210" rx="42" ry="58" fill="white" transform="rotate(20 406 210)"/>
+  <ellipse cx="106" cy="210" rx="24" ry="36" fill="#f9a8d4" transform="rotate(-20 106 210)"/>
+  <ellipse cx="406" cy="210" rx="24" ry="36" fill="#f9a8d4" transform="rotate(20 406 210)"/>
+
+  <!-- Eyes -->
+  <circle cx="210" cy="258" r="22" fill="#166534"/>
+  <circle cx="302" cy="258" r="22" fill="#166534"/>
+  <circle cx="216" cy="252" r="8" fill="white"/>
+  <circle cx="308" cy="252" r="8" fill="white"/>
+
+  <!-- Nose area -->
+  <ellipse cx="256" cy="350" rx="65" ry="48" fill="#fde68a"/>
+  <circle cx="234" cy="348" r="14" fill="#d97706"/>
+  <circle cx="278" cy="348" r="14" fill="#d97706"/>
+
+  <!-- Spots -->
+  <ellipse cx="195" cy="305" rx="28" ry="22" fill="#dcfce7" opacity="0.6"/>
+  <ellipse cx="315" cy="295" rx="22" ry="17" fill="#dcfce7" opacity="0.6"/>
+</svg>
