@@ -32,6 +32,7 @@ export default defineEventHandler(async event => {
 
   const calf = await prisma.calf.create({
     data: {
+      officialId: body.officialId || null,
       sex: body.sex,
       birthDate: body.birthDate ? new Date(body.birthDate) : new Date(),
       cowId: body.cowId,

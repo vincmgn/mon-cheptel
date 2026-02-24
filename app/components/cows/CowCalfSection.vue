@@ -16,11 +16,13 @@ const toast = useToast()
 const isOpen = ref(false)
 const sex = ref<'M' | 'F'>('M')
 const birthDate = ref(new Date().toISOString().split('T')[0])
+const officialId = ref('')
 const isAdding = ref(false)
 
 function openModal() {
   sex.value = 'M'
   birthDate.value = new Date().toISOString().split('T')[0]
+  officialId.value = ''
   isOpen.value = true
 }
 
@@ -29,7 +31,12 @@ async function addCalf() {
   try {
     await $fetch('/api/v1/calves', {
       method: 'POST',
-      body: { cowId: props.cow.id, sex: sex.value, birthDate: birthDate.value },
+      body: {
+        cowId: props.cow.id,
+        sex: sex.value,
+        birthDate: birthDate.value,
+        officialId: officialId.value || undefined,
+      },
     })
     toast.add({ title: 'Veau ajouté', color: 'success' })
     isOpen.value = false
@@ -106,6 +113,9 @@ function formatDate(dateStr: string) {
             >
               {{ calf.sex }}
             </UBadge>
+            <span v-if="calf.officialId" class="text-xs font-mono text-gray-500 dark:text-gray-400">
+              {{ calf.officialId }}
+            </span>
           </div>
           <p class="text-xs text-gray-400 mt-0.5">
             Né(e) le {{ formatDate(calf.birthDate) }}
@@ -146,6 +156,9 @@ function formatDate(dateStr: string) {
           </UFormField>
           <UFormField label="Date de naissance">
             <UInput v-model="birthDate" type="date" class="w-full" />
+          </UFormField>
+          <UFormField label="Numéro officiel" hint="Optionnel">
+            <UInput v-model="officialId" placeholder="Ex: FR12345678" class="w-full" />
           </UFormField>
           <div class="flex justify-end gap-2 pt-2">
             <UButton color="neutral" variant="outline" @click="isOpen = false"
