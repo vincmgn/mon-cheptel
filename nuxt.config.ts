@@ -19,7 +19,7 @@ export default defineNuxtConfig({
       name: 'Mon Cheptel',
       short_name: 'Cheptel',
       description: 'Application de gestion de votre cheptel',
-      theme_color: '#16a34a',
+      theme_color: '#22c55e',
       background_color: '#ffffff',
       display: 'standalone',
       orientation: 'portrait',

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <!-- Background -->
-  <rect width="512" height="512" rx="80" fill="#16a34a"/>
+  <rect width="512" height="512" rx="80" fill="#22c55e"/>
 
   <!-- Cow head - main circle -->
   <ellipse cx="256" cy="285" rx="150" ry="135" fill="white"/>
