@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { ApiList, Bull, BullWithCount } from '~~/types'
 import BullHeader from '~/components/bulls/BullHeader.vue'
-
-useHead({ title: 'Taureaux' })
 import BullEmptyState from '~/components/bulls/BullEmptyState.vue'
 import BullCard from '~/components/bulls/BullCard.vue'
 import BullCreateModal from '~/components/bulls/BullCreateModal.vue'
 import BullEditModal from '~/components/bulls/BullEditModal.vue'
 import BullDeleteModal from '~/components/bulls/BullDeleteModal.vue'
+
+useHead({ title: 'Taureaux' })
 
 const { data, refresh, status } =
   await useFetch<ApiList<BullWithCount>>('/api/v1/bulls')
