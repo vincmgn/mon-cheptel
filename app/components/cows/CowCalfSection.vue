@@ -113,7 +113,10 @@ function formatDate(dateStr: string) {
             <span class="font-medium text-sm">{{
               calf.sex === 'M' ? 'Mâle' : 'Femelle'
             }}</span>
-            <span v-if="calf.officialId" class="text-xs font-mono text-gray-500 dark:text-gray-400">
+            <span
+              v-if="calf.officialId"
+              class="text-xs font-mono text-gray-500 dark:text-gray-400"
+            >
               {{ calf.officialId }}
             </span>
           </div>
@@ -158,7 +161,11 @@ function formatDate(dateStr: string) {
             <UInput v-model="birthDate" type="date" class="w-full" />
           </UFormField>
           <UFormField label="Numéro officiel" hint="Optionnel">
-            <UInput v-model="officialId" placeholder="Ex: FR12345678" class="w-full" />
+            <UInput
+              v-model="officialId"
+              placeholder="Ex: FR12345678"
+              class="w-full"
+            />
           </UFormField>
           <div class="flex justify-end gap-2 pt-2">
             <UButton color="neutral" variant="outline" @click="isOpen = false"
