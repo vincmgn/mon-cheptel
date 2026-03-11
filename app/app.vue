@@ -8,6 +8,7 @@ useHead({
     { name: 'apple-mobile-web-app-title', content: 'Cheptel' },
     { name: 'mobile-web-app-capable', content: 'yes' },
   ],
+  titleTemplate: title => (title ? `${title} — Mon Cheptel` : 'Mon Cheptel'),
   link: [
     { rel: 'icon', href: '/favicon.ico', sizes: '48x48' },
     { rel: 'icon', href: '/icon.svg', sizes: 'any', type: 'image/svg+xml' },

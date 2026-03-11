@@ -53,22 +53,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Extract metadata (tags, labels)
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=raw,value=latest
-            type=sha,prefix=sha-
-
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -83,19 +73,17 @@ jobs:
         run: |
           set -e
           # 1. Obtenir le JWT de Portainer (fail fast en cas d'erreur)
-          JWT=$(curl -s -f -X POST "${{ secrets.DOCKER_PORTAINER_URL }}/api/auth" \
+          # DOCKER_PORTAINER_DIRECT_URL = URL directe (IP:port) sans Cloudflare, évite les timeouts 524
+          JWT=$(curl -s -f -X POST "${{ secrets.DOCKER_PORTAINER_DIRECT_URL }}/api/auth" \
             -H "Content-Type: application/json" \
             -d "{\"username\": \"${{ secrets.DOCKER_PORTAINER_USER }}\", \"password\": \"${{ secrets.DOCKER_PORTAINER_PASSWORD }}\"}" | jq -r .jwt)
 
           # 2. Récupérer l'ID de la stack
-          STACK_ID=$(curl -s -f -H "Authorization: Bearer $JWT" "${{ secrets.DOCKER_PORTAINER_URL }}/api/stacks" | \
+          STACK_ID=$(curl -s -f -H "Authorization: Bearer $JWT" "${{ secrets.DOCKER_PORTAINER_DIRECT_URL }}/api/stacks" | \
             jq -r ".[] | select(.Name == \"${{ secrets.PORTAINER_STACK_NAME }}\") | .Id")
 
-          # 3. Lire le contenu du docker-compose, remplacer le tag :latest par le SHA
-          #    (le tag SHA est unique par commit → Docker le pullera automatiquement
-          #    au redémarrage du container, sans bloquer la requête Portainer)
-          SHA_TAG="sha-$(echo "$GITHUB_SHA" | cut -c1-7)"
-          STACK_FILE_CONTENT=$(sed "s/:latest/:$SHA_TAG/g" docker-compose.prod.yml | jq -Rs .)
+          # 3. Lire le contenu du docker-compose et préparer le payload JSON
+          STACK_FILE_CONTENT=$(jq -Rs . < docker-compose.prod.yml)
 
           # 4. Préparer les variables d'environnement
           # La DATABASE_URL doit utiliser 'db' comme hostname (nom du service dans docker-compose)
@@ -110,10 +98,10 @@ jobs:
           echo "Updating stack $STACK_ID..."
           # On capture le code HTTP et le corps de réponse
           # NOTE: On utilise PUT /api/stacks/{id} au lieu de POST /api/stacks/{id}/update qui n'existe plus/pas
-          HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "${{ secrets.DOCKER_PORTAINER_URL }}/api/stacks/$STACK_ID?endpointId=2" \
+          HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "${{ secrets.DOCKER_PORTAINER_DIRECT_URL }}/api/stacks/$STACK_ID?endpointId=2" \
             -H "Authorization: Bearer $JWT" \
             -H "Content-Type: application/json" \
-            -d "{\"stackFileContent\": $STACK_FILE_CONTENT, \"env\": $ENV_VARS, \"prune\": true, \"pullImage\": false}")
+            -d "{\"stackFileContent\": $STACK_FILE_CONTENT, \"env\": $ENV_VARS, \"prune\": true, \"pullImage\": true}")
 
           HTTP_BODY=$(echo "$HTTP_RESPONSE" | head -n -1)
           HTTP_STATUS=$(echo "$HTTP_RESPONSE" | tail -n 1)

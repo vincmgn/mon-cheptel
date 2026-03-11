@@ -103,9 +103,6 @@ function formatDate(dateStr: string) {
       >
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2">
-            <span class="font-medium text-sm">{{
-              calf.sex === 'M' ? '♂ Mâle' : '♀ Femelle'
-            }}</span>
             <UBadge
               :color="calf.sex === 'M' ? 'primary' : 'error'"
               variant="subtle"
@@ -113,7 +110,13 @@ function formatDate(dateStr: string) {
             >
               {{ calf.sex }}
             </UBadge>
-            <span v-if="calf.officialId" class="text-xs font-mono text-gray-500 dark:text-gray-400">
+            <span class="font-medium text-sm">{{
+              calf.sex === 'M' ? 'Mâle' : 'Femelle'
+            }}</span>
+            <span
+              v-if="calf.officialId"
+              class="text-xs font-mono text-gray-500 dark:text-gray-400"
+            >
               {{ calf.officialId }}
             </span>
           </div>
@@ -143,22 +146,26 @@ function formatDate(dateStr: string) {
                 :variant="sex === 'M' ? 'solid' : 'outline'"
                 @click="sex = 'M'"
               >
-                ♂ Mâle
+                Mâle
               </UButton>
               <UButton
                 :color="sex === 'F' ? 'error' : 'neutral'"
                 :variant="sex === 'F' ? 'solid' : 'outline'"
                 @click="sex = 'F'"
               >
-                ♀ Femelle
+                Femelle
               </UButton>
             </div>
           </UFormField>
           <UFormField label="Date de naissance">
             <UInput v-model="birthDate" type="date" class="w-full" />
           </UFormField>
-          <UFormField label="Numéro officiel" hint="Optionnel">
-            <UInput v-model="officialId" placeholder="Ex: FR12345678" class="w-full" />
+          <UFormField label="Numéro" hint="Optionnel">
+            <UInput
+              v-model="officialId"
+              placeholder="Ex: FR12345678"
+              class="w-full"
+            />
           </UFormField>
           <div class="flex justify-end gap-2 pt-2">
             <UButton color="neutral" variant="outline" @click="isOpen = false"

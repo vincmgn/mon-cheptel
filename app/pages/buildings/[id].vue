@@ -16,6 +16,8 @@ const { data, refresh, status } = await useFetch<ApiResponse<BuildingWithPens>>(
 )
 const building = computed(() => data.value?.data)
 
+useHead(computed(() => ({ title: building.value?.name ?? 'Bâtiment' })))
+
 watchEffect(() => {
   if (status.value === 'success' && !building.value)
     router.replace('/locations')
@@ -49,9 +51,19 @@ function openDelete(pen: Pen) {
       <div class="flex items-end justify-between">
         <PenHeader :building="building" />
         <div class="mb-8">
-          <UButton icon="i-lucide-plus" @click="isCreateOpen = true"
-            >Nouvelle case</UButton
+          <UButton
+            aria-label="Nouvelle case"
+            class="max-sm:size-12 max-sm:rounded-full max-sm:px-0 max-sm:py-0 max-sm:flex max-sm:items-center max-sm:justify-center"
+            @click="isCreateOpen = true"
           >
+            <span class="sm:hidden flex items-center justify-center">
+              <UIcon name="i-lucide-plus" class="size-6" />
+            </span>
+            <span class="hidden sm:inline-flex sm:items-center sm:gap-2">
+              <UIcon name="i-lucide-plus" class="size-4" />
+              Nouvelle case
+            </span>
+          </UButton>
         </div>
       </div>
 

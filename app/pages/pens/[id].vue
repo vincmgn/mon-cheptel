@@ -15,6 +15,8 @@ const { data, refresh, status } = await useFetch<ApiResponse<PenWithCows>>(
 )
 const pen = computed(() => data.value?.data)
 
+useHead(computed(() => ({ title: pen.value?.name ?? 'Box' })))
+
 watchEffect(() => {
   if (status.value === 'success' && !pen.value) router.replace('/locations')
 })
@@ -38,8 +40,18 @@ function openDelete(cow: Cow) {
       <div class="flex items-end justify-between">
         <CowHeader :pen="pen" />
         <div class="mb-8">
-          <UButton icon="i-lucide-plus" @click="isCreateOpen = true">
-            Nouvelle vache
+          <UButton
+            aria-label="Nouvelle vache"
+            class="max-sm:size-12 max-sm:rounded-full max-sm:px-0 max-sm:py-0 max-sm:flex max-sm:items-center max-sm:justify-center"
+            @click="isCreateOpen = true"
+          >
+            <span class="sm:hidden flex items-center justify-center">
+              <UIcon name="i-lucide-plus" class="size-6" />
+            </span>
+            <span class="hidden sm:inline-flex sm:items-center sm:gap-2">
+              <UIcon name="i-lucide-plus" class="size-4" />
+              Nouvelle vache
+            </span>
           </UButton>
         </div>
       </div>
@@ -70,10 +82,10 @@ function openDelete(cow: Cow) {
               <div
                 class="p-2 rounded-lg bg-orange-500/10 dark:bg-orange-500/20 shrink-0 flex items-center justify-center"
               >
-                <UIcon name="i-lucide-beef" class="size-5 text-orange-500" />
+                🐄
               </div>
               <h3 class="font-semibold text-base truncate">
-                🐄 {{ cow.officialId }}
+                {{ cow.officialId }}
               </h3>
             </div>
             <div class="flex gap-1 ml-2 shrink-0">

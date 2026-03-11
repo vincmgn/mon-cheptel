@@ -3,6 +3,8 @@ import { z } from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 import HeadApp from '~/components/index/HeadApp.vue'
 
+useHead({ title: 'Connexion' })
+
 definePageMeta({ layout: false })
 
 const schema = z.object({

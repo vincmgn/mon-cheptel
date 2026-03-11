@@ -3,6 +3,8 @@ import Hero from '~/components/index/Hero.vue'
 import SearchBar from '~/components/shared/SearchBar.vue'
 import type { ApiList } from '~~/types'
 
+useHead({ title: 'Tableau de bord' })
+
 const { user, clear } = useUserSession()
 
 const { data: statsData } = await useAsyncData('dashboard-stats', () =>
@@ -83,7 +85,7 @@ async function logout() {
     </div>
 
     <!-- Main entry cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
       <NuxtLink to="/locations" class="group">
         <UCard
           class="h-full transition-all group-hover:shadow-md cursor-pointer"
@@ -130,5 +132,27 @@ async function logout() {
         </UCard>
       </NuxtLink>
     </div>
+
+    <!-- Export card -->
+    <NuxtLink to="/export" class="group">
+      <UCard class="transition-all group-hover:shadow-md cursor-pointer">
+        <div class="flex items-center gap-4">
+          <div
+            class="p-3 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center"
+          >
+            <UIcon name="i-lucide-download" class="size-8 text-emerald-500" />
+          </div>
+          <div>
+            <h2 class="text-lg font-bold">Export</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              CSV, Excel, PDF — Vaches, Taureaux, Veaux, IA
+            </p>
+          </div>
+          <div class="ml-auto shrink-0">
+            <UBadge color="success" variant="subtle">Exporter →</UBadge>
+          </div>
+        </div>
+      </UCard>
+    </NuxtLink>
   </UContainer>
 </template>
