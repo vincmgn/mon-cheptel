@@ -33,9 +33,11 @@ function parseDate(val: string | undefined): Date | undefined {
   if (!val?.trim()) return undefined
   const frMatch = val.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
   if (frMatch) {
-    return new Date(
-      `${frMatch[3]}-${frMatch[2].padStart(2, '0')}-${frMatch[1].padStart(2, '0')}`
-    )
+    const day = frMatch[1]
+    const month = frMatch[2]
+    const year = frMatch[3]
+    if (!day || !month || !year) return undefined
+    return new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)
   }
   const d = new Date(val.trim())
   return isNaN(d.getTime()) ? undefined : d
@@ -72,16 +74,26 @@ export default defineEventHandler(async event => {
 
     const preview = cowRows.map(row => {
       if (!row.officialId?.trim()) {
-        return { ...row, status: 'missingField', message: 'Identifiant manquant' }
+        return {
+          ...row,
+          status: 'missingField',
+          message: 'Identifiant manquant',
+        }
       }
       if (existingIds.has(row.officialId.trim())) {
-        return { ...row, status: 'duplicate', message: `"${row.officialId.trim()}" existe déjà` }
+        return {
+          ...row,
+          status: 'duplicate',
+          message: `"${row.officialId.trim()}" existe déjà`,
+        }
       }
       const pen = pens.find(
         p =>
           p.name.toLowerCase() === row.pen?.trim().toLowerCase() &&
-          p.building.name.toLowerCase() === row.building?.trim().toLowerCase() &&
-          p.building.location.name.toLowerCase() === row.location?.trim().toLowerCase()
+          p.building.name.toLowerCase() ===
+            row.building?.trim().toLowerCase() &&
+          p.building.location.name.toLowerCase() ===
+            row.location?.trim().toLowerCase()
       )
       if (!pen) {
         return {
@@ -112,7 +124,11 @@ export default defineEventHandler(async event => {
         return { ...row, status: 'missingField', message: 'Nom manquant' }
       }
       if (existingNames.has(row.name.trim().toLowerCase())) {
-        return { ...row, status: 'duplicate', message: `"${row.name.trim()}" existe déjà` }
+        return {
+          ...row,
+          status: 'duplicate',
+          message: `"${row.name.trim()}" existe déjà`,
+        }
       }
       return { ...row, status: 'ok' }
     })
@@ -141,14 +157,26 @@ export default defineEventHandler(async event => {
 
     const preview = breedingRows.map(row => {
       if (!row.date?.trim()) {
-        return { ...row, status: 'missingField', message: "Date d'insémination manquante" }
+        return {
+          ...row,
+          status: 'missingField',
+          message: "Date d'insémination manquante",
+        }
       }
       if (!row.cowOfficialId?.trim()) {
-        return { ...row, status: 'missingField', message: 'Numéro de vache manquant' }
+        return {
+          ...row,
+          status: 'missingField',
+          message: 'Numéro de vache manquant',
+        }
       }
       const parsedDate = parseDate(row.date)
       if (!parsedDate) {
-        return { ...row, status: 'missingField', message: `Date invalide : ${row.date}` }
+        return {
+          ...row,
+          status: 'missingField',
+          message: `Date invalide : ${row.date}`,
+        }
       }
       const cowId = cowMap.get(row.cowOfficialId.trim())
       if (!cowId) {
@@ -199,19 +227,35 @@ export default defineEventHandler(async event => {
         return { ...row, status: 'missingField', message: 'Sexe manquant' }
       }
       if (!row.birthDate?.trim()) {
-        return { ...row, status: 'missingField', message: 'Date de naissance manquante' }
+        return {
+          ...row,
+          status: 'missingField',
+          message: 'Date de naissance manquante',
+        }
       }
       if (!row.motherOfficialId?.trim()) {
-        return { ...row, status: 'missingField', message: 'Numéro de mère manquant' }
+        return {
+          ...row,
+          status: 'missingField',
+          message: 'Numéro de mère manquant',
+        }
       }
 
       const sexLower = row.sex.trim().toLowerCase()
       if (!['m', 'f', 'mâle', 'male', 'femelle'].includes(sexLower)) {
-        return { ...row, status: 'invalidSex', message: `Sexe invalide : ${row.sex} (attendu : Mâle ou Femelle)` }
+        return {
+          ...row,
+          status: 'invalidSex',
+          message: `Sexe invalide : ${row.sex} (attendu : Mâle ou Femelle)`,
+        }
       }
 
       if (!parseDate(row.birthDate)) {
-        return { ...row, status: 'missingField', message: `Date invalide : ${row.birthDate}` }
+        return {
+          ...row,
+          status: 'missingField',
+          message: `Date invalide : ${row.birthDate}`,
+        }
       }
 
       if (!cowMap.has(row.motherOfficialId.trim())) {
@@ -222,7 +266,10 @@ export default defineEventHandler(async event => {
         }
       }
 
-      if (row.officialId?.trim() && existingCalfIds.has(row.officialId.trim().toLowerCase())) {
+      if (
+        row.officialId?.trim() &&
+        existingCalfIds.has(row.officialId.trim().toLowerCase())
+      ) {
         return {
           ...row,
           status: 'duplicate',
@@ -238,6 +285,7 @@ export default defineEventHandler(async event => {
 
   throw createError({
     statusCode: 400,
-    message: 'Type invalide. Valeurs acceptées : cows, bulls, breedings, calves',
+    message:
+      'Type invalide. Valeurs acceptées : cows, bulls, breedings, calves',
   })
 })

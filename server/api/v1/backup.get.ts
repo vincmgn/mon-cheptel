@@ -12,12 +12,17 @@ export default defineEventHandler(async event => {
     }),
     prisma.cow.findMany({
       where: { pen: { building: { location: { userId } } } },
-      include: { pen: { include: { building: { include: { location: true } } } } },
+      include: {
+        pen: { include: { building: { include: { location: true } } } },
+      },
       orderBy: { createdAt: 'asc' },
     }),
     prisma.breeding.findMany({
       where: { cow: { pen: { building: { location: { userId } } } } },
-      include: { cow: { select: { officialId: true } }, bull: { select: { name: true } } },
+      include: {
+        cow: { select: { officialId: true } },
+        bull: { select: { name: true } },
+      },
       orderBy: { date: 'asc' },
     }),
     prisma.calf.findMany({

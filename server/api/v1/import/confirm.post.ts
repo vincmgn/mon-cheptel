@@ -33,9 +33,11 @@ function parseDate(val: string | undefined): Date | undefined {
   if (!val?.trim()) return undefined
   const frMatch = val.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
   if (frMatch) {
-    return new Date(
-      `${frMatch[3]}-${frMatch[2].padStart(2, '0')}-${frMatch[1].padStart(2, '0')}`
-    )
+    const day = frMatch[1]
+    const month = frMatch[2]
+    const year = frMatch[3]
+    if (!day || !month || !year) return undefined
+    return new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`)
   }
   const d = new Date(val.trim())
   return isNaN(d.getTime()) ? undefined : d
@@ -74,16 +76,27 @@ export default defineEventHandler(async event => {
     let skipped = 0
 
     for (const row of cowRows) {
-      if (!row.officialId?.trim()) { skipped++; continue }
-      if (existingIds.has(row.officialId.trim())) { skipped++; continue }
+      if (!row.officialId?.trim()) {
+        skipped++
+        continue
+      }
+      if (existingIds.has(row.officialId.trim())) {
+        skipped++
+        continue
+      }
 
       const pen = pens.find(
         p =>
           p.name.toLowerCase() === row.pen?.trim().toLowerCase() &&
-          p.building.name.toLowerCase() === row.building?.trim().toLowerCase() &&
-          p.building.location.name.toLowerCase() === row.location?.trim().toLowerCase()
+          p.building.name.toLowerCase() ===
+            row.building?.trim().toLowerCase() &&
+          p.building.location.name.toLowerCase() ===
+            row.location?.trim().toLowerCase()
       )
-      if (!pen) { skipped++; continue }
+      if (!pen) {
+        skipped++
+        continue
+      }
 
       const prophylaxis =
         row.prophylaxis?.trim().toLowerCase() === 'oui' ||
@@ -124,8 +137,14 @@ export default defineEventHandler(async event => {
     let skipped = 0
 
     for (const row of bullRows) {
-      if (!row.name?.trim()) { skipped++; continue }
-      if (existingNames.has(row.name.trim().toLowerCase())) { skipped++; continue }
+      if (!row.name?.trim()) {
+        skipped++
+        continue
+      }
+      if (existingNames.has(row.name.trim().toLowerCase())) {
+        skipped++
+        continue
+      }
 
       const createdAt = parseDate(row.createdAt)
 
@@ -176,21 +195,33 @@ export default defineEventHandler(async event => {
     let skipped = 0
 
     for (const row of breedingRows) {
-      if (!row.date?.trim() || !row.cowOfficialId?.trim()) { skipped++; continue }
+      if (!row.date?.trim() || !row.cowOfficialId?.trim()) {
+        skipped++
+        continue
+      }
 
       const parsedDate = parseDate(row.date)
-      if (!parsedDate) { skipped++; continue }
+      if (!parsedDate) {
+        skipped++
+        continue
+      }
 
       const cowId = cowMap.get(row.cowOfficialId.trim())
-      if (!cowId) { skipped++; continue }
+      if (!cowId) {
+        skipped++
+        continue
+      }
 
       const key = `${cowId}:${isoDay(parsedDate)}`
-      if (existingKeys.has(key)) { skipped++; continue }
+      if (existingKeys.has(key)) {
+        skipped++
+        continue
+      }
 
       const isMaybe = row.isMaybe?.trim().toLowerCase() === 'possible'
 
       const bullId = row.bullName?.trim()
-        ? bullMap.get(row.bullName.trim().toLowerCase()) ?? null
+        ? (bullMap.get(row.bullName.trim().toLowerCase()) ?? null)
         : null
       const bullName =
         !bullId && row.bullName?.trim() ? row.bullName.trim() : null
@@ -241,22 +272,34 @@ export default defineEventHandler(async event => {
     let skipped = 0
 
     for (const row of calfRows) {
-      if (!row.sex?.trim() || !row.birthDate?.trim() || !row.motherOfficialId?.trim()) {
-        skipped++; continue
+      if (
+        !row.sex?.trim() ||
+        !row.birthDate?.trim() ||
+        !row.motherOfficialId?.trim()
+      ) {
+        skipped++
+        continue
       }
 
       const birthDate = parseDate(row.birthDate)
-      if (!birthDate) { skipped++; continue }
+      if (!birthDate) {
+        skipped++
+        continue
+      }
 
       const cowId = cowMap.get(row.motherOfficialId.trim())
-      if (!cowId) { skipped++; continue }
+      if (!cowId) {
+        skipped++
+        continue
+      }
 
       const sexLower = row.sex.trim().toLowerCase()
       const sex = ['m', 'mâle', 'male'].includes(sexLower) ? 'M' : 'F'
 
       const officialId = row.officialId?.trim() || null
       if (officialId && existingCalfIds.has(officialId.toLowerCase())) {
-        skipped++; continue
+        skipped++
+        continue
       }
 
       try {
@@ -280,6 +323,7 @@ export default defineEventHandler(async event => {
 
   throw createError({
     statusCode: 400,
-    message: 'Type invalide. Valeurs acceptées : cows, bulls, breedings, calves',
+    message:
+      'Type invalide. Valeurs acceptées : cows, bulls, breedings, calves',
   })
 })
