@@ -82,6 +82,8 @@ async function deleteBreeding(id: number) {
   }
 }
 
+const GESTATION_DAYS = 283
+
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('fr-FR', {
     day: '2-digit',
@@ -89,6 +91,21 @@ function formatDate(dateStr: string) {
     year: 'numeric',
   })
 }
+
+function expectedCalving(dateStr: string): string {
+  const d = new Date(dateStr)
+  d.setDate(d.getDate() + GESTATION_DAYS)
+  return d.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
+const expectedCalvingDate = computed(() => {
+  if (!date.value) return null
+  return expectedCalving(date.value)
+})
 </script>
 
 <template>
@@ -132,6 +149,9 @@ function formatDate(dateStr: string) {
           <p class="text-xs text-gray-400 mt-0.5">
             {{ formatDate(breeding.date) }}
           </p>
+          <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">
+            Vêlage prévu : {{ expectedCalving(breeding.date) }}
+          </p>
         </div>
         <UButton
           icon="i-lucide-trash-2"
@@ -150,6 +170,12 @@ function formatDate(dateStr: string) {
         <div class="space-y-4">
           <UFormField label="Date">
             <UInput v-model="date" type="date" class="w-full" />
+            <p
+              v-if="expectedCalvingDate"
+              class="text-xs text-emerald-600 dark:text-emerald-400 mt-1.5"
+            >
+              🐄 Vêlage prévu le <strong>{{ expectedCalvingDate }}</strong>
+            </p>
           </UFormField>
 
           <UFormField label="Taureau">

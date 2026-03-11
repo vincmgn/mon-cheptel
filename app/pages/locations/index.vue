@@ -45,9 +45,19 @@ function openDelete(location: Location) {
       <div class="flex items-end justify-between mb-0">
         <LocationHeader :locations="locations" />
         <div class="mb-8">
-          <UButton icon="i-lucide-plus" @click="isCreateOpen = true"
-            >Nouveau lieu</UButton
+          <UButton
+            aria-label="Nouveau lieu"
+            class="max-sm:size-12 max-sm:rounded-full max-sm:px-0 max-sm:py-0 max-sm:flex max-sm:items-center max-sm:justify-center"
+            @click="isCreateOpen = true"
           >
+            <span class="sm:hidden flex items-center justify-center">
+              <UIcon name="i-lucide-plus" class="size-6" />
+            </span>
+            <span class="hidden sm:inline-flex sm:items-center sm:gap-2">
+              <UIcon name="i-lucide-plus" class="size-4" />
+              Nouveau lieu
+            </span>
+          </UButton>
         </div>
       </div>
     </div>

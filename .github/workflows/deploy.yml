@@ -73,12 +73,13 @@ jobs:
         run: |
           set -e
           # 1. Obtenir le JWT de Portainer (fail fast en cas d'erreur)
-          JWT=$(curl -s -f -X POST "${{ secrets.DOCKER_PORTAINER_URL }}/api/auth" \
+          # DOCKER_PORTAINER_DIRECT_URL = URL directe (IP:port) sans Cloudflare, évite les timeouts 524
+          JWT=$(curl -s -f -X POST "${{ secrets.DOCKER_PORTAINER_DIRECT_URL }}/api/auth" \
             -H "Content-Type: application/json" \
             -d "{\"username\": \"${{ secrets.DOCKER_PORTAINER_USER }}\", \"password\": \"${{ secrets.DOCKER_PORTAINER_PASSWORD }}\"}" | jq -r .jwt)
 
           # 2. Récupérer l'ID de la stack
-          STACK_ID=$(curl -s -f -H "Authorization: Bearer $JWT" "${{ secrets.DOCKER_PORTAINER_URL }}/api/stacks" | \
+          STACK_ID=$(curl -s -f -H "Authorization: Bearer $JWT" "${{ secrets.DOCKER_PORTAINER_DIRECT_URL }}/api/stacks" | \
             jq -r ".[] | select(.Name == \"${{ secrets.PORTAINER_STACK_NAME }}\") | .Id")
 
           # 3. Lire le contenu du docker-compose et préparer le payload JSON
@@ -97,7 +98,7 @@ jobs:
           echo "Updating stack $STACK_ID..."
           # On capture le code HTTP et le corps de réponse
           # NOTE: On utilise PUT /api/stacks/{id} au lieu de POST /api/stacks/{id}/update qui n'existe plus/pas
-          HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "${{ secrets.DOCKER_PORTAINER_URL }}/api/stacks/$STACK_ID?endpointId=2" \
+          HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "${{ secrets.DOCKER_PORTAINER_DIRECT_URL }}/api/stacks/$STACK_ID?endpointId=2" \
             -H "Authorization: Bearer $JWT" \
             -H "Content-Type: application/json" \
             -d "{\"stackFileContent\": $STACK_FILE_CONTENT, \"env\": $ENV_VARS, \"prune\": true, \"pullImage\": true}")
