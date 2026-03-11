@@ -117,6 +117,45 @@ const sections = [
   { key: 'breedings' as const, label: 'Inséminations', emoji: '💉' },
   { key: 'calves' as const, label: 'Veaux', emoji: '🐮' },
 ]
+
+// ── Reset (danger zone) ───────────────────────────────────────────────────────
+
+const resetConfirmInput = ref('')
+const resetPending = ref(false)
+const resetting = ref(false)
+const resetError = ref('')
+const resetResult = ref<{ calves: number; breedings: number; cows: number; bulls: number } | null>(null)
+
+async function confirmReset() {
+  resetting.value = true
+  resetError.value = ''
+  try {
+    const res = await $fetch<{ success: boolean; data: typeof resetResult.value }>(
+      '/api/v1/reset',
+      { method: 'DELETE' }
+    )
+    resetResult.value = res.data
+    resetPending.value = false
+    resetConfirmInput.value = ''
+  } catch (e: unknown) {
+    resetError.value =
+      (e as { data?: { message?: string } }).data?.message ?? 'Erreur lors de la suppression'
+  } finally {
+    resetting.value = false
+  }
+}
+
+function cancelReset() {
+  resetPending.value = false
+  resetConfirmInput.value = ''
+  resetError.value = ''
+}
+
+const resetTotal = computed(() =>
+  resetResult.value
+    ? Object.values(resetResult.value).reduce((s, v) => s + v, 0)
+    : 0
+)
 </script>
 
 <template>
@@ -277,6 +316,93 @@ const sections = [
           class="mt-3"
         />
       </UCard>
+
+      <!-- Danger zone -->
+      <div class="rounded-xl border-2 border-red-200 dark:border-red-900 overflow-hidden">
+        <div class="px-4 py-3 bg-red-50 dark:bg-red-950/40 flex items-center gap-2">
+          <UIcon name="i-lucide-triangle-alert" class="size-4 text-red-500" />
+          <span class="text-sm font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">
+            Zone de danger
+          </span>
+        </div>
+
+        <div class="p-4 space-y-4">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-sm font-medium">Supprimer toutes les données</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                Supprime définitivement toutes les vaches, taureaux, inséminations et veaux.
+                Les lieux, bâtiments et cases sont conservés.
+              </p>
+            </div>
+            <UButton
+              v-if="!resetPending && !resetResult"
+              color="error"
+              variant="subtle"
+              icon="i-lucide-trash-2"
+              @click="resetPending = true"
+            >
+              Supprimer
+            </UButton>
+          </div>
+
+          <!-- Confirmation inline -->
+          <template v-if="resetPending">
+            <div class="rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 p-4 space-y-3">
+              <p class="text-sm text-red-700 dark:text-red-300 font-medium">
+                Cette action est irréversible. Tapez <strong>SUPPRIMER</strong> pour confirmer.
+              </p>
+              <UInput
+                v-model="resetConfirmInput"
+                placeholder="SUPPRIMER"
+                :ui="{ base: 'font-mono' }"
+              />
+              <div class="flex gap-2">
+                <UButton
+                  color="error"
+                  icon="i-lucide-trash-2"
+                  :disabled="resetConfirmInput !== 'SUPPRIMER' || resetting"
+                  :loading="resetting"
+                  @click="confirmReset"
+                >
+                  Confirmer la suppression
+                </UButton>
+                <UButton variant="ghost" color="neutral" @click="cancelReset">
+                  Annuler
+                </UButton>
+              </div>
+            </div>
+          </template>
+
+          <!-- Reset result -->
+          <template v-if="resetResult">
+            <div class="rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 flex items-center gap-3">
+              <UIcon name="i-lucide-check-circle" class="size-5 text-success-500 shrink-0" />
+              <p class="text-sm text-gray-700 dark:text-gray-300">
+                <strong>{{ resetTotal }}</strong> enregistrement(s) supprimé(s) —
+                {{ resetResult.cows }} vache(s), {{ resetResult.bulls }} taureau(x),
+                {{ resetResult.breedings }} insémination(s), {{ resetResult.calves }} veau(x)
+              </p>
+              <UButton
+                variant="ghost"
+                color="neutral"
+                size="xs"
+                icon="i-lucide-x"
+                class="ml-auto"
+                @click="resetResult = null"
+              />
+            </div>
+          </template>
+
+          <UAlert
+            v-if="resetError"
+            color="error"
+            variant="subtle"
+            icon="i-lucide-alert-circle"
+            :description="resetError"
+          />
+        </div>
+      </div>
 
     </div>
   </UContainer>
