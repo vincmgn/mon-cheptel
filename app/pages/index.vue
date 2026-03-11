@@ -133,26 +133,28 @@ async function logout() {
       </NuxtLink>
     </div>
 
-    <!-- Export card -->
-    <NuxtLink to="/export" class="group">
-      <UCard class="transition-all group-hover:shadow-md cursor-pointer">
-        <div class="flex items-center gap-4">
-          <div
-            class="p-3 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center"
-          >
-            <UIcon name="i-lucide-download" class="size-8 text-emerald-500" />
+    <!-- Data card -->
+    <div class="grid grid-cols-1 gap-4">
+      <NuxtLink to="/data" class="group">
+        <UCard class="h-full transition-all group-hover:shadow-md cursor-pointer">
+          <div class="flex items-center gap-4">
+            <div
+              class="p-3 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center"
+            >
+              <UIcon name="i-lucide-database" class="size-8 text-emerald-500" />
+            </div>
+            <div>
+              <h2 class="text-lg font-bold">Données</h2>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Importer et exporter vos fichiers CSV, Excel et PDF
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 class="text-lg font-bold">Export</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              PDF, CSV, Excel — Vaches, Taureaux, Veaux & Inséminations
-            </p>
+          <div class="mt-4">
+            <UBadge color="success" variant="subtle">Ouvrir →</UBadge>
           </div>
-          <div class="ml-auto shrink-0">
-            <UBadge color="success" variant="subtle">Exporter →</UBadge>
-          </div>
-        </div>
-      </UCard>
-    </NuxtLink>
+        </UCard>
+      </NuxtLink>
+    </div>
   </UContainer>
 </template>
