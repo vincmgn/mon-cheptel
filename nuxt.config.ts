@@ -1,10 +1,23 @@
+import { readFileSync } from 'node:fs'
 import tailwindcss from '@tailwindcss/vite'
+
+const packageJson = JSON.parse(
+  readFileSync(new URL('./package.json', import.meta.url), 'utf8')
+) as { version?: string }
+
+const appVersion =
+  process.env.NUXT_PUBLIC_APP_VERSION ?? packageJson.version ?? '0.0.0'
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   modules: ['@nuxt/ui', 'nuxt-auth-utils', '@vite-pwa/nuxt'],
   css: ['~/assets/css/main.css'],
+  runtimeConfig: {
+    public: {
+      appVersion,
+    },
+  },
   vite: {
     plugins: [tailwindcss()],
   },
