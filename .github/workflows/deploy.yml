@@ -66,9 +66,6 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Redeploy Portainer stack with updated compose
         run: |
           set -euo pipefail
@@ -151,6 +148,13 @@ jobs:
             -H "Authorization: Bearer $JWT" \
             -H "Content-Type: application/json" \
             -d "{\"stackFileContent\": $STACK_FILE_CONTENT, \"env\": $ENV_VARS, \"prune\": true, \"pullImage\": false}")
+          CURL_EXIT_CODE=$?
+          set -e
+
+          if [ "$CURL_EXIT_CODE" -ne 0 ]; then
+            echo "Erreur réseau Portainer (curl=$CURL_EXIT_CODE). Vérifie l'accès runner -> $PORTAINER_URL"
+            exit "$CURL_EXIT_CODE"
+          fi
 
           HTTP_BODY=$(echo "$HTTP_RESPONSE" | head -n -1)
           HTTP_STATUS=$(echo "$HTTP_RESPONSE" | tail -n 1)
