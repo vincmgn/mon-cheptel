@@ -66,27 +66,68 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Redeploy Portainer stack with updated compose
         run: |
-          set -e
-          # 1. Obtenir le JWT de Portainer (fail fast en cas d'erreur)
-          # DOCKER_PORTAINER_DIRECT_URL = URL directe (IP:port) sans Cloudflare, évite les timeouts 524
-          JWT=$(curl -s -f -X POST "${{ secrets.DOCKER_PORTAINER_DIRECT_URL }}/api/auth" \
-            -H "Content-Type: application/json" \
-            -d "{\"username\": \"${{ secrets.DOCKER_PORTAINER_USER }}\", \"password\": \"${{ secrets.DOCKER_PORTAINER_PASSWORD }}\"}" | jq -r .jwt)
+          set -euo pipefail
 
-          # 2. Récupérer l'ID de la stack
-          STACK_ID=$(curl -s -f -H "Authorization: Bearer $JWT" "${{ secrets.DOCKER_PORTAINER_DIRECT_URL }}/api/stacks" | \
-            jq -r ".[] | select(.Name == \"${{ secrets.PORTAINER_STACK_NAME }}\") | .Id")
+          DIRECT_URL="${{ secrets.DOCKER_PORTAINER_DIRECT_URL }}"
+          PUBLIC_URL="${{ secrets.DOCKER_PORTAINER_URL }}"
 
-          # 3. Lire le contenu du docker-compose et préparer le payload JSON
+          DIRECT_URL="${DIRECT_URL%/}"
+          PUBLIC_URL="${PUBLIC_URL%/}"
+
+          CURL_BASE=(--silent --show-error --fail --connect-timeout 10 --max-time 30 --retry 1 --retry-delay 2)
+
+          resolve_portainer() {
+            local candidate="$1"
+            if [ -z "$candidate" ]; then
+              return 1
+            fi
+
+            local jwt
+            jwt=$(curl "${CURL_BASE[@]}" -X POST "$candidate/api/auth" \
+              -H "Content-Type: application/json" \
+              -d "{\"username\": \"${{ secrets.DOCKER_PORTAINER_USER }}\", \"password\": \"${{ secrets.DOCKER_PORTAINER_PASSWORD }}\"}" | jq -r .jwt || true)
+
+            if [ -n "$jwt" ] && [ "$jwt" != "null" ]; then
+              echo "$candidate|$jwt"
+              return 0
+            fi
+
+            return 1
+          }
+
+          PORTAINER_AUTH=""
+          if PORTAINER_AUTH=$(resolve_portainer "$DIRECT_URL"); then
+            echo "Portainer direct reachable"
+          elif PORTAINER_AUTH=$(resolve_portainer "$PUBLIC_URL"); then
+            echo "Portainer public URL reachable"
+          else
+            echo "Impossible de joindre Portainer (direct + public)"
+            exit 1
+          fi
+
+          PORTAINER_URL="${PORTAINER_AUTH%%|*}"
+          JWT="${PORTAINER_AUTH#*|}"
+
+          STACKS_JSON=$(curl "${CURL_BASE[@]}" -H "Authorization: Bearer $JWT" "$PORTAINER_URL/api/stacks")
+          STACK_ID=$(echo "$STACKS_JSON" | jq -r '.[] | select(.Name == "${{ secrets.PORTAINER_STACK_NAME }}") | .Id' | head -n 1)
+          ENDPOINT_ID=$(echo "$STACKS_JSON" | jq -r '.[] | select(.Name == "${{ secrets.PORTAINER_STACK_NAME }}") | .EndpointId' | head -n 1)
+
+          if [ -z "$STACK_ID" ] || [ "$STACK_ID" = "null" ]; then
+            echo "Stack introuvable: ${{ secrets.PORTAINER_STACK_NAME }}"
+            echo "Stacks disponibles:"
+            echo "$STACKS_JSON" | jq -r '.[].Name'
+            exit 1
+          fi
+
+          if [ -z "$ENDPOINT_ID" ] || [ "$ENDPOINT_ID" = "null" ]; then
+            echo "EndpointId introuvable pour la stack $STACK_ID"
+            exit 1
+          fi
+
           STACK_FILE_CONTENT=$(jq -Rs . < docker-compose.prod.yml)
 
-          # 4. Préparer les variables d'environnement
-          # La DATABASE_URL doit utiliser 'db' comme hostname (nom du service dans docker-compose)
           DATABASE_URL="postgresql://user_prod:password_prod@db:5432/cheptel_db"
           ENV_VARS=$(jq -n \
             --arg db_url "$DATABASE_URL" \
@@ -94,11 +135,8 @@ jobs:
             --arg nuxt_session_password "${{ secrets.NUXT_SESSION_PASSWORD }}" \
             '[{name: "DATABASE_URL", value: $db_url}, {name: "NUXT_SECRET", value: $nuxt_secret}, {name: "NUXT_SESSION_PASSWORD", value: $nuxt_session_password}]')
 
-          # 5. Mettre à jour la stack via l'endpoint d'update (avec redeploy)
-          echo "Updating stack $STACK_ID..."
-          # On capture le code HTTP et le corps de réponse
-          # NOTE: On utilise PUT /api/stacks/{id} au lieu de POST /api/stacks/{id}/update qui n'existe plus/pas
-          HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "${{ secrets.DOCKER_PORTAINER_DIRECT_URL }}/api/stacks/$STACK_ID?endpointId=2" \
+          echo "Updating stack $STACK_ID (endpointId=$ENDPOINT_ID)..."
+          HTTP_RESPONSE=$(curl --silent --show-error -w "\n%{http_code}" -X PUT "$PORTAINER_URL/api/stacks/$STACK_ID?endpointId=$ENDPOINT_ID" \
             -H "Authorization: Bearer $JWT" \
             -H "Content-Type: application/json" \
             -d "{\"stackFileContent\": $STACK_FILE_CONTENT, \"env\": $ENV_VARS, \"prune\": true, \"pullImage\": true}")
@@ -110,7 +148,6 @@ jobs:
             echo "Error updating stack (HTTP $HTTP_STATUS):"
             echo "$HTTP_BODY"
             exit 1
-          else
-            echo "Stack update initiated successfully:"
-            echo "$HTTP_BODY"
           fi
+
+          echo "Stack update initiated successfully"
