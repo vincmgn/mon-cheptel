@@ -133,26 +133,49 @@ async function logout() {
       </NuxtLink>
     </div>
 
-    <!-- Export card -->
-    <NuxtLink to="/export" class="group">
-      <UCard class="transition-all group-hover:shadow-md cursor-pointer">
-        <div class="flex items-center gap-4">
-          <div
-            class="p-3 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center"
-          >
-            <UIcon name="i-lucide-download" class="size-8 text-emerald-500" />
+    <!-- Export / Import cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <NuxtLink to="/export" class="group">
+        <UCard class="h-full transition-all group-hover:shadow-md cursor-pointer">
+          <div class="flex items-center gap-4">
+            <div
+              class="p-3 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center"
+            >
+              <UIcon name="i-lucide-download" class="size-8 text-emerald-500" />
+            </div>
+            <div>
+              <h2 class="text-lg font-bold">Export</h2>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                CSV, Excel, PDF — Vaches, Taureaux, Veaux, IA
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 class="text-lg font-bold">Export</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              CSV, Excel, PDF — Vaches, Taureaux, Veaux, IA
-            </p>
-          </div>
-          <div class="ml-auto shrink-0">
+          <div class="mt-4">
             <UBadge color="success" variant="subtle">Exporter →</UBadge>
           </div>
-        </div>
-      </UCard>
-    </NuxtLink>
+        </UCard>
+      </NuxtLink>
+
+      <NuxtLink to="/import" class="group">
+        <UCard class="h-full transition-all group-hover:shadow-md cursor-pointer">
+          <div class="flex items-center gap-4">
+            <div
+              class="p-3 rounded-xl bg-sky-500/10 dark:bg-sky-500/20 flex items-center justify-center"
+            >
+              <UIcon name="i-lucide-upload" class="size-8 text-sky-500" />
+            </div>
+            <div>
+              <h2 class="text-lg font-bold">Import</h2>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                CSV, Excel — Vaches, Taureaux
+              </p>
+            </div>
+          </div>
+          <div class="mt-4">
+            <UBadge color="info" variant="subtle">Importer →</UBadge>
+          </div>
+        </UCard>
+      </NuxtLink>
+    </div>
   </UContainer>
 </template>
