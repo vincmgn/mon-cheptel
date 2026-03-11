@@ -136,7 +136,9 @@ async function logout() {
     <!-- Data card -->
     <div class="grid grid-cols-1 gap-4">
       <NuxtLink to="/data" class="group">
-        <UCard class="h-full transition-all group-hover:shadow-md cursor-pointer">
+        <UCard
+          class="h-full transition-all group-hover:shadow-md cursor-pointer"
+        >
           <div class="flex items-center gap-4">
             <div
               class="p-3 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center"
