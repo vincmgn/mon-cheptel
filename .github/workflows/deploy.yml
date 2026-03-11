@@ -76,6 +76,14 @@ jobs:
           DIRECT_URL="${DIRECT_URL%/}"
           PUBLIC_URL="${PUBLIC_URL%/}"
 
+          COMPOSE_PATH="$GITHUB_WORKSPACE/docker-compose.prod.yml"
+          if [ ! -f "$COMPOSE_PATH" ]; then
+            echo "Fichier compose introuvable: $COMPOSE_PATH"
+            pwd
+            ls -la
+            exit 1
+          fi
+
           CURL_BASE=(--silent --show-error --fail --connect-timeout 10 --max-time 30 --retry 1 --retry-delay 2)
 
           resolve_portainer() {
@@ -126,7 +134,7 @@ jobs:
             exit 1
           fi
 
-          STACK_FILE_CONTENT=$(jq -Rs . < docker-compose.prod.yml)
+          STACK_FILE_CONTENT=$(jq -Rs . < "$COMPOSE_PATH")
 
           DATABASE_URL="postgresql://user_prod:password_prod@db:5432/cheptel_db"
           ENV_VARS=$(jq -n \

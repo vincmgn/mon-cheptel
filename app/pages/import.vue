@@ -1,7 +1,7 @@
 <script setup lang="ts">
-useHead({ title: "Import de données" })
+useHead({ title: 'Import de données' })
 
-type ImportType = 'cows' | 'bulls'
+type ImportType = 'cows' | 'bulls' | 'breedings' | 'calves'
 
 interface ColumnDef {
   label: string
@@ -11,6 +11,8 @@ interface ColumnDef {
 const typeOptions: { value: ImportType; label: string; emoji: string }[] = [
   { value: 'cows', label: 'Vaches', emoji: '🐄' },
   { value: 'bulls', label: 'Taureaux', emoji: '🐂' },
+  { value: 'calves', label: 'Veaux', emoji: '🐮' },
+  { value: 'breedings', label: 'Inséminations', emoji: '💉' },
 ]
 
 const expectedColumns: Record<ImportType, ColumnDef[]> = {
@@ -26,36 +28,85 @@ const expectedColumns: Record<ImportType, ColumnDef[]> = {
     { label: 'Nom', required: true },
     { label: "Date d'ajout", required: false },
   ],
+  breedings: [
+    { label: "Date d'insémination", required: true },
+    { label: 'Vache (N°)', required: true },
+    { label: 'Taureau', required: false },
+    { label: 'Statut', required: false },
+  ],
+  calves: [
+    { label: 'N°', required: false },
+    { label: 'Sexe', required: true },
+    { label: 'Date de naissance', required: true },
+    { label: 'Mère (N°)', required: true },
+  ],
 }
 
 // Maps normalized column header → field key
 const columnMap: Record<ImportType, Record<string, string>> = {
   cows: {
     'n°': 'officialId',
-    'n': 'officialId',
-    'numero': 'officialId',
-    'numéro': 'officialId',
-    'officialid': 'officialId',
-    'lieu': 'location',
-    'location': 'location',
-    'bâtiment': 'building',
-    'batiment': 'building',
-    'building': 'building',
-    'case': 'pen',
-    'pen': 'pen',
-    'prophylaxie': 'prophylaxis',
-    'prophylaxis': 'prophylaxis',
+    n: 'officialId',
+    numero: 'officialId',
+    numéro: 'officialId',
+    officialid: 'officialId',
+    lieu: 'location',
+    location: 'location',
+    bâtiment: 'building',
+    batiment: 'building',
+    building: 'building',
+    case: 'pen',
+    pen: 'pen',
+    prophylaxie: 'prophylaxis',
+    prophylaxis: 'prophylaxis',
     "date d'entrée": 'createdAt',
     "date d'entree": 'createdAt',
-    'createdat': 'createdAt',
+    createdat: 'createdAt',
   },
   bulls: {
-    'nom': 'name',
-    'name': 'name',
+    nom: 'name',
+    name: 'name',
     "date d'ajout": 'createdAt',
-    "date d'ajout": 'createdAt',
-    'createdat': 'createdAt',
+    createdat: 'createdAt',
   },
+  breedings: {
+    "date d'insémination": 'date',
+    "date d'insemination": 'date',
+    date: 'date',
+    'vache (n°)': 'cowOfficialId',
+    vache: 'cowOfficialId',
+    cowofficialid: 'cowOfficialId',
+    taureau: 'bullName',
+    bullname: 'bullName',
+    statut: 'isMaybe',
+    ismayb: 'isMaybe',
+  },
+  calves: {
+    'n°': 'officialId',
+    officialid: 'officialId',
+    sexe: 'sex',
+    sex: 'sex',
+    'date de naissance': 'birthDate',
+    birthdate: 'birthDate',
+    'mère (n°)': 'motherOfficialId',
+    'mere (n°)': 'motherOfficialId',
+    mère: 'motherOfficialId',
+    mere: 'motherOfficialId',
+    motherofficialid: 'motherOfficialId',
+  },
+}
+
+const statusConfig: Record<
+  string,
+  { color: 'success' | 'warning' | 'error'; label: string }
+> = {
+  ok: { color: 'success', label: 'OK' },
+  duplicate: { color: 'warning', label: 'Doublon' },
+  penNotFound: { color: 'error', label: 'Case introuvable' },
+  cowNotFound: { color: 'error', label: 'Vache introuvable' },
+  motherNotFound: { color: 'error', label: 'Mère introuvable' },
+  missingField: { color: 'error', label: 'Champ manquant' },
+  invalidSex: { color: 'error', label: 'Sexe invalide' },
 }
 
 // ── State ────────────────────────────────────────────────────────────────────
@@ -64,7 +115,9 @@ const importType = ref<ImportType>('cows')
 const fileInput = ref<HTMLInputElement | null>(null)
 const fileName = ref('')
 const parsedRows = ref<Record<string, string>[]>([])
-const previewRows = ref<(Record<string, string> & { status: string; message?: string })[]>([])
+const previewRows = ref<
+  (Record<string, string> & { status: string; message?: string })[]
+>([])
 const step = ref<'upload' | 'preview' | 'done'>('upload')
 const previewing = ref(false)
 const importing = ref(false)
@@ -84,13 +137,13 @@ watch(importType, () => {
 // ── Computed ─────────────────────────────────────────────────────────────────
 
 const okRows = computed(() => previewRows.value.filter(r => r.status === 'ok'))
-const errorRows = computed(() => previewRows.value.filter(r => r.status !== 'ok'))
+const errorRows = computed(() =>
+  previewRows.value.filter(r => r.status !== 'ok')
+)
 
-const previewColumns = computed(() => {
-  if (!previewRows.value.length) return []
-  const cols = expectedColumns[importType.value].map(c => c.label)
-  return cols
-})
+const previewColumns = computed(() =>
+  expectedColumns[importType.value].map(c => c.label)
+)
 
 // ── File parsing ─────────────────────────────────────────────────────────────
 
@@ -108,9 +161,17 @@ async function onFileChange(e: Event) {
   try {
     const XLSX = await import('xlsx')
     const buf = await f.arrayBuffer()
-    // For CSV files exported with semicolons
     const wb = XLSX.read(buf, { type: 'array', codepage: 65001, FS: ';' })
-    const ws = wb.Sheets[wb.SheetNames[0]]
+    const firstSheetName = wb.SheetNames[0]
+    if (!firstSheetName) {
+      errorMsg.value = 'Aucune feuille trouvée dans le fichier'
+      return
+    }
+    const ws = wb.Sheets[firstSheetName]
+    if (!ws) {
+      errorMsg.value = 'Feuille de calcul introuvable dans le fichier'
+      return
+    }
     const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, {
       raw: false,
       defval: '',
@@ -136,7 +197,8 @@ async function onFileChange(e: Event) {
     parsedRows.value = mapped
     await loadPreview()
   } catch {
-    errorMsg.value = 'Impossible de lire le fichier. Vérifiez le format (CSV ou Excel).'
+    errorMsg.value =
+      'Impossible de lire le fichier. Vérifiez le format (CSV ou Excel).'
   }
 }
 
@@ -144,14 +206,19 @@ async function loadPreview() {
   previewing.value = true
   errorMsg.value = ''
   try {
-    const res = await $fetch<{ success: boolean; data: typeof previewRows.value }>(
-      '/api/v1/import/preview',
-      { method: 'POST', body: { type: importType.value, rows: parsedRows.value } }
-    )
+    const res = await $fetch<{
+      success: boolean
+      data: typeof previewRows.value
+    }>('/api/v1/import/preview', {
+      method: 'POST',
+      body: { type: importType.value, rows: parsedRows.value },
+    })
     previewRows.value = res.data
     step.value = 'preview'
   } catch (e: unknown) {
-    errorMsg.value = (e as { data?: { message?: string } }).data?.message ?? 'Erreur lors de la validation'
+    errorMsg.value =
+      (e as { data?: { message?: string } }).data?.message ??
+      'Erreur lors de la validation'
   } finally {
     previewing.value = false
   }
@@ -161,14 +228,19 @@ async function confirmImport() {
   importing.value = true
   errorMsg.value = ''
   try {
-    const res = await $fetch<{ success: boolean; data: { created: number; skipped: number } }>(
-      '/api/v1/import/confirm',
-      { method: 'POST', body: { type: importType.value, rows: parsedRows.value } }
-    )
+    const res = await $fetch<{
+      success: boolean
+      data: { created: number; skipped: number }
+    }>('/api/v1/import/confirm', {
+      method: 'POST',
+      body: { type: importType.value, rows: parsedRows.value },
+    })
     importResult.value = res.data
     step.value = 'done'
   } catch (e: unknown) {
-    errorMsg.value = (e as { data?: { message?: string } }).data?.message ?? "Erreur lors de l'import"
+    errorMsg.value =
+      (e as { data?: { message?: string } }).data?.message ??
+      "Erreur lors de l'import"
   } finally {
     importing.value = false
   }
@@ -189,7 +261,9 @@ function reset() {
 function downloadTemplate() {
   const cols = expectedColumns[importType.value]
   const header = cols.map(c => c.label).join(';')
-  const blob = new Blob(['\ufeff' + header + '\n'], { type: 'text/csv;charset=utf-8;' })
+  const blob = new Blob(['\ufeff' + header + '\n'], {
+    type: 'text/csv;charset=utf-8;',
+  })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
@@ -207,24 +281,22 @@ function getCellValue(row: Record<string, string>, colLabel: string): string {
   const key = map[colLabel.toLowerCase()] ?? colLabel
   return row[key] ?? ''
 }
-
-const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; label: string }> = {
-  ok: { color: 'success', label: 'OK' },
-  duplicate: { color: 'warning', label: 'Doublon' },
-  penNotFound: { color: 'error', label: 'Case introuvable' },
-  missingField: { color: 'error', label: 'Champ manquant' },
-}
 </script>
 
 <template>
   <UContainer class="py-10 max-w-4xl">
     <!-- Header -->
     <div class="flex items-center gap-3 mb-8">
-      <UButton icon="i-lucide-arrow-left" color="neutral" variant="ghost" to="/" />
+      <UButton
+        icon="i-lucide-arrow-left"
+        color="neutral"
+        variant="ghost"
+        to="/data"
+      />
       <div>
         <h1 class="text-2xl font-bold">Import de données</h1>
         <p class="text-sm text-gray-500 dark:text-gray-400">
-          Importez vos vaches ou taureaux depuis un fichier CSV ou Excel
+          Importez vos données depuis un fichier CSV ou Excel
         </p>
       </div>
     </div>
@@ -232,7 +304,9 @@ const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; lab
     <UCard class="space-y-8">
       <!-- Step 1: Type -->
       <div>
-        <p class="text-md font-semibold text-gray-400 uppercase tracking-wider mb-3">
+        <p
+          class="text-md font-semibold text-gray-400 uppercase tracking-wider mb-3"
+        >
           1. Type de données
         </p>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -251,12 +325,32 @@ const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; lab
             {{ opt.label }}
           </button>
         </div>
+
+        <!-- Order hint for breedings/calves -->
+        <UAlert
+          v-if="importType === 'breedings'"
+          color="info"
+          variant="subtle"
+          icon="i-lucide-info"
+          description="Les vaches et taureaux référencés doivent déjà exister dans l'application."
+          class="mt-3"
+        />
+        <UAlert
+          v-if="importType === 'calves'"
+          color="info"
+          variant="subtle"
+          icon="i-lucide-info"
+          description="Les vaches mères référencées doivent déjà exister dans l'application."
+          class="mt-3"
+        />
       </div>
 
       <!-- Step 2: File -->
-      <div>
+      <div class="mt-6">
         <div class="flex items-center justify-between mb-3">
-          <p class="text-md font-semibold text-gray-400 uppercase tracking-wider">
+          <p
+            class="text-md font-semibold text-gray-400 uppercase tracking-wider"
+          >
             2. Fichier CSV ou Excel
           </p>
           <UButton
@@ -272,7 +366,9 @@ const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; lab
 
         <!-- Expected columns hint -->
         <div class="mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-800 text-sm">
-          <p class="text-gray-500 dark:text-gray-400 mb-2">Colonnes attendues :</p>
+          <p class="text-gray-500 dark:text-gray-400 mb-2">
+            Colonnes attendues :
+          </p>
           <div class="flex flex-wrap gap-2">
             <UBadge
               v-for="col in expectedColumns[importType]"
@@ -284,7 +380,8 @@ const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; lab
             </UBadge>
           </div>
           <p class="text-xs text-gray-400 mt-2">
-            Séparateur CSV : point-virgule (;) · Dates : jj/mm/aaaa ou aaaa-mm-jj
+            Séparateur CSV : point-virgule (;) · Dates : jj/mm/aaaa ou
+            aaaa-mm-jj
           </p>
         </div>
 
@@ -293,7 +390,10 @@ const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; lab
           class="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl p-8 text-center cursor-pointer hover:border-primary transition-colors"
           @click="fileInput?.click()"
         >
-          <UIcon name="i-lucide-upload" class="size-8 mx-auto mb-2 text-gray-400" />
+          <UIcon
+            name="i-lucide-upload"
+            class="size-8 mx-auto mb-2 text-gray-400"
+          />
           <p class="text-sm text-gray-600 dark:text-gray-400">
             <template v-if="fileName">
               <span class="font-medium text-primary">{{ fileName }}</span>
@@ -322,7 +422,7 @@ const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; lab
           class="mt-3"
         />
 
-        <!-- Loading state -->
+        <!-- Loading -->
         <div v-if="previewing" class="mt-4 space-y-2">
           <div
             v-for="i in 4"
@@ -334,9 +434,11 @@ const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; lab
 
       <!-- Step 3: Preview -->
       <template v-if="step === 'preview' && previewRows.length">
-        <div>
+        <div class="mt-6">
           <div class="flex items-center justify-between mb-3">
-            <p class="text-md font-semibold text-gray-400 uppercase tracking-wider">
+            <p
+              class="text-md font-semibold text-gray-400 uppercase tracking-wider"
+            >
               3. Vérification
             </p>
             <div class="flex gap-2">
@@ -350,7 +452,9 @@ const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; lab
           </div>
 
           <!-- Preview table -->
-          <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+          <div
+            class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700"
+          >
             <table class="w-full text-sm">
               <thead class="bg-gray-50 dark:bg-gray-800">
                 <tr>
@@ -406,7 +510,7 @@ const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; lab
             </table>
           </div>
 
-          <!-- Confirm button -->
+          <!-- Confirm -->
           <div class="flex gap-3 mt-4">
             <UButton
               icon="i-lucide-upload"
@@ -416,9 +520,9 @@ const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; lab
             >
               Importer {{ okRows.length }} ligne(s)
             </UButton>
-            <UButton variant="ghost" color="neutral" @click="reset">
-              Annuler
-            </UButton>
+            <UButton variant="ghost" color="neutral" @click="reset"
+              >Annuler</UButton
+            >
           </div>
         </div>
       </template>
@@ -426,16 +530,19 @@ const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; lab
       <!-- Step 4: Done -->
       <template v-if="step === 'done' && importResult">
         <div class="text-center py-8">
-          <UIcon name="i-lucide-check-circle" class="size-12 mx-auto mb-3 text-success-500" />
+          <UIcon
+            name="i-lucide-check-circle"
+            class="size-12 mx-auto mb-3 text-success-500"
+          />
           <h2 class="text-lg font-semibold mb-1">Import terminé</h2>
           <p class="text-gray-500 dark:text-gray-400 text-sm">
             <strong>{{ importResult.created }}</strong> ligne(s) importée(s) ·
             <strong>{{ importResult.skipped }}</strong> ignorée(s)
           </p>
           <div class="flex gap-3 justify-center mt-6">
-            <UButton variant="outline" color="neutral" @click="reset">
-              Nouvel import
-            </UButton>
+            <UButton variant="outline" color="neutral" @click="reset"
+              >Nouvel import</UButton
+            >
             <UButton to="/">Retour au tableau de bord</UButton>
           </div>
         </div>
