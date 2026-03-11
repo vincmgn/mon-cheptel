@@ -6,11 +6,16 @@ export default defineEventHandler(async event => {
   const query = getQuery(event)
 
   const type = query.type as string
-  const dateFrom = query.dateFrom ? new Date(query.dateFrom as string) : undefined
-  const dateTo = query.dateTo ? new Date((query.dateTo as string) + 'T23:59:59') : undefined
+  const dateFrom = query.dateFrom
+    ? new Date(query.dateFrom as string)
+    : undefined
+  const dateTo = query.dateTo
+    ? new Date((query.dateTo as string) + 'T23:59:59')
+    : undefined
 
   if (type === 'cows') {
-    const dateFilter = dateFrom || dateTo ? { createdAt: { gte: dateFrom, lte: dateTo } } : {}
+    const dateFilter =
+      dateFrom || dateTo ? { createdAt: { gte: dateFrom, lte: dateTo } } : {}
     const data = await prisma.cow.findMany({
       where: { pen: { building: { location: { userId } } }, ...dateFilter },
       include: {
@@ -28,7 +33,8 @@ export default defineEventHandler(async event => {
   }
 
   if (type === 'bulls') {
-    const dateFilter = dateFrom || dateTo ? { createdAt: { gte: dateFrom, lte: dateTo } } : {}
+    const dateFilter =
+      dateFrom || dateTo ? { createdAt: { gte: dateFrom, lte: dateTo } } : {}
     const data = await prisma.bull.findMany({
       where: { userId, ...dateFilter },
       include: { _count: { select: { breedings: true } } },
@@ -38,7 +44,8 @@ export default defineEventHandler(async event => {
   }
 
   if (type === 'calves') {
-    const dateFilter = dateFrom || dateTo ? { birthDate: { gte: dateFrom, lte: dateTo } } : {}
+    const dateFilter =
+      dateFrom || dateTo ? { birthDate: { gte: dateFrom, lte: dateTo } } : {}
     const data = await prisma.calf.findMany({
       where: {
         cow: { pen: { building: { location: { userId } } } },
@@ -57,7 +64,8 @@ export default defineEventHandler(async event => {
   }
 
   if (type === 'breedings') {
-    const dateFilter = dateFrom || dateTo ? { date: { gte: dateFrom, lte: dateTo } } : {}
+    const dateFilter =
+      dateFrom || dateTo ? { date: { gte: dateFrom, lte: dateTo } } : {}
     const data = await prisma.breeding.findMany({
       where: {
         cow: { pen: { building: { location: { userId } } } },
@@ -76,5 +84,9 @@ export default defineEventHandler(async event => {
     return { success: true, data }
   }
 
-  throw createError({ statusCode: 400, message: 'Type invalide. Valeurs acceptées : cows, bulls, calves, breedings' })
+  throw createError({
+    statusCode: 400,
+    message:
+      'Type invalide. Valeurs acceptées : cows, bulls, calves, breedings',
+  })
 })

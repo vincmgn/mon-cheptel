@@ -5,7 +5,7 @@ defineProps<{
   breedings: BullDetail['breedings']
 }>()
 
-const GESTATION_DAYS = 280
+const GESTATION_DAYS = 283
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('fr-FR', {
@@ -18,7 +18,11 @@ function formatDate(dateStr: string) {
 function expectedCalving(dateStr: string): string {
   const d = new Date(dateStr)
   d.setDate(d.getDate() + GESTATION_DAYS)
-  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })
+  return d.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  })
 }
 </script>
 

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { ApiList, Bull, BullWithCount } from '~~/types'
 import BullHeader from '~/components/bulls/BullHeader.vue'
-
-useHead({ title: 'Taureaux' })
 import BullEmptyState from '~/components/bulls/BullEmptyState.vue'
 import BullCard from '~/components/bulls/BullCard.vue'
 import BullCreateModal from '~/components/bulls/BullCreateModal.vue'
 import BullEditModal from '~/components/bulls/BullEditModal.vue'
 import BullDeleteModal from '~/components/bulls/BullDeleteModal.vue'
+
+useHead({ title: 'Taureaux' })
 
 const { data, refresh, status } =
   await useFetch<ApiList<BullWithCount>>('/api/v1/bulls')
@@ -40,9 +40,19 @@ function openDelete(bull: Bull) {
     <div class="flex items-end justify-between">
       <BullHeader :bulls="bulls" />
       <div class="mb-8">
-        <UButton icon="i-lucide-plus" @click="isCreateOpen = true"
-          >Nouveau taureau</UButton
+        <UButton
+          aria-label="Nouveau taureau"
+          class="max-sm:size-12 max-sm:rounded-full max-sm:px-0 max-sm:py-0 max-sm:flex max-sm:items-center max-sm:justify-center"
+          @click="isCreateOpen = true"
         >
+          <span class="sm:hidden flex items-center justify-center">
+            <UIcon name="i-lucide-plus" class="size-6" />
+          </span>
+          <span class="hidden sm:inline-flex sm:items-center sm:gap-2">
+            <UIcon name="i-lucide-plus" class="size-4" />
+            Nouveau taureau
+          </span>
+        </UButton>
       </div>
     </div>
 

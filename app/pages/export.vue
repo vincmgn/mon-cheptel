@@ -11,48 +11,56 @@ interface FieldDef {
 
 // ── Type options ────────────────────────────────────────────────────────────
 
-const typeOptions: { value: ExportType; label: string; icon: string }[] = [
-  { value: 'cows', label: 'Vaches', icon: 'i-lucide-tag' },
-  { value: 'bulls', label: 'Taureaux', icon: 'i-lucide-shield' },
-  { value: 'calves', label: 'Veaux', icon: 'i-lucide-rabbit' },
-  { value: 'breedings', label: 'Inséminations', icon: 'i-lucide-heart' },
+const typeOptions: { value: ExportType; label: string; emoji: string }[] = [
+  { value: 'cows', label: 'Vaches', emoji: '🐄' },
+  { value: 'bulls', label: 'Taureaux', emoji: '🐂' },
+  { value: 'calves', label: 'Veaux', emoji: '🐮' },
+  { value: 'breedings', label: 'Inséminations', emoji: '💉' },
 ]
 
 // ── Field definitions ────────────────────────────────────────────────────────
 
 const fieldDefs: Record<ExportType, FieldDef[]> = {
   cows: [
-    { key: 'officialId', label: 'N° officiel', default: true },
+    { key: 'officialId', label: 'N°', default: true },
     { key: 'location', label: 'Lieu', default: true },
     { key: 'building', label: 'Bâtiment', default: true },
     { key: 'pen', label: 'Case', default: true },
     { key: 'prophylaxis', label: 'Prophylaxie', default: true },
     { key: 'createdAt', label: "Date d'entrée", default: true },
-    { key: 'calvesCount', label: 'Nb de veaux', default: true },
-    { key: 'breedingsCount', label: "Nb d'IA", default: false },
-    { key: 'lastBreedingDate', label: 'Dernière IA (date)', default: true },
-    { key: 'lastBreedingBull', label: 'Dernière IA (taureau)', default: true },
+    { key: 'calvesCount', label: 'Nombre de veaux', default: true },
+    { key: 'breedingsCount', label: "Nombre d'inséminations", default: true },
+    {
+      key: 'lastBreedingDate',
+      label: 'Dernière insémination (date)',
+      default: true,
+    },
+    {
+      key: 'lastBreedingBull',
+      label: 'Dernière insémination (taureau)',
+      default: true,
+    },
   ],
   bulls: [
     { key: 'name', label: 'Nom', default: true },
     { key: 'createdAt', label: "Date d'ajout", default: true },
-    { key: 'breedingsCount', label: "Nb d'IA", default: true },
+    { key: 'breedingsCount', label: "Nombre d'inséminations", default: true },
   ],
   calves: [
-    { key: 'officialId', label: 'N° officiel', default: true },
+    { key: 'officialId', label: 'N°', default: true },
     { key: 'sex', label: 'Sexe', default: true },
     { key: 'birthDate', label: 'Date de naissance', default: true },
-    { key: 'motherOfficialId', label: 'Mère (N° officiel)', default: true },
+    { key: 'motherOfficialId', label: 'Mère (N°)', default: true },
     { key: 'motherLocation', label: 'Lieu de la mère', default: false },
     { key: 'motherBuilding', label: 'Bâtiment de la mère', default: false },
   ],
   breedings: [
-    { key: 'date', label: "Date d'IA", default: true },
-    { key: 'cowOfficialId', label: 'Vache (N° officiel)', default: true },
+    { key: 'date', label: "Date d'insémination", default: true },
+    { key: 'cowOfficialId', label: 'Vache (N°)', default: true },
     { key: 'cowLocation', label: 'Lieu de la vache', default: true },
     { key: 'bullName', label: 'Taureau', default: true },
     { key: 'isMaybe', label: 'Statut', default: true },
-    { key: 'expectedCalving', label: 'Vêlage prévu (+280j)', default: true },
+    { key: 'expectedCalving', label: 'Vêlage prévu (+283j)', default: true },
   ],
 }
 
@@ -62,11 +70,13 @@ const exportType = ref<ExportType>('cows')
 const dateFrom = ref('')
 const dateTo = ref('')
 const selectedFields = ref<Record<string, boolean>>(
-  Object.fromEntries(fieldDefs.cows.map(f => [f.key, f.default])),
+  Object.fromEntries(fieldDefs.cows.map(f => [f.key, f.default]))
 )
 
 watch(exportType, type => {
-  selectedFields.value = Object.fromEntries(fieldDefs[type].map(f => [f.key, f.default]))
+  selectedFields.value = Object.fromEntries(
+    fieldDefs[type].map(f => [f.key, f.default])
+  )
   dateFrom.value = ''
   dateTo.value = ''
 })
@@ -77,7 +87,9 @@ const {
   data: rawResponse,
   status,
   refresh,
-} = await useFetch<{ success: boolean; data: unknown[] }>(() => `/api/v1/export?type=${exportType.value}`)
+} = await useFetch<{ success: boolean; data: unknown[] }>(
+  () => `/api/v1/export?type=${exportType.value}`
+)
 
 watch(exportType, () => refresh())
 
@@ -101,11 +113,14 @@ const filteredData = computed(() => {
   })
 })
 
-const activeColumns = computed(() => fieldDefs[exportType.value].filter(f => selectedFields.value[f.key]))
+const activeColumns = computed(() =>
+  fieldDefs[exportType.value].filter(f => selectedFields.value[f.key])
+)
 
 const periodLabel = computed(() => {
   if (exportType.value === 'calves') return 'Filtré sur la date de naissance'
-  if (exportType.value === 'breedings') return "Filtré sur la date d'IA"
+  if (exportType.value === 'breedings')
+    return "Filtré sur la date d'insémination"
   return "Filtré sur la date d'entrée"
 })
 
@@ -130,15 +145,24 @@ function getCellValue(item: unknown, fieldKey: string): string | number {
     const count = r._count as Record<string, number> | undefined
 
     switch (fieldKey) {
-      case 'officialId': return String(r.officialId ?? '')
-      case 'location': return String(location?.name ?? '')
-      case 'building': return String(building?.name ?? '')
-      case 'pen': return String(pen?.name ?? '')
-      case 'prophylaxis': return r.prophylaxis ? 'Oui' : 'Non'
-      case 'createdAt': return formatDate(r.createdAt as string)
-      case 'calvesCount': return count?.calves ?? 0
-      case 'breedingsCount': return count?.breedings ?? 0
-      case 'lastBreedingDate': return lastBreeding ? formatDate(lastBreeding.date as string) : ''
+      case 'officialId':
+        return String(r.officialId ?? '')
+      case 'location':
+        return String(location?.name ?? '')
+      case 'building':
+        return String(building?.name ?? '')
+      case 'pen':
+        return String(pen?.name ?? '')
+      case 'prophylaxis':
+        return r.prophylaxis ? 'Oui' : 'Non'
+      case 'createdAt':
+        return formatDate(r.createdAt as string)
+      case 'calvesCount':
+        return count?.calves ?? 0
+      case 'breedingsCount':
+        return count?.breedings ?? 0
+      case 'lastBreedingDate':
+        return lastBreeding ? formatDate(lastBreeding.date as string) : ''
       case 'lastBreedingBull':
         return String(lastBull?.name ?? lastBreeding?.bullName ?? '')
     }
@@ -147,9 +171,12 @@ function getCellValue(item: unknown, fieldKey: string): string | number {
   if (type === 'bulls') {
     const count = r._count as Record<string, number> | undefined
     switch (fieldKey) {
-      case 'name': return String(r.name ?? '')
-      case 'createdAt': return formatDate(r.createdAt as string)
-      case 'breedingsCount': return count?.breedings ?? 0
+      case 'name':
+        return String(r.name ?? '')
+      case 'createdAt':
+        return formatDate(r.createdAt as string)
+      case 'breedingsCount':
+        return count?.breedings ?? 0
     }
   }
 
@@ -157,14 +184,21 @@ function getCellValue(item: unknown, fieldKey: string): string | number {
     const cow = r.cow as Record<string, unknown> | null
     const pen = (cow?.pen as Record<string, unknown> | null) ?? null
     const building = (pen?.building as Record<string, unknown> | null) ?? null
-    const location = (building?.location as Record<string, unknown> | null) ?? null
+    const location =
+      (building?.location as Record<string, unknown> | null) ?? null
     switch (fieldKey) {
-      case 'officialId': return String(r.officialId ?? 'Non identifié')
-      case 'sex': return r.sex === 'M' ? 'Mâle' : 'Femelle'
-      case 'birthDate': return formatDate(r.birthDate as string)
-      case 'motherOfficialId': return String(cow?.officialId ?? '')
-      case 'motherLocation': return String(location?.name ?? '')
-      case 'motherBuilding': return String(building?.name ?? '')
+      case 'officialId':
+        return String(r.officialId ?? 'Non identifié')
+      case 'sex':
+        return r.sex === 'M' ? 'Mâle' : 'Femelle'
+      case 'birthDate':
+        return formatDate(r.birthDate as string)
+      case 'motherOfficialId':
+        return String(cow?.officialId ?? '')
+      case 'motherLocation':
+        return String(location?.name ?? '')
+      case 'motherBuilding':
+        return String(building?.name ?? '')
     }
   }
 
@@ -172,18 +206,24 @@ function getCellValue(item: unknown, fieldKey: string): string | number {
     const cow = r.cow as Record<string, unknown> | null
     const pen = (cow?.pen as Record<string, unknown> | null) ?? null
     const building = (pen?.building as Record<string, unknown> | null) ?? null
-    const location = (building?.location as Record<string, unknown> | null) ?? null
+    const location =
+      (building?.location as Record<string, unknown> | null) ?? null
     const bull = r.bull as Record<string, unknown> | null
     switch (fieldKey) {
-      case 'date': return formatDate(r.date as string)
-      case 'cowOfficialId': return String(cow?.officialId ?? '')
-      case 'cowLocation': return String(location?.name ?? '')
-      case 'bullName': return String(bull?.name ?? r.bullName ?? 'Inconnu')
-      case 'isMaybe': return r.isMaybe ? 'Possible' : 'Confirmé'
+      case 'date':
+        return formatDate(r.date as string)
+      case 'cowOfficialId':
+        return String(cow?.officialId ?? '')
+      case 'cowLocation':
+        return String(location?.name ?? '')
+      case 'bullName':
+        return String(bull?.name ?? r.bullName ?? 'Inconnu')
+      case 'isMaybe':
+        return r.isMaybe ? 'Possible' : 'Confirmé'
       case 'expectedCalving': {
         if (!r.date) return ''
         const d = new Date(r.date as string)
-        d.setDate(d.getDate() + 280)
+        d.setDate(d.getDate() + 283)
         return formatDate(d)
       }
     }
@@ -239,16 +279,21 @@ function today() {
 
 function exportCSV() {
   const rows = buildRows()
-  if (!rows.length) return
+  const firstRow = rows[0]
+  if (!firstRow) return
 
-  const headers = Object.keys(rows[0])
+  const headers = Object.keys(firstRow)
   const lines = [
     headers.join(';'),
     ...rows.map(row =>
-      headers.map(h => `"${String(row[h] ?? '').replace(/"/g, '""')}"`).join(';'),
+      headers
+        .map(h => `"${String(row[h] ?? '').replace(/"/g, '""')}"`)
+        .join(';')
     ),
   ]
-  const blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' })
+  const blob = new Blob(['\ufeff' + lines.join('\n')], {
+    type: 'text/csv;charset=utf-8;',
+  })
   triggerDownload(blob, `export_${exportType.value}_${today()}.csv`)
 }
 
@@ -261,22 +306,99 @@ async function exportExcel() {
   const XLSX = await import('xlsx')
   const ws = XLSX.utils.json_to_sheet(rows)
   const wb = XLSX.utils.book_new()
-  const sheetName = typeOptions.find(t => t.value === exportType.value)?.label ?? exportType.value
+  const sheetName =
+    typeOptions.find(t => t.value === exportType.value)?.label ??
+    exportType.value
   XLSX.utils.book_append_sheet(wb, ws, sheetName)
   XLSX.writeFile(wb, `export_${exportType.value}_${today()}.xlsx`)
 }
 
-// ── PDF export (browser print) ───────────────────────────────────────────────
+// ── PDF export (download) ────────────────────────────────────────────────────
 
-function exportPDF() {
-  window.print()
+async function exportPDF() {
+  if (!filteredData.value.length || !activeColumns.value.length) return
+
+  const { jsPDF } = await import('jspdf')
+  const { default: autoTable } = await import('jspdf-autotable')
+  const appConfig = useAppConfig()
+
+  const themeToRgb: Record<string, [number, number, number]> = {
+    green: [34, 197, 94],
+    sky: [14, 165, 233],
+    violet: [139, 92, 246],
+    orange: [249, 115, 22],
+  }
+  const primaryTheme = String(appConfig.ui?.colors?.primary ?? 'green')
+  const primaryRgb = themeToRgb[primaryTheme] ?? themeToRgb.green
+
+  const doc = new jsPDF({
+    orientation: 'landscape',
+    unit: 'mm',
+    format: 'a4',
+    compress: true,
+  })
+
+  const farmName = String(user.value?.farmName ?? 'Mon Cheptel')
+  const exportTypeLabel = typeLabel.value
+  const pageWidth = doc.internal.pageSize.getWidth()
+  const marginX = 8
+  const availableWidth = pageWidth - marginX * 2
+
+  doc.setFontSize(14)
+  doc.text(`${farmName} — ${exportTypeLabel}`, marginX, 12)
+  doc.setFontSize(9)
+
+  const periodText =
+    dateFrom.value || dateTo.value
+      ? ` · Période: ${dateFrom.value ? formatDate(dateFrom.value) : '...'} -> ${dateTo.value ? formatDate(dateTo.value) : '...'}`
+      : ''
+  doc.text(
+    `Généré le ${new Date().toLocaleDateString('fr-FR')} · ${filteredData.value.length} enregistrement(s)${periodText}`,
+    marginX,
+    17
+  )
+
+  const headers = activeColumns.value.map(col => col.label)
+  const body = filteredData.value.map(item =>
+    activeColumns.value.map(col => String(getCellValue(item, col.key) ?? ''))
+  )
+
+  const colWidth = availableWidth / Math.max(headers.length, 1)
+  const columnStyles = Object.fromEntries(
+    headers.map((_, idx) => [idx, { cellWidth: colWidth }])
+  ) as Record<number, { cellWidth: number }>
+
+  autoTable(doc, {
+    startY: 22,
+    margin: { left: marginX, right: marginX, top: 10, bottom: 10 },
+    head: [headers],
+    body,
+    tableWidth: availableWidth,
+    theme: 'grid',
+    styles: {
+      fontSize: 8,
+      cellPadding: 1.4,
+      overflow: 'linebreak',
+      valign: 'middle',
+    },
+    headStyles: {
+      fontStyle: 'bold',
+      fillColor: primaryRgb,
+      textColor: [255, 255, 255],
+    },
+    columnStyles,
+  })
+
+  doc.save(`export_${exportType.value}_${today()}.pdf`)
 }
 
 // ── User session for print header ────────────────────────────────────────────
 
 const { user } = useUserSession()
 
-const typeLabel = computed(() => typeOptions.find(t => t.value === exportType.value)?.label ?? '')
+const typeLabel = computed(
+  () => typeOptions.find(t => t.value === exportType.value)?.label ?? ''
+)
 
 const previewRows = computed(() => filteredData.value.slice(0, 100))
 const hasMore = computed(() => filteredData.value.length > 100)
@@ -302,11 +424,12 @@ const hasMore = computed(() => filteredData.value.length > 100)
     <!-- Page header (hidden in print) -->
     <div class="print:hidden">
       <div class="flex items-center gap-3 mb-8">
-        <NuxtLink to="/">
-          <UButton variant="ghost" icon="i-lucide-arrow-left" color="neutral" size="sm">
-            Retour
-          </UButton>
-        </NuxtLink>
+        <UButton
+          icon="i-lucide-arrow-left"
+          color="neutral"
+          variant="ghost"
+          to="/"
+        />
         <div>
           <h1 class="text-2xl font-bold">Export de données</h1>
           <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -319,7 +442,9 @@ const hasMore = computed(() => filteredData.value.length > 100)
       <UCard class="mb-6 space-y-8">
         <!-- Step 1 : Type -->
         <div>
-          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+          <p
+            class="text-md font-semibold text-gray-400 uppercase tracking-wider mb-3"
+          >
             1. Type de données
           </p>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -334,26 +459,36 @@ const hasMore = computed(() => filteredData.value.length > 100)
               "
               @click="exportType = opt.value as ExportType"
             >
-              <UIcon :name="opt.icon" class="size-5" />
+              <span class="text-lg leading-none">{{ opt.emoji }}</span>
               {{ opt.label }}
             </button>
           </div>
         </div>
 
         <!-- Step 2 : Période -->
-        <div>
-          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+        <div class="mt-6">
+          <p
+            class="text-md font-semibold text-gray-400 uppercase tracking-wider mb-3"
+          >
             2. Période
-            <span class="font-normal normal-case text-gray-400">(optionnel)</span>
+            <span class="font-normal normal-case text-gray-400"
+              >(optionnel)</span
+            >
           </p>
           <div class="flex items-center gap-3 flex-wrap">
             <div class="flex items-center gap-2">
-              <label class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">Du</label>
-              <UInput type="date" v-model="dateFrom" size="sm" />
+              <label
+                class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap"
+                >Du</label
+              >
+              <UInput v-model="dateFrom" type="date" size="sm" />
             </div>
             <div class="flex items-center gap-2">
-              <label class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">Au</label>
-              <UInput type="date" v-model="dateTo" size="sm" />
+              <label
+                class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap"
+                >Au</label
+              >
+              <UInput v-model="dateTo" type="date" size="sm" />
             </div>
             <UButton
               v-if="dateFrom || dateTo"
@@ -361,10 +496,7 @@ const hasMore = computed(() => filteredData.value.length > 100)
               size="sm"
               color="neutral"
               icon="i-lucide-x"
-              @click="
-                dateFrom = ''
-                dateTo = ''
-              "
+              @click="((dateFrom = ''), (dateTo = ''))"
             >
               Effacer
             </UButton>
@@ -373,16 +505,28 @@ const hasMore = computed(() => filteredData.value.length > 100)
         </div>
 
         <!-- Step 3 : Champs -->
-        <div>
+        <div class="mt-6">
           <div class="flex items-center justify-between mb-3">
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+            <p
+              class="text-md font-semibold text-gray-400 uppercase tracking-wider"
+            >
               3. Champs à exporter
             </p>
             <div class="flex gap-1">
-              <UButton variant="ghost" size="xs" color="neutral" @click="selectAll">
+              <UButton
+                variant="ghost"
+                size="xs"
+                color="neutral"
+                @click="selectAll"
+              >
                 Tout
               </UButton>
-              <UButton variant="ghost" size="xs" color="neutral" @click="selectNone">
+              <UButton
+                variant="ghost"
+                size="xs"
+                color="neutral"
+                @click="selectNone"
+              >
                 Aucun
               </UButton>
             </div>
@@ -393,14 +537,18 @@ const hasMore = computed(() => filteredData.value.length > 100)
               :key="field.key"
               :model-value="selectedFields[field.key]"
               :label="field.label"
-              @update:model-value="val => (selectedFields[field.key] = Boolean(val))"
+              @update:model-value="
+                val => (selectedFields[field.key] = Boolean(val))
+              "
             />
           </div>
         </div>
 
         <!-- Step 4 : Export -->
-        <div>
-          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+        <div class="mt-6">
+          <p
+            class="text-md font-semibold text-gray-400 uppercase tracking-wider mb-3"
+          >
             4. Exporter
           </p>
           <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
@@ -415,7 +563,11 @@ const hasMore = computed(() => filteredData.value.length > 100)
               icon="i-lucide-file-text"
               variant="outline"
               color="neutral"
-              :disabled="!filteredData.length || status === 'pending' || !activeColumns.length"
+              :disabled="
+                !filteredData.length ||
+                status === 'pending' ||
+                !activeColumns.length
+              "
               @click="exportCSV"
             >
               CSV
@@ -424,7 +576,11 @@ const hasMore = computed(() => filteredData.value.length > 100)
               icon="i-lucide-table-2"
               variant="outline"
               color="success"
-              :disabled="!filteredData.length || status === 'pending' || !activeColumns.length"
+              :disabled="
+                !filteredData.length ||
+                status === 'pending' ||
+                !activeColumns.length
+              "
               @click="exportExcel"
             >
               Excel
@@ -433,7 +589,11 @@ const hasMore = computed(() => filteredData.value.length > 100)
               icon="i-lucide-printer"
               variant="outline"
               color="error"
-              :disabled="!filteredData.length || status === 'pending' || !activeColumns.length"
+              :disabled="
+                !filteredData.length ||
+                status === 'pending' ||
+                !activeColumns.length
+              "
               @click="exportPDF"
             >
               PDF
@@ -444,7 +604,7 @@ const hasMore = computed(() => filteredData.value.length > 100)
     </div>
 
     <!-- Preview / print table -->
-    <div>
+    <div class="mt-6">
       <div class="print:hidden flex items-center justify-between mb-3">
         <h2 class="font-semibold text-gray-700 dark:text-gray-300">Aperçu</h2>
         <UBadge v-if="filteredData.length" color="primary" variant="subtle">
@@ -481,7 +641,9 @@ const hasMore = computed(() => filteredData.value.length > 100)
 
       <!-- Table -->
       <template v-else>
-        <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+        <div
+          class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700"
+        >
           <table class="w-full text-sm">
             <thead class="bg-gray-50 dark:bg-gray-800">
               <tr>
@@ -511,7 +673,10 @@ const hasMore = computed(() => filteredData.value.length > 100)
             </tbody>
           </table>
         </div>
-        <p v-if="hasMore" class="text-xs text-gray-400 mt-2 text-center print:hidden">
+        <p
+          v-if="hasMore"
+          class="text-xs text-gray-400 mt-2 text-center print:hidden"
+        >
           Aperçu limité à 100 lignes · L'export inclut la totalité des
           {{ filteredData.length }} enregistrements
         </p>
@@ -519,3 +684,12 @@ const hasMore = computed(() => filteredData.value.length > 100)
     </div>
   </UContainer>
 </template>
+
+<style>
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 12mm;
+  }
+}
+</style>

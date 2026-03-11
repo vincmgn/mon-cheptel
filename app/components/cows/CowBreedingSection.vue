@@ -82,7 +82,7 @@ async function deleteBreeding(id: number) {
   }
 }
 
-const GESTATION_DAYS = 280
+const GESTATION_DAYS = 283
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('fr-FR', {
@@ -95,7 +95,11 @@ function formatDate(dateStr: string) {
 function expectedCalving(dateStr: string): string {
   const d = new Date(dateStr)
   d.setDate(d.getDate() + GESTATION_DAYS)
-  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })
+  return d.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  })
 }
 
 const expectedCalvingDate = computed(() => {
@@ -166,7 +170,10 @@ const expectedCalvingDate = computed(() => {
         <div class="space-y-4">
           <UFormField label="Date">
             <UInput v-model="date" type="date" class="w-full" />
-            <p v-if="expectedCalvingDate" class="text-xs text-emerald-600 dark:text-emerald-400 mt-1.5">
+            <p
+              v-if="expectedCalvingDate"
+              class="text-xs text-emerald-600 dark:text-emerald-400 mt-1.5"
+            >
               🐄 Vêlage prévu le <strong>{{ expectedCalvingDate }}</strong>
             </p>
           </UFormField>

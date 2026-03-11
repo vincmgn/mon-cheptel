@@ -149,7 +149,7 @@ async function logout() {
             </p>
           </div>
           <div class="ml-auto shrink-0">
-            <UBadge color="emerald" variant="subtle">Exporter →</UBadge>
+            <UBadge color="success" variant="subtle">Exporter →</UBadge>
           </div>
         </div>
       </UCard>
