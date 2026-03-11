@@ -15,15 +15,34 @@ interface BullRow {
   createdAt?: string
 }
 
+interface BreedingRow {
+  date?: string
+  cowOfficialId?: string
+  bullName?: string
+  isMaybe?: string
+}
+
+interface CalfRow {
+  officialId?: string
+  sex?: string
+  birthDate?: string
+  motherOfficialId?: string
+}
+
 function parseDate(val: string | undefined): Date | undefined {
   if (!val?.trim()) return undefined
-  // dd/mm/yyyy (French format from export)
   const frMatch = val.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
   if (frMatch) {
-    return new Date(`${frMatch[3]}-${frMatch[2].padStart(2, '0')}-${frMatch[1].padStart(2, '0')}`)
+    return new Date(
+      `${frMatch[3]}-${frMatch[2].padStart(2, '0')}-${frMatch[1].padStart(2, '0')}`
+    )
   }
   const d = new Date(val.trim())
   return isNaN(d.getTime()) ? undefined : d
+}
+
+function isoDay(d: Date): string {
+  return d.toISOString().slice(0, 10)
 }
 
 export default defineEventHandler(async event => {
@@ -34,6 +53,8 @@ export default defineEventHandler(async event => {
   if (!Array.isArray(rows) || !rows.length) {
     throw createError({ statusCode: 400, message: 'Aucune ligne à traiter' })
   }
+
+  // ── Vaches ──────────────────────────────────────────────────────────────────
 
   if (type === 'cows') {
     const cowRows = rows as CowRow[]
@@ -67,7 +88,6 @@ export default defineEventHandler(async event => {
       const prophylaxis =
         row.prophylaxis?.trim().toLowerCase() === 'oui' ||
         row.prophylaxis?.trim().toLowerCase() === 'true'
-
       const createdAt = parseDate(row.createdAt)
 
       try {
@@ -88,6 +108,8 @@ export default defineEventHandler(async event => {
 
     return { success: true, data: { created, skipped } }
   }
+
+  // ── Taureaux ─────────────────────────────────────────────────────────────────
 
   if (type === 'bulls') {
     const bullRows = rows as BullRow[]
@@ -125,8 +147,139 @@ export default defineEventHandler(async event => {
     return { success: true, data: { created, skipped } }
   }
 
+  // ── Inséminations ─────────────────────────────────────────────────────────────
+
+  if (type === 'breedings') {
+    const breedingRows = rows as BreedingRow[]
+
+    const cows = await prisma.cow.findMany({
+      where: { pen: { building: { location: { userId } } } },
+      select: { id: true, officialId: true },
+    })
+    const cowMap = new Map(cows.map(c => [c.officialId, c.id]))
+
+    const bulls = await prisma.bull.findMany({
+      where: { userId },
+      select: { id: true, name: true },
+    })
+    const bullMap = new Map(bulls.map(b => [b.name.toLowerCase(), b.id]))
+
+    const existingBreedings = await prisma.breeding.findMany({
+      where: { cow: { pen: { building: { location: { userId } } } } },
+      select: { cowId: true, date: true },
+    })
+    const existingKeys = new Set(
+      existingBreedings.map(b => `${b.cowId}:${isoDay(b.date)}`)
+    )
+
+    let created = 0
+    let skipped = 0
+
+    for (const row of breedingRows) {
+      if (!row.date?.trim() || !row.cowOfficialId?.trim()) { skipped++; continue }
+
+      const parsedDate = parseDate(row.date)
+      if (!parsedDate) { skipped++; continue }
+
+      const cowId = cowMap.get(row.cowOfficialId.trim())
+      if (!cowId) { skipped++; continue }
+
+      const key = `${cowId}:${isoDay(parsedDate)}`
+      if (existingKeys.has(key)) { skipped++; continue }
+
+      const isMaybe = row.isMaybe?.trim().toLowerCase() === 'possible'
+
+      const bullId = row.bullName?.trim()
+        ? bullMap.get(row.bullName.trim().toLowerCase()) ?? null
+        : null
+      const bullName =
+        !bullId && row.bullName?.trim() ? row.bullName.trim() : null
+
+      try {
+        await prisma.breeding.create({
+          data: {
+            date: parsedDate,
+            cowId,
+            isMaybe,
+            ...(bullId ? { bullId } : {}),
+            ...(bullName ? { bullName } : {}),
+          },
+        })
+        existingKeys.add(key)
+        created++
+      } catch {
+        skipped++
+      }
+    }
+
+    return { success: true, data: { created, skipped } }
+  }
+
+  // ── Veaux ─────────────────────────────────────────────────────────────────────
+
+  if (type === 'calves') {
+    const calfRows = rows as CalfRow[]
+
+    const cows = await prisma.cow.findMany({
+      where: { pen: { building: { location: { userId } } } },
+      select: { id: true, officialId: true },
+    })
+    const cowMap = new Map(cows.map(c => [c.officialId, c.id]))
+
+    const existingCalves = await prisma.calf.findMany({
+      where: {
+        officialId: { not: null },
+        cow: { pen: { building: { location: { userId } } } },
+      },
+      select: { officialId: true },
+    })
+    const existingCalfIds = new Set(
+      existingCalves.map(c => c.officialId!.toLowerCase())
+    )
+
+    let created = 0
+    let skipped = 0
+
+    for (const row of calfRows) {
+      if (!row.sex?.trim() || !row.birthDate?.trim() || !row.motherOfficialId?.trim()) {
+        skipped++; continue
+      }
+
+      const birthDate = parseDate(row.birthDate)
+      if (!birthDate) { skipped++; continue }
+
+      const cowId = cowMap.get(row.motherOfficialId.trim())
+      if (!cowId) { skipped++; continue }
+
+      const sexLower = row.sex.trim().toLowerCase()
+      const sex = ['m', 'mâle', 'male'].includes(sexLower) ? 'M' : 'F'
+
+      const officialId = row.officialId?.trim() || null
+      if (officialId && existingCalfIds.has(officialId.toLowerCase())) {
+        skipped++; continue
+      }
+
+      try {
+        await prisma.calf.create({
+          data: {
+            cowId,
+            sex,
+            birthDate,
+            ...(officialId ? { officialId } : {}),
+          },
+        })
+        if (officialId) existingCalfIds.add(officialId.toLowerCase())
+        created++
+      } catch {
+        skipped++
+      }
+    }
+
+    return { success: true, data: { created, skipped } }
+  }
+
   throw createError({
     statusCode: 400,
-    message: 'Type invalide. Valeurs acceptées : cows, bulls',
+    message: 'Type invalide. Valeurs acceptées : cows, bulls, breedings, calves',
   })
 })

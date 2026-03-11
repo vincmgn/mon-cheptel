@@ -52,7 +52,7 @@ useHead({ title: 'Données' })
             <div>
               <h2 class="text-lg font-bold">Import</h2>
               <p class="text-sm text-gray-500 dark:text-gray-400">
-                CSV, Excel — Vaches, Taureaux
+                CSV, Excel — Vaches, Taureaux, Veaux, IA
               </p>
             </div>
           </div>

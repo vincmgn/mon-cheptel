@@ -1,7 +1,7 @@
 <script setup lang="ts">
 useHead({ title: "Import de données" })
 
-type ImportType = 'cows' | 'bulls'
+type ImportType = 'cows' | 'bulls' | 'breedings' | 'calves'
 
 interface ColumnDef {
   label: string
@@ -11,6 +11,8 @@ interface ColumnDef {
 const typeOptions: { value: ImportType; label: string; emoji: string }[] = [
   { value: 'cows', label: 'Vaches', emoji: '🐄' },
   { value: 'bulls', label: 'Taureaux', emoji: '🐂' },
+  { value: 'calves', label: 'Veaux', emoji: '🐮' },
+  { value: 'breedings', label: 'Inséminations', emoji: '💉' },
 ]
 
 const expectedColumns: Record<ImportType, ColumnDef[]> = {
@@ -25,6 +27,18 @@ const expectedColumns: Record<ImportType, ColumnDef[]> = {
   bulls: [
     { label: 'Nom', required: true },
     { label: "Date d'ajout", required: false },
+  ],
+  breedings: [
+    { label: "Date d'insémination", required: true },
+    { label: 'Vache (N°)', required: true },
+    { label: 'Taureau', required: false },
+    { label: 'Statut', required: false },
+  ],
+  calves: [
+    { label: 'N°', required: false },
+    { label: 'Sexe', required: true },
+    { label: 'Date de naissance', required: true },
+    { label: 'Mère (N°)', required: true },
   ],
 }
 
@@ -53,9 +67,43 @@ const columnMap: Record<ImportType, Record<string, string>> = {
     'nom': 'name',
     'name': 'name',
     "date d'ajout": 'createdAt',
-    "date d'ajout": 'createdAt',
     'createdat': 'createdAt',
   },
+  breedings: {
+    "date d'insémination": 'date',
+    "date d'insemination": 'date',
+    'date': 'date',
+    'vache (n°)': 'cowOfficialId',
+    'vache': 'cowOfficialId',
+    'cowofficialid': 'cowOfficialId',
+    'taureau': 'bullName',
+    'bullname': 'bullName',
+    'statut': 'isMaybe',
+    'ismayb': 'isMaybe',
+  },
+  calves: {
+    'n°': 'officialId',
+    'officialid': 'officialId',
+    'sexe': 'sex',
+    'sex': 'sex',
+    'date de naissance': 'birthDate',
+    'birthdate': 'birthDate',
+    'mère (n°)': 'motherOfficialId',
+    'mere (n°)': 'motherOfficialId',
+    'mère': 'motherOfficialId',
+    'mere': 'motherOfficialId',
+    'motherofficialid': 'motherOfficialId',
+  },
+}
+
+const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; label: string }> = {
+  ok: { color: 'success', label: 'OK' },
+  duplicate: { color: 'warning', label: 'Doublon' },
+  penNotFound: { color: 'error', label: 'Case introuvable' },
+  cowNotFound: { color: 'error', label: 'Vache introuvable' },
+  motherNotFound: { color: 'error', label: 'Mère introuvable' },
+  missingField: { color: 'error', label: 'Champ manquant' },
+  invalidSex: { color: 'error', label: 'Sexe invalide' },
 }
 
 // ── State ────────────────────────────────────────────────────────────────────
@@ -86,11 +134,9 @@ watch(importType, () => {
 const okRows = computed(() => previewRows.value.filter(r => r.status === 'ok'))
 const errorRows = computed(() => previewRows.value.filter(r => r.status !== 'ok'))
 
-const previewColumns = computed(() => {
-  if (!previewRows.value.length) return []
-  const cols = expectedColumns[importType.value].map(c => c.label)
-  return cols
-})
+const previewColumns = computed(() =>
+  expectedColumns[importType.value].map(c => c.label)
+)
 
 // ── File parsing ─────────────────────────────────────────────────────────────
 
@@ -108,7 +154,6 @@ async function onFileChange(e: Event) {
   try {
     const XLSX = await import('xlsx')
     const buf = await f.arrayBuffer()
-    // For CSV files exported with semicolons
     const wb = XLSX.read(buf, { type: 'array', codepage: 65001, FS: ';' })
     const ws = wb.Sheets[wb.SheetNames[0]]
     const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, {
@@ -151,7 +196,8 @@ async function loadPreview() {
     previewRows.value = res.data
     step.value = 'preview'
   } catch (e: unknown) {
-    errorMsg.value = (e as { data?: { message?: string } }).data?.message ?? 'Erreur lors de la validation'
+    errorMsg.value =
+      (e as { data?: { message?: string } }).data?.message ?? 'Erreur lors de la validation'
   } finally {
     previewing.value = false
   }
@@ -168,7 +214,8 @@ async function confirmImport() {
     importResult.value = res.data
     step.value = 'done'
   } catch (e: unknown) {
-    errorMsg.value = (e as { data?: { message?: string } }).data?.message ?? "Erreur lors de l'import"
+    errorMsg.value =
+      (e as { data?: { message?: string } }).data?.message ?? "Erreur lors de l'import"
   } finally {
     importing.value = false
   }
@@ -207,24 +254,17 @@ function getCellValue(row: Record<string, string>, colLabel: string): string {
   const key = map[colLabel.toLowerCase()] ?? colLabel
   return row[key] ?? ''
 }
-
-const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; label: string }> = {
-  ok: { color: 'success', label: 'OK' },
-  duplicate: { color: 'warning', label: 'Doublon' },
-  penNotFound: { color: 'error', label: 'Case introuvable' },
-  missingField: { color: 'error', label: 'Champ manquant' },
-}
 </script>
 
 <template>
   <UContainer class="py-10 max-w-4xl">
     <!-- Header -->
     <div class="flex items-center gap-3 mb-8">
-      <UButton icon="i-lucide-arrow-left" color="neutral" variant="ghost" to="/" />
+      <UButton icon="i-lucide-arrow-left" color="neutral" variant="ghost" to="/data" />
       <div>
         <h1 class="text-2xl font-bold">Import de données</h1>
         <p class="text-sm text-gray-500 dark:text-gray-400">
-          Importez vos vaches ou taureaux depuis un fichier CSV ou Excel
+          Importez vos données depuis un fichier CSV ou Excel
         </p>
       </div>
     </div>
@@ -251,6 +291,24 @@ const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; lab
             {{ opt.label }}
           </button>
         </div>
+
+        <!-- Order hint for breedings/calves -->
+        <UAlert
+          v-if="importType === 'breedings'"
+          color="info"
+          variant="subtle"
+          icon="i-lucide-info"
+          description="Les vaches et taureaux référencés doivent déjà exister dans l'application."
+          class="mt-3"
+        />
+        <UAlert
+          v-if="importType === 'calves'"
+          color="info"
+          variant="subtle"
+          icon="i-lucide-info"
+          description="Les vaches mères référencées doivent déjà exister dans l'application."
+          class="mt-3"
+        />
       </div>
 
       <!-- Step 2: File -->
@@ -322,7 +380,7 @@ const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; lab
           class="mt-3"
         />
 
-        <!-- Loading state -->
+        <!-- Loading -->
         <div v-if="previewing" class="mt-4 space-y-2">
           <div
             v-for="i in 4"
@@ -406,7 +464,7 @@ const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; lab
             </table>
           </div>
 
-          <!-- Confirm button -->
+          <!-- Confirm -->
           <div class="flex gap-3 mt-4">
             <UButton
               icon="i-lucide-upload"
@@ -416,9 +474,7 @@ const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; lab
             >
               Importer {{ okRows.length }} ligne(s)
             </UButton>
-            <UButton variant="ghost" color="neutral" @click="reset">
-              Annuler
-            </UButton>
+            <UButton variant="ghost" color="neutral" @click="reset">Annuler</UButton>
           </div>
         </div>
       </template>
@@ -433,9 +489,7 @@ const statusConfig: Record<string, { color: 'success' | 'warning' | 'error'; lab
             <strong>{{ importResult.skipped }}</strong> ignorée(s)
           </p>
           <div class="flex gap-3 justify-center mt-6">
-            <UButton variant="outline" color="neutral" @click="reset">
-              Nouvel import
-            </UButton>
+            <UButton variant="outline" color="neutral" @click="reset">Nouvel import</UButton>
             <UButton to="/">Retour au tableau de bord</UButton>
           </div>
         </div>
