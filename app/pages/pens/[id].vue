@@ -70,10 +70,10 @@ function openDelete(cow: Cow) {
               <div
                 class="p-2 rounded-lg bg-orange-500/10 dark:bg-orange-500/20 shrink-0 flex items-center justify-center"
               >
-                <UIcon name="i-lucide-beef" class="size-5 text-orange-500" />
+                🐄
               </div>
               <h3 class="font-semibold text-base truncate">
-                🐄 {{ cow.officialId }}
+                {{ cow.officialId }}
               </h3>
             </div>
             <div class="flex gap-1 ml-2 shrink-0">

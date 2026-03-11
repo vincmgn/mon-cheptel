@@ -103,9 +103,6 @@ function formatDate(dateStr: string) {
       >
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2">
-            <span class="font-medium text-sm">{{
-              calf.sex === 'M' ? '♂ Mâle' : '♀ Femelle'
-            }}</span>
             <UBadge
               :color="calf.sex === 'M' ? 'primary' : 'error'"
               variant="subtle"
@@ -113,6 +110,9 @@ function formatDate(dateStr: string) {
             >
               {{ calf.sex }}
             </UBadge>
+            <span class="font-medium text-sm">{{
+              calf.sex === 'M' ? 'Mâle' : 'Femelle'
+            }}</span>
             <span v-if="calf.officialId" class="text-xs font-mono text-gray-500 dark:text-gray-400">
               {{ calf.officialId }}
             </span>
@@ -143,14 +143,14 @@ function formatDate(dateStr: string) {
                 :variant="sex === 'M' ? 'solid' : 'outline'"
                 @click="sex = 'M'"
               >
-                ♂ Mâle
+                Mâle
               </UButton>
               <UButton
                 :color="sex === 'F' ? 'error' : 'neutral'"
                 :variant="sex === 'F' ? 'solid' : 'outline'"
                 @click="sex = 'F'"
               >
-                ♀ Femelle
+                Femelle
               </UButton>
             </div>
           </UFormField>
