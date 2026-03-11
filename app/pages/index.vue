@@ -145,7 +145,7 @@ async function logout() {
           <div>
             <h2 class="text-lg font-bold">Export</h2>
             <p class="text-sm text-gray-500 dark:text-gray-400">
-              CSV, Excel, PDF — Vaches, Taureaux, Veaux, IA
+              PDF, CSV, Excel — Vaches, Taureaux, Veaux & Inséminations
             </p>
           </div>
           <div class="ml-auto shrink-0">

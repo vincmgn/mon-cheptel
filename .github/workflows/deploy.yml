@@ -71,19 +71,50 @@ jobs:
 
       - name: Redeploy Portainer stack with updated compose
         run: |
-          set -e
+          set -euo pipefail
+
+          PORTAINER_URL="${{ secrets.DOCKER_PORTAINER_DIRECT_URL }}"
+          PORTAINER_URL="${PORTAINER_URL%/}"
+
+          if [ -z "$PORTAINER_URL" ]; then
+            echo "DOCKER_PORTAINER_DIRECT_URL est vide"
+            exit 1
+          fi
+
+          CURL_BASE=(--silent --show-error --fail --connect-timeout 10 --max-time 30 --retry 2 --retry-delay 2 --retry-connrefused)
           # 1. Obtenir le JWT de Portainer (fail fast en cas d'erreur)
           # DOCKER_PORTAINER_DIRECT_URL = URL directe (IP:port) sans Cloudflare, évite les timeouts 524
-          JWT=$(curl -s -f -X POST "${{ secrets.DOCKER_PORTAINER_DIRECT_URL }}/api/auth" \
+          JWT=$(curl "${CURL_BASE[@]}" -X POST "$PORTAINER_URL/api/auth" \
             -H "Content-Type: application/json" \
             -d "{\"username\": \"${{ secrets.DOCKER_PORTAINER_USER }}\", \"password\": \"${{ secrets.DOCKER_PORTAINER_PASSWORD }}\"}" | jq -r .jwt)
 
-          # 2. Récupérer l'ID de la stack
-          STACK_ID=$(curl -s -f -H "Authorization: Bearer $JWT" "${{ secrets.DOCKER_PORTAINER_DIRECT_URL }}/api/stacks" | \
-            jq -r ".[] | select(.Name == \"${{ secrets.PORTAINER_STACK_NAME }}\") | .Id")
+          if [ -z "$JWT" ] || [ "$JWT" = "null" ]; then
+            echo "Impossible d'obtenir le JWT Portainer"
+            exit 1
+          fi
 
-          # 3. Lire le contenu du docker-compose et préparer le payload JSON
-          STACK_FILE_CONTENT=$(jq -Rs . < docker-compose.prod.yml)
+          # 2. Récupérer l'ID de la stack
+          STACKS_JSON=$(curl "${CURL_BASE[@]}" -H "Authorization: Bearer $JWT" "$PORTAINER_URL/api/stacks")
+          STACK_ID=$(echo "$STACKS_JSON" | jq -r '.[] | select(.Name == "${{ secrets.PORTAINER_STACK_NAME }}") | .Id' | head -n 1)
+          ENDPOINT_ID=$(echo "$STACKS_JSON" | jq -r '.[] | select(.Name == "${{ secrets.PORTAINER_STACK_NAME }}") | .EndpointId' | head -n 1)
+
+          if [ -z "$STACK_ID" ] || [ "$STACK_ID" = "null" ]; then
+            echo "Stack introuvable: ${{ secrets.PORTAINER_STACK_NAME }}"
+            echo "Stacks disponibles:"
+            echo "$STACKS_JSON" | jq -r '.[].Name'
+            exit 1
+          fi
+
+          if [ -z "$ENDPOINT_ID" ] || [ "$ENDPOINT_ID" = "null" ]; then
+            echo "EndpointId introuvable pour la stack $STACK_ID"
+            exit 1
+          fi
+
+          # 3. Lire le contenu du docker-compose, remplacer le tag :latest par le SHA
+          #    (le tag SHA est unique par commit → Docker le pullera automatiquement
+          #    au redémarrage du container, sans bloquer la requête Portainer)
+          SHA_TAG="sha-$(echo "$GITHUB_SHA" | cut -c1-7)"
+          STACK_FILE_CONTENT=$(sed "s/:latest/:$SHA_TAG/g" docker-compose.prod.yml | jq -Rs .)
 
           # 4. Préparer les variables d'environnement
           # La DATABASE_URL doit utiliser 'db' comme hostname (nom du service dans docker-compose)
@@ -95,13 +126,21 @@ jobs:
             '[{name: "DATABASE_URL", value: $db_url}, {name: "NUXT_SECRET", value: $nuxt_secret}, {name: "NUXT_SESSION_PASSWORD", value: $nuxt_session_password}]')
 
           # 5. Mettre à jour la stack via l'endpoint d'update (avec redeploy)
-          echo "Updating stack $STACK_ID..."
+          echo "Updating stack $STACK_ID (endpointId=$ENDPOINT_ID)..."
           # On capture le code HTTP et le corps de réponse
           # NOTE: On utilise PUT /api/stacks/{id} au lieu de POST /api/stacks/{id}/update qui n'existe plus/pas
-          HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "${{ secrets.DOCKER_PORTAINER_DIRECT_URL }}/api/stacks/$STACK_ID?endpointId=2" \
+          set +e
+          HTTP_RESPONSE=$(curl --silent --show-error --connect-timeout 10 --max-time 180 --retry 1 -w "\n%{http_code}" -X PUT "$PORTAINER_URL/api/stacks/$STACK_ID?endpointId=$ENDPOINT_ID" \
             -H "Authorization: Bearer $JWT" \
             -H "Content-Type: application/json" \
-            -d "{\"stackFileContent\": $STACK_FILE_CONTENT, \"env\": $ENV_VARS, \"prune\": true, \"pullImage\": true}")
+            -d "{\"stackFileContent\": $STACK_FILE_CONTENT, \"env\": $ENV_VARS, \"prune\": true, \"pullImage\": false}")
+          CURL_EXIT_CODE=$?
+          set -e
+
+          if [ "$CURL_EXIT_CODE" -ne 0 ]; then
+            echo "Erreur réseau Portainer (curl=$CURL_EXIT_CODE). Vérifie l'accès runner -> $PORTAINER_URL"
+            exit "$CURL_EXIT_CODE"
+          fi
 
           HTTP_BODY=$(echo "$HTTP_RESPONSE" | head -n -1)
           HTTP_STATUS=$(echo "$HTTP_RESPONSE" | tail -n 1)
