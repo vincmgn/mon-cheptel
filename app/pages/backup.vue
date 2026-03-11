@@ -176,8 +176,8 @@ const resetTotal = computed(() =>
       <!-- Export card -->
       <UCard>
         <div class="flex items-center gap-4">
-          <div class="p-3 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20">
-            <UIcon name="i-lucide-database" class="size-7 text-emerald-500" />
+          <div class="p-3 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center">
+            <UIcon name="i-lucide-database" class="size-8 text-emerald-500" />
           </div>
           <div class="flex-1">
             <h2 class="text-base font-semibold">Tout exporter</h2>
@@ -207,8 +207,8 @@ const resetTotal = computed(() =>
       <!-- Restore card -->
       <UCard>
         <div class="flex items-center gap-4 mb-4">
-          <div class="p-3 rounded-xl bg-amber-500/10 dark:bg-amber-500/20">
-            <UIcon name="i-lucide-upload" class="size-7 text-amber-500" />
+          <div class="p-3 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center">
+            <UIcon name="i-lucide-upload" class="size-8 text-amber-500" />
           </div>
           <div class="flex-1">
             <h2 class="text-base font-semibold">Tout importer</h2>

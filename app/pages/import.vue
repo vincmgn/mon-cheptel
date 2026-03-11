@@ -312,7 +312,7 @@ function getCellValue(row: Record<string, string>, colLabel: string): string {
       </div>
 
       <!-- Step 2: File -->
-      <div>
+      <div class="mt-6">
         <div class="flex items-center justify-between mb-3">
           <p class="text-md font-semibold text-gray-400 uppercase tracking-wider">
             2. Fichier CSV ou Excel
@@ -392,7 +392,7 @@ function getCellValue(row: Record<string, string>, colLabel: string): string {
 
       <!-- Step 3: Preview -->
       <template v-if="step === 'preview' && previewRows.length">
-        <div>
+        <div class="mt-6">
           <div class="flex items-center justify-between mb-3">
             <p class="text-md font-semibold text-gray-400 uppercase tracking-wider">
               3. Vérification
