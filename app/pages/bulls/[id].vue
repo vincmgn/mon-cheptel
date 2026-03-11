@@ -14,6 +14,8 @@ const { data, refresh, status } = await useFetch<ApiResponse<BullDetail>>(
 )
 const bull = computed(() => data.value?.data)
 
+useHead(computed(() => ({ title: bull.value?.name ?? 'Taureau' })))
+
 watchEffect(() => {
   if (status.value === 'success' && !bull.value) router.replace('/bulls')
 })

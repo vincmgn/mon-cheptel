@@ -20,6 +20,8 @@ const { data, refresh, status } = await useFetch<
 >(`/api/v1/locations/${id}`)
 const location = computed(() => data.value?.data)
 
+useHead(computed(() => ({ title: location.value?.name ?? 'Exploitation' })))
+
 watchEffect(() => {
   if (status.value === 'success' && !location.value)
     router.replace('/locations')

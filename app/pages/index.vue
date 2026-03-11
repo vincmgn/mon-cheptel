@@ -3,6 +3,8 @@ import Hero from '~/components/index/Hero.vue'
 import SearchBar from '~/components/shared/SearchBar.vue'
 import type { ApiList } from '~~/types'
 
+useHead({ title: 'Tableau de bord' })
+
 const { user, clear } = useUserSession()
 
 const { data: statsData } = await useAsyncData('dashboard-stats', () =>
