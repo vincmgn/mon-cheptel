@@ -66,6 +66,9 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Redeploy Portainer stack with updated compose
         run: |
           set -euo pipefail
@@ -147,7 +150,7 @@ jobs:
           HTTP_RESPONSE=$(curl --silent --show-error -w "\n%{http_code}" -X PUT "$PORTAINER_URL/api/stacks/$STACK_ID?endpointId=$ENDPOINT_ID" \
             -H "Authorization: Bearer $JWT" \
             -H "Content-Type: application/json" \
-            -d "{\"stackFileContent\": $STACK_FILE_CONTENT, \"env\": $ENV_VARS, \"prune\": true, \"pullImage\": false}")
+            -d "{\"stackFileContent\": $STACK_FILE_CONTENT, \"env\": $ENV_VARS, \"prune\": true, \"pullImage\": true}")
           CURL_EXIT_CODE=$?
           set -e
 
