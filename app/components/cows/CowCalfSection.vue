@@ -160,7 +160,7 @@ function formatDate(dateStr: string) {
           <UFormField label="Date de naissance">
             <UInput v-model="birthDate" type="date" class="w-full" />
           </UFormField>
-          <UFormField label="Numéro officiel" hint="Optionnel">
+          <UFormField label="Numéro" hint="Optionnel">
             <UInput
               v-model="officialId"
               placeholder="Ex: FR12345678"

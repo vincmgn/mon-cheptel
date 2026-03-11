@@ -58,7 +58,7 @@ async function onSubmit() {
     <UModal :open="open" title="Ajouter une vache" @update:open="emit('close')">
       <template #body>
         <div class="space-y-4">
-          <UFormField label="Numéro officiel" required>
+          <UFormField label="Numéro" required>
             <UInput
               v-model="officialId"
               placeholder="Ex: FR 12345678901"
