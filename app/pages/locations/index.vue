@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import LocationCreateModal from '~/components/locations/LocationCreateModal.vue'
+
+useHead({ title: 'Exploitations' })
 import LocationEditModal from '~/components/locations/LocationEditModal.vue'
 import LocationDeleteModal from '~/components/locations/LocationDeleteModal.vue'
 import LocationList from '~/components/locations/LocationList.vue'

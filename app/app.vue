@@ -2,6 +2,7 @@
 const toaster = { position: 'bottom-left' } as const
 
 useHead({
+  titleTemplate: title => (title ? `${title} — Mon Cheptel` : 'Mon Cheptel'),
   link: [
     { rel: 'icon', href: '/favicon.ico', sizes: '48x48' },
     { rel: 'icon', href: '/icon.svg', sizes: 'any', type: 'image/svg+xml' },
