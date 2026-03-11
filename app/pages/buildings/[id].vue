@@ -16,6 +16,8 @@ const { data, refresh, status } = await useFetch<ApiResponse<BuildingWithPens>>(
 )
 const building = computed(() => data.value?.data)
 
+useHead(computed(() => ({ title: building.value?.name ?? 'Bâtiment' })))
+
 watchEffect(() => {
   if (status.value === 'success' && !building.value)
     router.replace('/locations')

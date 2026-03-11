@@ -14,6 +14,8 @@ const { data, refresh, status } = await useFetch<ApiResponse<CowDetail>>(
 )
 const cow = computed(() => data.value?.data)
 
+useHead(computed(() => ({ title: cow.value?.officialId ?? 'Vache' })))
+
 watchEffect(() => {
   if (status.value === 'success' && !cow.value) router.replace('/locations')
 })

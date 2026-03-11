@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const { user } = useUserSession()
+
+useHead({ title: 'Mon compte' })
 </script>
 
 <template>

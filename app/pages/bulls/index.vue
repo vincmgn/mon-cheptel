@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { ApiList, Bull, BullWithCount } from '~~/types'
 import BullHeader from '~/components/bulls/BullHeader.vue'
+
+useHead({ title: 'Taureaux' })
 import BullEmptyState from '~/components/bulls/BullEmptyState.vue'
 import BullCard from '~/components/bulls/BullCard.vue'
 import BullCreateModal from '~/components/bulls/BullCreateModal.vue'

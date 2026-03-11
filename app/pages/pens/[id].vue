@@ -15,6 +15,8 @@ const { data, refresh, status } = await useFetch<ApiResponse<PenWithCows>>(
 )
 const pen = computed(() => data.value?.data)
 
+useHead(computed(() => ({ title: pen.value?.name ?? 'Box' })))
+
 watchEffect(() => {
   if (status.value === 'success' && !pen.value) router.replace('/locations')
 })
