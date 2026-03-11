@@ -19,6 +19,27 @@ useHead({ title: 'Données' })
       </div>
     </div>
 
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+      <NuxtLink to="/backup" class="group sm:col-span-2">
+        <UCard class="h-full transition-all group-hover:shadow-md cursor-pointer">
+          <div class="flex items-center gap-4">
+            <div
+              class="p-3 rounded-xl bg-violet-500/10 dark:bg-violet-500/20 flex items-center justify-center"
+            >
+              <UIcon name="i-lucide-database" class="size-8 text-violet-500" />
+            </div>
+            <div class="flex-1">
+              <h2 class="text-lg font-bold">Sauvegarde complète</h2>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Tout exporter en un fichier JSON · Tout restaurer depuis ce fichier
+              </p>
+            </div>
+            <UBadge color="secondary" variant="subtle">Accéder →</UBadge>
+          </div>
+        </UCard>
+      </NuxtLink>
+    </div>
+
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <NuxtLink to="/export" class="group">
         <UCard class="h-full transition-all group-hover:shadow-md cursor-pointer">
