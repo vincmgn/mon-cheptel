@@ -1,3 +1,9 @@
+<script setup lang="ts">
+const {
+  public: { appVersion },
+} = useRuntimeConfig()
+</script>
+
 <template>
   <div>
     <div class="text-center mb-8">
@@ -9,6 +15,9 @@
       <h1 class="text-2xl font-bold">Mon Cheptel</h1>
       <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
         Gestion de votre élevage
+      </p>
+      <p class="text-xs text-gray-400 dark:text-gray-500 mt-2 font-medium">
+        Version {{ appVersion }}
       </p>
     </div>
   </div>

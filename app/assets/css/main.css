@@ -8,3 +8,34 @@ button {
 input {
   font-size: 17px;
 }
+
+.app-splash-card {
+  animation: app-splash-float 1.2s ease-in-out infinite alternate;
+}
+
+.app-splash-enter-active,
+.app-splash-leave-active {
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease;
+}
+
+.app-splash-enter-from,
+.app-splash-leave-to {
+  opacity: 0;
+}
+
+.app-splash-enter-from .app-splash-card,
+.app-splash-leave-to .app-splash-card {
+  transform: translateY(10px) scale(0.98);
+}
+
+@keyframes app-splash-float {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-8px);
+  }
+}

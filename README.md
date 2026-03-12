@@ -97,6 +97,38 @@ Prisma est épinglé en 6.19.2. Évite de passer à Prisma 7 pour le moment (dif
 - Dev server: `yarn dev`
 - Lint + typecheck + build: `yarn validate`
 
+## Version et release
+
+- La version applicative est déclarée dans `package.json`.
+- L'interface affiche cette version via `runtimeConfig.public.appVersion`.
+- En production, la version affichée correspond à celle présente dans l'image buildée.
+
+Workflow simple recommandé:
+
+1. Monter la version:
+
+- `yarn release:patch` pour un correctif
+- `yarn release:minor` pour une nouvelle fonctionnalité compatible
+- `yarn release:major` pour un changement majeur
+
+2. Vérifier le diff puis valider l'application avec `yarn validate`
+3. Committer la release: `git commit -am "chore: release v0.1.1"`
+4. Pousser sur `main`: `git push`
+5. Tagger la version publiée: `git tag v0.1.1 && git push origin v0.1.1`
+
+Règle pratique:
+
+- `0.1.1`: correctif
+- `0.2.0`: nouvelle fonctionnalité compatible
+- `1.0.0`: première version stable
+
+Comportement CI/CD:
+
+- Un push sur `main` valide, build et déploie l'image `latest`
+- Ce même build publie aussi une image versionnée `vX.Y.Z` basée sur `package.json`
+- Un push de tag Git `vX.Y.Z` publie aussi explicitement le tag Docker correspondant
+- La version affichée dans l'app doit correspondre à l'image réellement déployée
+
 ## CI/CD Pipeline
 
 Le workflow `.github/workflows/deploy.yml` automatise:
