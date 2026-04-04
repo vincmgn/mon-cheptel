@@ -3,6 +3,7 @@ const toaster = { position: 'bottom-left' } as const
 const {
   public: { appVersion },
 } = useRuntimeConfig()
+const MIN_SPLASH_DURATION_MS = 1200
 const showSplash = ref(true)
 
 onMounted(() => {
@@ -10,7 +11,7 @@ onMounted(() => {
 
   const hideSplash = () => {
     const elapsed = window.performance.now() - splashStart
-    const remaining = Math.max(450 - elapsed, 0)
+    const remaining = Math.max(MIN_SPLASH_DURATION_MS - elapsed, 0)
 
     window.setTimeout(() => {
       showSplash.value = false
@@ -53,7 +54,7 @@ useHead({
       >
         <div class="app-splash-card text-center">
           <div
-            class="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-3xl bg-primary/12 text-6xl shadow-lg shadow-primary/10 ring-1 ring-primary/10 dark:bg-primary/20"
+            class="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-xl bg-primary/12 text-6xl shadow-lg shadow-primary/10 ring-1 ring-primary/10 dark:bg-primary/20"
           >
             🐄
           </div>

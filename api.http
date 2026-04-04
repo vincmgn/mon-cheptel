@@ -288,3 +288,161 @@ Content-Type: application/json
 
 ### Supprimer une note
 DELETE {{baseUrl}}/notes/1
+
+# ═══════════════════════════════════════════
+# AUTH : OK
+# ═══════════════════════════════════════════
+
+### S'enregistrer
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "jean",
+  "password": "password123",
+  "farmName": "Ferme de Jean"
+}
+
+### Se connecter
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "jean",
+  "password": "password123"
+}
+
+### Se déconnecter
+POST http://localhost:3000/api/auth/logout
+
+### Modifier le profil utilisateur
+PUT http://localhost:3000/api/auth/account
+Content-Type: application/json
+
+{
+  "farmName": "Ferme de Jean Updated"
+}
+
+### Modifier le mot de passe
+PUT http://localhost:3000/api/auth/account
+Content-Type: application/json
+
+{
+  "currentPassword": "password123",
+  "newPassword": "newPassword456",
+  "confirmPassword": "newPassword456"
+}
+
+# ═══════════════════════════════════════════
+# SEARCH : OK
+# ═══════════════════════════════════════════
+
+### Rechercher dans les données
+GET {{baseUrl}}/search?q=FR
+
+# ═══════════════════════════════════════════
+# EXPORT : OK
+# ═══════════════════════════════════════════
+
+### Exporter les vaches (depuis une date à une autre)
+GET {{baseUrl}}/export?type=cows&dateFrom=2025-01-01&dateTo=2025-12-31
+
+### Exporter les taureaux
+GET {{baseUrl}}/export?type=bulls
+
+### Exporter les veaux
+GET {{baseUrl}}/export?type=calves
+
+### Exporter les saillies
+GET {{baseUrl}}/export?type=breedings
+
+# ═══════════════════════════════════════════
+# BACKUP/RESTORE : OK
+# ═══════════════════════════════════════════
+
+### Télécharger une sauvegarde
+GET {{baseUrl}}/backup
+
+### Restaurer depuis une sauvegarde
+POST {{baseUrl}}/restore
+Content-Type: application/json
+
+{
+  "version": 1,
+  "bulls": [
+    {
+      "name": "Taureau 1",
+      "createdAt": "2025-01-01"
+    }
+  ],
+  "cows": [
+    {
+      "officialId": "FR-12345",
+      "location": "Ferme",
+      "building": "Étable",
+      "pen": "Box A",
+      "prophylaxis": false,
+      "createdAt": "2025-01-01"
+    }
+  ],
+  "breedings": [
+    {
+      "date": "2025-02-15",
+      "cowOfficialId": "FR-12345",
+      "bullName": "Taureau 1",
+      "isMaybe": false
+    }
+  ],
+  "calves": [
+    {
+      "sex": "F",
+      "birthDate": "2025-03-01",
+      "motherOfficialId": "FR-12345"
+    }
+  ]
+}
+
+# ═══════════════════════════════════════════
+# IMPORT : OK
+# ═══════════════════════════════════════════
+
+### Aperçu d'import (CSV/XLSX)
+POST {{baseUrl}}/import/preview
+Content-Type: application/json
+
+{
+  "cows": [
+    {
+      "officialId": "FR-99999",
+      "location": "Ferme",
+      "building": "Étable",
+      "pen": "Box B",
+      "prophylaxis": "true",
+      "createdAt": "01/02/2025"
+    }
+  ]
+}
+
+### Confirmer l'import
+POST {{baseUrl}}/import/confirm
+Content-Type: application/json
+
+{
+  "cows": [
+    {
+      "officialId": "FR-99999",
+      "location": "Ferme",
+      "building": "Étable",
+      "pen": "Box B",
+      "prophylaxis": "true",
+      "createdAt": "01/02/2025"
+    }
+  ]
+}
+
+# ═══════════════════════════════════════════
+# RESET : OK
+# ═══════════════════════════════════════════
+
+### Réinitialiser toutes les données utilisateur
+DELETE {{baseUrl}}/reset
