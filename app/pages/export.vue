@@ -51,8 +51,9 @@ const fieldDefs: Record<ExportType, FieldDef[]> = {
     { key: 'sex', label: 'Sexe', default: true },
     { key: 'birthDate', label: 'Date de naissance', default: true },
     { key: 'motherOfficialId', label: 'Mère (N°)', default: true },
-    { key: 'motherLocation', label: 'Lieu de la mère', default: false },
-    { key: 'motherBuilding', label: 'Bâtiment de la mère', default: false },
+    { key: 'motherLocation', label: 'Lieu de la mère', default: true },
+    { key: 'motherBuilding', label: 'Bâtiment de la mère', default: true },
+    { key: 'motherPen', label: 'Case de la mère', default: true },
   ],
   breedings: [
     { key: 'date', label: "Date d'insémination", default: true },
@@ -199,6 +200,8 @@ function getCellValue(item: unknown, fieldKey: string): string | number {
         return String(location?.name ?? '')
       case 'motherBuilding':
         return String(building?.name ?? '')
+      case 'motherPen':
+        return String(pen?.name ?? '')
     }
   }
 
