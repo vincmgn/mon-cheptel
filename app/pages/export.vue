@@ -73,6 +73,7 @@ const dateTo = ref('')
 const selectedFields = ref<Record<string, boolean>>(
   Object.fromEntries(fieldDefs.cows.map(f => [f.key, f.default]))
 )
+const filterField = ref<string>(fieldDefs.cows[0].key)
 
 watch(exportType, type => {
   selectedFields.value = Object.fromEntries(
@@ -80,6 +81,7 @@ watch(exportType, type => {
   )
   dateFrom.value = ''
   dateTo.value = ''
+  filterField.value = fieldDefs[type][0].key
 })
 
 // ── Data fetch ───────────────────────────────────────────────────────────────
@@ -117,6 +119,36 @@ const filteredData = computed(() => {
 const activeColumns = computed(() =>
   fieldDefs[exportType.value].filter(f => selectedFields.value[f.key])
 )
+
+// Keep filterField valid when active columns change
+watch(
+  selectedFields,
+  fields => {
+    if (!fields[filterField.value]) {
+      const first = fieldDefs[exportType.value].find(f => fields[f.key])
+      if (first) filterField.value = first.key
+    }
+  },
+  { deep: true },
+)
+
+// Active columns with filterField placed first
+const orderedActiveColumns = computed(() => {
+  const cols = activeColumns.value
+  const idx = cols.findIndex(f => f.key === filterField.value)
+  if (idx <= 0) return cols
+  return [cols[idx], ...cols.slice(0, idx), ...cols.slice(idx + 1)]
+})
+
+// Filtered data sorted by the chosen filter column
+const sortedFilteredData = computed(() => {
+  const data = [...filteredData.value]
+  return data.sort((a, b) => {
+    const aVal = String(getCellValue(a, filterField.value))
+    const bVal = String(getCellValue(b, filterField.value))
+    return aVal.localeCompare(bVal, 'fr')
+  })
+})
 
 const periodLabel = computed(() => {
   if (exportType.value === 'calves') return 'Filtré sur la date de naissance'
@@ -238,9 +270,9 @@ function getCellValue(item: unknown, fieldKey: string): string | number {
 // ── Build rows for export ────────────────────────────────────────────────────
 
 function buildRows(): Record<string, string | number>[] {
-  return filteredData.value.map(item => {
+  return sortedFilteredData.value.map(item => {
     const row: Record<string, string | number> = {}
-    for (const field of activeColumns.value) {
+    for (const field of orderedActiveColumns.value) {
       row[field.label] = getCellValue(item, field.key)
     }
     return row
@@ -319,7 +351,7 @@ async function exportExcel() {
 // ── PDF export (download) ────────────────────────────────────────────────────
 
 async function exportPDF() {
-  if (!filteredData.value.length || !activeColumns.value.length) return
+  if (!sortedFilteredData.value.length || !orderedActiveColumns.value.length) return
 
   const { jsPDF } = await import('jspdf')
   const { default: autoTable } = await import('jspdf-autotable')
@@ -356,14 +388,14 @@ async function exportPDF() {
       ? ` · Période: ${dateFrom.value ? formatDate(dateFrom.value) : '...'} -> ${dateTo.value ? formatDate(dateTo.value) : '...'}`
       : ''
   doc.text(
-    `Généré le ${new Date().toLocaleDateString('fr-FR')} · ${filteredData.value.length} enregistrement(s)${periodText}`,
+    `Généré le ${new Date().toLocaleDateString('fr-FR')} · ${sortedFilteredData.value.length} enregistrement(s)${periodText}`,
     marginX,
     17
   )
 
-  const headers = activeColumns.value.map(col => col.label)
-  const body = filteredData.value.map(item =>
-    activeColumns.value.map(col => String(getCellValue(item, col.key) ?? ''))
+  const headers = orderedActiveColumns.value.map(col => col.label)
+  const body = sortedFilteredData.value.map(item =>
+    orderedActiveColumns.value.map(col => String(getCellValue(item, col.key) ?? ''))
   )
 
   const colWidth = availableWidth / Math.max(headers.length, 1)
@@ -403,7 +435,7 @@ const typeLabel = computed(
   () => typeOptions.find(t => t.value === exportType.value)?.label ?? ''
 )
 
-const previewRows = computed(() => filteredData.value.slice(0, 100))
+const previewRows = computed(() => sortedFilteredData.value.slice(0, 100))
 const hasMore = computed(() => filteredData.value.length > 100)
 </script>
 
@@ -547,12 +579,46 @@ const hasMore = computed(() => filteredData.value.length > 100)
           </div>
         </div>
 
-        <!-- Step 4 : Export -->
+        <!-- Step 4 : Colonne principale -->
         <div class="mt-6">
           <p
             class="text-md font-semibold text-gray-400 uppercase tracking-wider mb-3"
           >
-            4. Exporter
+            4. Colonne principale
+          </p>
+          <p
+            v-if="!activeColumns.length"
+            class="text-sm text-gray-400 dark:text-gray-500 italic"
+          >
+            Sélectionnez au moins un champ à l'étape 3.
+          </p>
+          <div v-else class="flex flex-wrap gap-2">
+            <button
+              v-for="col in activeColumns"
+              :key="col.key"
+              class="px-3 py-1.5 rounded-lg border text-sm font-medium transition-all cursor-pointer"
+              :class="
+                filterField === col.key
+                  ? 'border-primary bg-primary/5 text-primary dark:bg-primary/10'
+                  : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600'
+              "
+              @click="filterField = col.key"
+            >
+              {{ col.label }}
+            </button>
+          </div>
+          <p class="text-xs text-gray-400 mt-1.5">
+            Apparaîtra en premier dans le tableau — les données seront triées
+            par ce champ.
+          </p>
+        </div>
+
+        <!-- Step 5 : Export -->
+        <div class="mt-6">
+          <p
+            class="text-md font-semibold text-gray-400 uppercase tracking-wider mb-3"
+          >
+            5. Exporter
           </p>
           <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
             <template v-if="status === 'pending'">Chargement…</template>
@@ -651,7 +717,7 @@ const hasMore = computed(() => filteredData.value.length > 100)
             <thead class="bg-gray-50 dark:bg-gray-800">
               <tr>
                 <th
-                  v-for="col in activeColumns"
+                  v-for="col in orderedActiveColumns"
                   :key="col.key"
                   class="text-left px-3 py-2.5 font-medium text-gray-600 dark:text-gray-300 whitespace-nowrap border-b border-gray-200 dark:border-gray-700"
                 >
@@ -666,7 +732,7 @@ const hasMore = computed(() => filteredData.value.length > 100)
                 class="border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors print:hover:bg-transparent"
               >
                 <td
-                  v-for="col in activeColumns"
+                  v-for="col in orderedActiveColumns"
                   :key="col.key"
                   class="px-3 py-2 text-gray-700 dark:text-gray-300 whitespace-nowrap"
                 >
