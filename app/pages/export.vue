@@ -73,7 +73,12 @@ const dateTo = ref('')
 const selectedFields = ref<Record<string, boolean>>(
   Object.fromEntries(fieldDefs.cows.map(f => [f.key, f.default]))
 )
-const filterField = ref<string>(fieldDefs.cows[0].key)
+
+function getFirstFieldKey(type: ExportType): string {
+  return fieldDefs[type][0]?.key ?? ''
+}
+
+const filterField = ref<string>(getFirstFieldKey('cows'))
 
 watch(exportType, type => {
   selectedFields.value = Object.fromEntries(
@@ -81,7 +86,7 @@ watch(exportType, type => {
   )
   dateFrom.value = ''
   dateTo.value = ''
-  filterField.value = fieldDefs[type][0].key
+  filterField.value = getFirstFieldKey(type)
 })
 
 // ── Data fetch ───────────────────────────────────────────────────────────────
@@ -129,7 +134,7 @@ watch(
       if (first) filterField.value = first.key
     }
   },
-  { deep: true },
+  { deep: true }
 )
 
 // Active columns with filterField placed first
@@ -137,7 +142,9 @@ const orderedActiveColumns = computed(() => {
   const cols = activeColumns.value
   const idx = cols.findIndex(f => f.key === filterField.value)
   if (idx <= 0) return cols
-  return [cols[idx], ...cols.slice(0, idx), ...cols.slice(idx + 1)]
+  const first = cols[idx]
+  if (!first) return cols
+  return [first, ...cols.slice(0, idx), ...cols.slice(idx + 1)]
 })
 
 // Filtered data sorted by the chosen filter column
@@ -351,7 +358,8 @@ async function exportExcel() {
 // ── PDF export (download) ────────────────────────────────────────────────────
 
 async function exportPDF() {
-  if (!sortedFilteredData.value.length || !orderedActiveColumns.value.length) return
+  if (!sortedFilteredData.value.length || !orderedActiveColumns.value.length)
+    return
 
   const { jsPDF } = await import('jspdf')
   const { default: autoTable } = await import('jspdf-autotable')
@@ -395,7 +403,9 @@ async function exportPDF() {
 
   const headers = orderedActiveColumns.value.map(col => col.label)
   const body = sortedFilteredData.value.map(item =>
-    orderedActiveColumns.value.map(col => String(getCellValue(item, col.key) ?? ''))
+    orderedActiveColumns.value.map(col =>
+      String(getCellValue(item, col.key) ?? '')
+    )
   )
 
   const colWidth = availableWidth / Math.max(headers.length, 1)
