@@ -4,6 +4,8 @@ on:
   push:
     branches: ['main']
     tags: ['v*']
+  pull_request:
+    branches: ['develop', 'main']
 
 # Annuler les builds en cours si nouveau push
 concurrency:
@@ -34,6 +36,7 @@ jobs:
         run: yarn format:check & yarn lint & yarn typecheck & wait
 
   build-and-push:
+    if: github.event_name == 'push'
     needs: validate
     runs-on: ubuntu-latest
     permissions:
