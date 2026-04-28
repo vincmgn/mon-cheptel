@@ -18,6 +18,8 @@ export default defineEventHandler(async event => {
     })
   }
 
+  const type = body.type === 'meadow' ? 'meadow' : 'building'
+
   const locationExists = await prisma.location.findUnique({
     where: { id: body.locationId },
   })
@@ -42,8 +44,18 @@ export default defineEventHandler(async event => {
   }
 
   const building = await prisma.building.create({
-    data: { name: body.name.trim(), locationId: body.locationId },
-    include: { location: true },
+    data: {
+      name: body.name.trim(),
+      locationId: body.locationId,
+      type,
+      ...(type === 'meadow'
+        ? { pens: { create: { name: body.name.trim() } } }
+        : {}),
+    },
+    include: {
+      location: true,
+      pens: true,
+    },
   })
 
   setResponseStatus(event, 201)
