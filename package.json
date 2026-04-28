@@ -14,10 +14,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "nuxt typecheck",
-    "validate": "yarn format && yarn format:check && yarn lint && yarn typecheck && yarn build",
-    "release:patch": "yarn version --patch --no-git-tag-version",
-    "release:minor": "yarn version --minor --no-git-tag-version",
-    "release:major": "yarn version --major --no-git-tag-version"
+    "validate": "yarn format && yarn format:check && yarn lint && yarn typecheck && yarn build"
   },
   "dependencies": {
     "@prisma/client": "6.19.2",
