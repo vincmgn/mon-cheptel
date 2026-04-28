@@ -151,9 +151,10 @@ const orderedActiveColumns = computed(() => {
 const sortedFilteredData = computed(() => {
   const data = [...filteredData.value]
   return data.sort((a, b) => {
-    const aVal = String(getCellValue(a, filterField.value))
-    const bVal = String(getCellValue(b, filterField.value))
-    return aVal.localeCompare(bVal, 'fr')
+    const aVal = getSortValue(a, filterField.value)
+    const bVal = getSortValue(b, filterField.value)
+    if (typeof aVal === 'number' && typeof bVal === 'number') return aVal - bVal
+    return String(aVal).localeCompare(String(bVal), 'fr')
   })
 })
 
@@ -165,6 +166,40 @@ const periodLabel = computed(() => {
 })
 
 // ── Cell value resolver ──────────────────────────────────────────────────────
+
+function getSortValue(item: unknown, fieldKey: string): string | number {
+  const r = item as Record<string, unknown>
+  const type = exportType.value
+
+  if (type === 'cows') {
+    if (fieldKey === 'createdAt')
+      return r.createdAt ? new Date(r.createdAt as string).getTime() : 0
+    if (fieldKey === 'lastBreedingDate') {
+      const last = (r.breedings as Record<string, unknown>[] | undefined)?.[0]
+      return last?.date ? new Date(last.date as string).getTime() : 0
+    }
+  }
+  if (type === 'bulls') {
+    if (fieldKey === 'createdAt')
+      return r.createdAt ? new Date(r.createdAt as string).getTime() : 0
+  }
+  if (type === 'calves') {
+    if (fieldKey === 'birthDate')
+      return r.birthDate ? new Date(r.birthDate as string).getTime() : 0
+  }
+  if (type === 'breedings') {
+    if (fieldKey === 'date')
+      return r.date ? new Date(r.date as string).getTime() : 0
+    if (fieldKey === 'expectedCalving') {
+      if (!r.date) return 0
+      const d = new Date(r.date as string)
+      d.setDate(d.getDate() + 283)
+      return d.getTime()
+    }
+  }
+
+  return String(getCellValue(item, fieldKey))
+}
 
 function formatDate(d: string | Date | null | undefined): string {
   if (!d) return ''
