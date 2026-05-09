@@ -29,10 +29,10 @@ Le projet suit la structure standard d'une application Nuxt 4 :
 
 ## 🧑‍💻 Développeurs
 
-Si vous êtes développeur et que vous souhaitez contribuer ou faire tourner le projet localement, veuillez consulter les notes techniques internes (disponibles en local si partagées par l'équipe). 
+Si vous êtes développeur et que vous souhaitez contribuer ou faire tourner le projet localement, veuillez consulter les notes techniques internes (disponibles en local si partagées par l'équipe).
 
 L'environnement de développement nécessite **Docker**, **Yarn** et **Node.js 20**.
 
 ---
 
-*Développé avec ❤️ par Vincent.*
+_Développé avec ❤️ par Vincent._

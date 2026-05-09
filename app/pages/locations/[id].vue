@@ -20,6 +20,13 @@ const { data, refresh, status } = await useFetch<
 >(`/api/v1/locations/${id}`)
 const location = computed(() => data.value?.data)
 
+const buildings = computed(
+  () => location.value?.buildings.filter(b => b.type !== 'meadow') ?? []
+)
+const meadows = computed(
+  () => location.value?.buildings.filter(b => b.type === 'meadow') ?? []
+)
+
 useHead(computed(() => ({ title: location.value?.name ?? 'Exploitation' })))
 
 watchEffect(() => {
@@ -56,7 +63,7 @@ function openDelete(building: Building) {
         <BuildingHeader :location="location" />
         <div class="mb-8">
           <UButton
-            aria-label="Nouveau bâtiment"
+            aria-label="Nouveau bâtiment ou pré"
             class="max-sm:size-12 max-sm:rounded-full max-sm:px-0 max-sm:py-0 max-sm:flex max-sm:items-center max-sm:justify-center"
             @click="isCreateOpen = true"
           >
@@ -65,7 +72,7 @@ function openDelete(building: Building) {
             </span>
             <span class="hidden sm:inline-flex sm:items-center sm:gap-2">
               <UIcon name="i-lucide-plus" class="size-4" />
-              Nouveau bâtiment
+              Nouveau
             </span>
           </UButton>
         </div>
@@ -89,49 +96,113 @@ function openDelete(building: Building) {
         @click="isCreateOpen = true"
       />
 
-      <!-- Card grid -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <UCard
-          v-for="building in location.buildings"
-          :key="building.id"
-          class="flex flex-col"
-        >
-          <div class="flex items-start justify-between">
-            <div class="flex items-center gap-2 min-w-0">
-              <div
-                class="p-2 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 shrink-0 flex items-center justify-center"
-              >
-                <UIcon
-                  name="i-lucide-building-2"
-                  class="size-5 text-amber-500"
-                />
+      <template v-else>
+        <!-- Section Bâtiments -->
+        <div v-if="buildings.length">
+          <h2
+            class="text-sm font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-3 flex items-center gap-2"
+          >
+            <UIcon name="i-lucide-building-2" class="size-4" />
+            Bâtiments
+          </h2>
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"
+          >
+            <UCard
+              v-for="building in buildings"
+              :key="building.id"
+              class="flex flex-col"
+            >
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-2 min-w-0">
+                  <div
+                    class="p-2 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 shrink-0 flex items-center justify-center"
+                  >
+                    <UIcon
+                      name="i-lucide-building-2"
+                      class="size-5 text-amber-500"
+                    />
+                  </div>
+                  <h3 class="font-semibold text-base truncate">
+                    {{ building.name }}
+                  </h3>
+                </div>
+                <div class="flex gap-1 ml-2 shrink-0">
+                  <UButton
+                    icon="i-lucide-pencil"
+                    color="neutral"
+                    variant="subtle"
+                    size="md"
+                    aria-label="Modifier"
+                    @click="openEdit(building)"
+                  />
+                  <UButton
+                    icon="i-lucide-trash-2"
+                    color="error"
+                    variant="subtle"
+                    size="md"
+                    aria-label="Supprimer"
+                    @click="openDelete(building)"
+                  />
+                </div>
               </div>
-              <h3 class="font-semibold text-base truncate">
-                {{ building.name }}
-              </h3>
-            </div>
-            <div class="flex gap-1 ml-2 shrink-0">
-              <UButton
-                icon="i-lucide-pencil"
-                color="neutral"
-                variant="subtle"
-                size="md"
-                aria-label="Modifier"
-                @click="openEdit(building)"
-              />
-              <UButton
-                icon="i-lucide-trash-2"
-                color="error"
-                variant="subtle"
-                size="md"
-                aria-label="Supprimer"
-                @click="openDelete(building)"
-              />
-            </div>
+              <BuildingCard :building="building" />
+            </UCard>
           </div>
-          <BuildingCard :building="building" />
-        </UCard>
-      </div>
+        </div>
+
+        <!-- Section Prés -->
+        <div v-if="meadows.length">
+          <h2
+            class="text-sm font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-3 flex items-center gap-2"
+          >
+            <UIcon name="i-lucide-trees" class="size-4" />
+            Prés
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <UCard
+              v-for="meadow in meadows"
+              :key="meadow.id"
+              class="flex flex-col"
+            >
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-2 min-w-0">
+                  <div
+                    class="p-2 rounded-lg bg-green-500/10 dark:bg-green-500/20 shrink-0 flex items-center justify-center"
+                  >
+                    <UIcon
+                      name="i-lucide-trees"
+                      class="size-5 text-green-500"
+                    />
+                  </div>
+                  <h3 class="font-semibold text-base truncate">
+                    {{ meadow.name }}
+                  </h3>
+                </div>
+                <div class="flex gap-1 ml-2 shrink-0">
+                  <UButton
+                    icon="i-lucide-pencil"
+                    color="neutral"
+                    variant="subtle"
+                    size="md"
+                    aria-label="Modifier"
+                    @click="openEdit(meadow)"
+                  />
+                  <UButton
+                    icon="i-lucide-trash-2"
+                    color="error"
+                    variant="subtle"
+                    size="md"
+                    aria-label="Supprimer"
+                    @click="openDelete(meadow)"
+                  />
+                </div>
+              </div>
+              <BuildingCard :building="meadow" />
+            </UCard>
+          </div>
+        </div>
+      </template>
     </div>
 
     <BuildingCreateModal
