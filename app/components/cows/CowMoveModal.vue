@@ -111,8 +111,9 @@ async function onMove() {
           Choisissez la destination (case ou pré) :
         </p>
 
-        <div class="space-y-3 max-h-80 overflow-y-auto pr-1">
-          <div v-for="loc in grouped" :key="loc.id">
+        <div class="max-h-80 overflow-y-auto pr-1">
+          <div v-for="(loc, index) in grouped" :key="loc.id">
+            <div v-if="index > 0" class="border-t border-gray-200 dark:border-gray-700 my-3" />
             <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1.5">
               {{ loc.name }}
             </p>
