@@ -124,20 +124,20 @@ function onMoved() {
         <UCard
           v-for="cow in pen.cows"
           :key="cow.id"
-          class="flex flex-col cursor-pointer transition-all"
+          class="flex flex-col transition-all"
           :class="isSelected(cow.id) ? 'ring-2 ring-primary-500' : ''"
-          @click="toggleSelect(cow.id)"
         >
           <div class="flex items-start justify-between">
             <div class="flex items-center gap-2 min-w-0">
               <!-- Checkbox visuel -->
               <div
-                class="size-5 rounded border-2 shrink-0 flex items-center justify-center transition-colors"
+                class="size-5 rounded border-2 shrink-0 flex items-center justify-center transition-colors cursor-pointer"
                 :class="
                   isSelected(cow.id)
                     ? 'bg-primary-500 border-primary-500'
                     : 'border-gray-300 dark:border-gray-600'
                 "
+                @click="toggleSelect(cow.id)"
               >
                 <UIcon
                   v-if="isSelected(cow.id)"
