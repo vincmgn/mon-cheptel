@@ -1,6 +1,6 @@
 {
   "name": "mon-cheptel",
-  "version": "0.1.4",
+  "version": "0.1.7",
   "type": "module",
   "private": true,
   "scripts": {
