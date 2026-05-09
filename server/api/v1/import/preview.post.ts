@@ -29,6 +29,12 @@ interface CalfRow {
   motherOfficialId?: string
 }
 
+interface WeighingRow {
+  calfOfficialId?: string
+  date?: string
+  weight?: string
+}
+
 function parseDate(val: string | undefined): Date | undefined {
   if (!val?.trim()) return undefined
   const frMatch = val.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
@@ -283,9 +289,50 @@ export default defineEventHandler(async event => {
     return { success: true, data: preview }
   }
 
+  // ── Pesées ────────────────────────────────────────────────────────────────────
+
+  if (type === 'weighings') {
+    const weighingRows = rows as WeighingRow[]
+
+    const calves = await prisma.calf.findMany({
+      where: {
+        officialId: { not: null },
+        cow: { pen: { building: { location: { userId } } } },
+      },
+      select: { id: true, officialId: true },
+    })
+    const calfMap = new Map(calves.map(c => [c.officialId!, c.id]))
+
+    const preview = weighingRows.map(row => {
+      if (!row.calfOfficialId?.trim()) {
+        return { ...row, status: 'missingField', message: 'N° veau manquant' }
+      }
+      if (!row.date?.trim()) {
+        return { ...row, status: 'missingField', message: 'Date manquante' }
+      }
+      if (!row.weight?.trim()) {
+        return { ...row, status: 'missingField', message: 'Poids manquant' }
+      }
+      const parsedDate = parseDate(row.date)
+      if (!parsedDate) {
+        return { ...row, status: 'missingField', message: `Date invalide : ${row.date}` }
+      }
+      const w = parseFloat(row.weight.replace(',', '.'))
+      if (isNaN(w) || w <= 0) {
+        return { ...row, status: 'invalidWeight', message: `Poids invalide : ${row.weight}` }
+      }
+      if (!calfMap.has(row.calfOfficialId.trim())) {
+        return { ...row, status: 'calfNotFound', message: `Veau introuvable : ${row.calfOfficialId.trim()}` }
+      }
+      return { ...row, status: 'ok' }
+    })
+
+    return { success: true, data: preview }
+  }
+
   throw createError({
     statusCode: 400,
     message:
-      'Type invalide. Valeurs acceptées : cows, bulls, breedings, calves',
+      'Type invalide. Valeurs acceptées : cows, bulls, breedings, calves, weighings',
   })
 })

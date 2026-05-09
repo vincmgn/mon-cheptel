@@ -1,7 +1,7 @@
 <script setup lang="ts">
 useHead({ title: 'Export de données' })
 
-type ExportType = 'cows' | 'bulls' | 'calves' | 'breedings'
+type ExportType = 'cows' | 'bulls' | 'calves' | 'breedings' | 'weighings'
 
 interface FieldDef {
   key: string
@@ -16,6 +16,7 @@ const typeOptions: { value: ExportType; label: string; emoji: string }[] = [
   { value: 'bulls', label: 'Taureaux', emoji: '🐂' },
   { value: 'calves', label: 'Veaux', emoji: '🐮' },
   { value: 'breedings', label: 'Inséminations', emoji: '💉' },
+  { value: 'weighings', label: 'Pesées', emoji: '⚖️' },
 ]
 
 // ── Field definitions ────────────────────────────────────────────────────────
@@ -62,6 +63,15 @@ const fieldDefs: Record<ExportType, FieldDef[]> = {
     { key: 'bullName', label: 'Taureau', default: true },
     { key: 'isMaybe', label: 'Statut', default: true },
     { key: 'expectedCalving', label: 'Vêlage prévu (+283j)', default: true },
+  ],
+  weighings: [
+    { key: 'date', label: 'Date', default: true },
+    { key: 'calfOfficialId', label: 'N° veau', default: true },
+    { key: 'calfSex', label: 'Sexe veau', default: true },
+    { key: 'weight', label: 'Poids (kg)', default: true },
+    { key: 'motherOfficialId', label: 'Mère (N°)', default: true },
+    { key: 'motherLocation', label: 'Lieu', default: false },
+    { key: 'motherBuilding', label: 'Bâtiment', default: false },
   ],
 }
 
@@ -111,7 +121,7 @@ const filteredData = computed(() => {
     const record = item as Record<string, unknown>
     let dateField: string
     if (exportType.value === 'calves') dateField = record.birthDate as string
-    else if (exportType.value === 'breedings') dateField = record.date as string
+    else if (exportType.value === 'breedings' || exportType.value === 'weighings') dateField = record.date as string
     else dateField = record.createdAt as string
 
     const d = new Date(dateField)
@@ -160,8 +170,8 @@ const sortedFilteredData = computed(() => {
 
 const periodLabel = computed(() => {
   if (exportType.value === 'calves') return 'Filtré sur la date de naissance'
-  if (exportType.value === 'breedings')
-    return "Filtré sur la date d'insémination"
+  if (exportType.value === 'breedings') return "Filtré sur la date d'insémination"
+  if (exportType.value === 'weighings') return 'Filtré sur la date de pesée'
   return "Filtré sur la date d'entrée"
 })
 
@@ -186,6 +196,11 @@ function getSortValue(item: unknown, fieldKey: string): string | number {
   if (type === 'calves') {
     if (fieldKey === 'birthDate')
       return r.birthDate ? new Date(r.birthDate as string).getTime() : 0
+  }
+  if (type === 'weighings') {
+    if (fieldKey === 'date')
+      return r.date ? new Date(r.date as string).getTime() : 0
+    if (fieldKey === 'weight') return (r.weight as number) ?? 0
   }
   if (type === 'breedings') {
     if (fieldKey === 'date')
@@ -303,6 +318,30 @@ function getCellValue(item: unknown, fieldKey: string): string | number {
         d.setDate(d.getDate() + 283)
         return formatDate(d)
       }
+    }
+  }
+
+  if (type === 'weighings') {
+    const calf = r.calf as Record<string, unknown> | null
+    const cow = (calf?.cow as Record<string, unknown> | null) ?? null
+    const pen = (cow?.pen as Record<string, unknown> | null) ?? null
+    const building = (pen?.building as Record<string, unknown> | null) ?? null
+    const location = (building?.location as Record<string, unknown> | null) ?? null
+    switch (fieldKey) {
+      case 'date':
+        return formatDate(r.date as string)
+      case 'calfOfficialId':
+        return String(calf?.officialId ?? 'Non identifié')
+      case 'calfSex':
+        return (calf?.sex as string) === 'M' ? 'Mâle' : 'Femelle'
+      case 'weight':
+        return r.weight as number
+      case 'motherOfficialId':
+        return String(cow?.officialId ?? '')
+      case 'motherLocation':
+        return String(location?.name ?? '')
+      case 'motherBuilding':
+        return String(building?.name ?? '')
     }
   }
 

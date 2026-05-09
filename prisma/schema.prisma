@@ -55,13 +55,22 @@ model Cow {
 }
 
 model Calf {
-  id         Int       @id @default(autoincrement())
-  officialId String?   @unique
+  id         Int        @id @default(autoincrement())
+  officialId String?    @unique
   sex        String
-  birthDate  DateTime  @default(now())
+  birthDate  DateTime   @default(now())
   cowId      Int
-  cow        Cow       @relation(fields: [cowId], references: [id])
+  cow        Cow        @relation(fields: [cowId], references: [id])
   notes      Note[]
+  weighings  Weighing[]
+}
+
+model Weighing {
+  id      Int      @id @default(autoincrement())
+  date    DateTime @default(now())
+  weight  Float
+  calfId  Int
+  calf    Calf     @relation(fields: [calfId], references: [id])
 }
 
 model Bull {
