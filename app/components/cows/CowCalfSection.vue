@@ -81,19 +81,19 @@ function toggleWeighings(calfId: number) {
 const isWeighingOpen = ref(false)
 const weighingCalfId = ref<number | null>(null)
 const weighingDate = ref(new Date().toISOString().split('T')[0])
-const weighingWeight = ref('')
+const weighingWeight = ref<number | null>(null)
 const isAddingWeighing = ref(false)
 
 function openWeighingModal(calfId: number) {
   weighingCalfId.value = calfId
   weighingDate.value = new Date().toISOString().split('T')[0]
-  weighingWeight.value = ''
+  weighingWeight.value = null
   isWeighingOpen.value = true
 }
 
 async function addWeighing() {
-  if (!weighingCalfId.value || !weighingWeight.value) return
-  const w = parseFloat(weighingWeight.value.replace(',', '.'))
+  if (!weighingCalfId.value || weighingWeight.value === null) return
+  const w = weighingWeight.value
   if (isNaN(w) || w <= 0) {
     toast.add({ title: 'Poids invalide', color: 'error' })
     return
@@ -102,7 +102,11 @@ async function addWeighing() {
   try {
     await $fetch('/api/v1/weighings', {
       method: 'POST',
-      body: { calfId: weighingCalfId.value, weight: w, date: weighingDate.value },
+      body: {
+        calfId: weighingCalfId.value,
+        weight: w,
+        date: weighingDate.value,
+      },
     })
     toast.add({ title: 'Pesée ajoutée', color: 'success' })
     isWeighingOpen.value = false
@@ -157,7 +161,9 @@ function formatDateShort(dateStr: string) {
   <section>
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg font-semibold">🐃 Veaux</h2>
-      <UButton size="sm" icon="i-lucide-plus" @click="openModal">Ajouter</UButton>
+      <UButton size="sm" icon="i-lucide-plus" @click="openModal"
+        >Ajouter</UButton
+      >
     </div>
 
     <div
@@ -229,7 +235,9 @@ function formatDateShort(dateStr: string) {
           class="border-t border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-900"
         >
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+            <span
+              class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide"
+            >
               Pesées
             </span>
             <UButton
@@ -306,7 +314,9 @@ function formatDateShort(dateStr: string) {
             />
           </UFormField>
           <div class="flex justify-end gap-2 pt-2">
-            <UButton color="neutral" variant="outline" @click="isOpen = false">Annuler</UButton>
+            <UButton color="neutral" variant="outline" @click="isOpen = false"
+              >Annuler</UButton
+            >
             <UButton :loading="isAdding" @click="addCalf">Ajouter</UButton>
           </div>
         </div>
@@ -326,13 +336,20 @@ function formatDateShort(dateStr: string) {
               type="number"
               min="0"
               step="0.1"
-              placeholder="Ex: 42.5"
+              placeholder="Ex: 194.5"
               class="w-full"
             />
           </UFormField>
           <div class="flex justify-end gap-2 pt-2">
-            <UButton color="neutral" variant="outline" @click="isWeighingOpen = false">Annuler</UButton>
-            <UButton :loading="isAddingWeighing" @click="addWeighing">Ajouter</UButton>
+            <UButton
+              color="neutral"
+              variant="outline"
+              @click="isWeighingOpen = false"
+              >Annuler</UButton
+            >
+            <UButton :loading="isAddingWeighing" @click="addWeighing"
+              >Ajouter</UButton
+            >
           </div>
         </div>
       </template>

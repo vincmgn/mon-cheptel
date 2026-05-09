@@ -10,12 +10,19 @@ export default defineEventHandler(async event => {
     where: { id },
     include: {
       calf: {
-        include: { cow: { include: { pen: { include: { building: { include: { location: true } } } } } } },
+        include: {
+          cow: {
+            include: {
+              pen: { include: { building: { include: { location: true } } } },
+            },
+          },
+        },
       },
     },
   })
 
-  if (!weighing) throw createError({ statusCode: 404, message: 'Pesée introuvable' })
+  if (!weighing)
+    throw createError({ statusCode: 404, message: 'Pesée introuvable' })
   if (weighing.calf.cow.pen.building.location.userId !== userId)
     throw createError({ statusCode: 403, message: 'Accès interdit' })
 

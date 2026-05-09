@@ -345,22 +345,37 @@ export default defineEventHandler(async event => {
     let skipped = 0
 
     for (const row of weighingRows) {
-      if (!row.calfOfficialId?.trim() || !row.date?.trim() || !row.weight?.trim()) {
+      if (
+        !row.calfOfficialId?.trim() ||
+        !row.date?.trim() ||
+        !row.weight?.trim()
+      ) {
         skipped++
         continue
       }
 
       const parsedDate = parseDate(row.date)
-      if (!parsedDate) { skipped++; continue }
+      if (!parsedDate) {
+        skipped++
+        continue
+      }
 
       const w = parseFloat(row.weight.replace(',', '.'))
-      if (isNaN(w) || w <= 0) { skipped++; continue }
+      if (isNaN(w) || w <= 0) {
+        skipped++
+        continue
+      }
 
       const calfId = calfMap.get(row.calfOfficialId.trim())
-      if (!calfId) { skipped++; continue }
+      if (!calfId) {
+        skipped++
+        continue
+      }
 
       try {
-        await prisma.weighing.create({ data: { calfId, weight: w, date: parsedDate } })
+        await prisma.weighing.create({
+          data: { calfId, weight: w, date: parsedDate },
+        })
         created++
       } catch {
         skipped++

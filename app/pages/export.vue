@@ -121,7 +121,11 @@ const filteredData = computed(() => {
     const record = item as Record<string, unknown>
     let dateField: string
     if (exportType.value === 'calves') dateField = record.birthDate as string
-    else if (exportType.value === 'breedings' || exportType.value === 'weighings') dateField = record.date as string
+    else if (
+      exportType.value === 'breedings' ||
+      exportType.value === 'weighings'
+    )
+      dateField = record.date as string
     else dateField = record.createdAt as string
 
     const d = new Date(dateField)
@@ -170,7 +174,8 @@ const sortedFilteredData = computed(() => {
 
 const periodLabel = computed(() => {
   if (exportType.value === 'calves') return 'Filtré sur la date de naissance'
-  if (exportType.value === 'breedings') return "Filtré sur la date d'insémination"
+  if (exportType.value === 'breedings')
+    return "Filtré sur la date d'insémination"
   if (exportType.value === 'weighings') return 'Filtré sur la date de pesée'
   return "Filtré sur la date d'entrée"
 })
@@ -326,7 +331,8 @@ function getCellValue(item: unknown, fieldKey: string): string | number {
     const cow = (calf?.cow as Record<string, unknown> | null) ?? null
     const pen = (cow?.pen as Record<string, unknown> | null) ?? null
     const building = (pen?.building as Record<string, unknown> | null) ?? null
-    const location = (building?.location as Record<string, unknown> | null) ?? null
+    const location =
+      (building?.location as Record<string, unknown> | null) ?? null
     switch (fieldKey) {
       case 'date':
         return formatDate(r.date as string)

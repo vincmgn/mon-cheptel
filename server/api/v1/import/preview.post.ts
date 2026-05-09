@@ -315,14 +315,26 @@ export default defineEventHandler(async event => {
       }
       const parsedDate = parseDate(row.date)
       if (!parsedDate) {
-        return { ...row, status: 'missingField', message: `Date invalide : ${row.date}` }
+        return {
+          ...row,
+          status: 'missingField',
+          message: `Date invalide : ${row.date}`,
+        }
       }
       const w = parseFloat(row.weight.replace(',', '.'))
       if (isNaN(w) || w <= 0) {
-        return { ...row, status: 'invalidWeight', message: `Poids invalide : ${row.weight}` }
+        return {
+          ...row,
+          status: 'invalidWeight',
+          message: `Poids invalide : ${row.weight}`,
+        }
       }
       if (!calfMap.has(row.calfOfficialId.trim())) {
-        return { ...row, status: 'calfNotFound', message: `Veau introuvable : ${row.calfOfficialId.trim()}` }
+        return {
+          ...row,
+          status: 'calfNotFound',
+          message: `Veau introuvable : ${row.calfOfficialId.trim()}`,
+        }
       }
       return { ...row, status: 'ok' }
     })

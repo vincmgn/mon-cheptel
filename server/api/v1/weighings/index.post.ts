@@ -16,7 +16,13 @@ export default defineEventHandler(async event => {
 
   const calf = await prisma.calf.findUnique({
     where: { id: calfId },
-    include: { cow: { include: { pen: { include: { building: { include: { location: true } } } } } } },
+    include: {
+      cow: {
+        include: {
+          pen: { include: { building: { include: { location: true } } } },
+        },
+      },
+    },
   })
 
   if (!calf) throw createError({ statusCode: 404, message: 'Veau introuvable' })
