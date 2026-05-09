@@ -2,6 +2,13 @@ import type { Cow } from './cow'
 import type { Pen } from './pen'
 import type { Building } from './building'
 
+export interface Weighing {
+  id: number
+  date: string
+  weight: number
+  calfId: number
+}
+
 // Type de base
 export interface Calf {
   id: number

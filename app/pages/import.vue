@@ -1,7 +1,7 @@
 <script setup lang="ts">
 useHead({ title: 'Import de données' })
 
-type ImportType = 'cows' | 'bulls' | 'breedings' | 'calves'
+type ImportType = 'cows' | 'bulls' | 'breedings' | 'calves' | 'weighings'
 
 interface ColumnDef {
   label: string
@@ -13,9 +13,15 @@ const typeOptions: { value: ImportType; label: string; emoji: string }[] = [
   { value: 'bulls', label: 'Taureaux', emoji: '🐂' },
   { value: 'calves', label: 'Veaux', emoji: '🐮' },
   { value: 'breedings', label: 'Inséminations', emoji: '💉' },
+  { value: 'weighings', label: 'Pesées', emoji: '⚖️' },
 ]
 
 const expectedColumns: Record<ImportType, ColumnDef[]> = {
+  weighings: [
+    { label: 'N° veau', required: true },
+    { label: 'Date', required: true },
+    { label: 'Poids (kg)', required: true },
+  ],
   cows: [
     { label: 'N°', required: true },
     { label: 'Lieu', required: true },
@@ -94,6 +100,16 @@ const columnMap: Record<ImportType, Record<string, string>> = {
     mere: 'motherOfficialId',
     motherofficialid: 'motherOfficialId',
   },
+  weighings: {
+    'n° veau': 'calfOfficialId',
+    'n° du veau': 'calfOfficialId',
+    veau: 'calfOfficialId',
+    calfofficialid: 'calfOfficialId',
+    date: 'date',
+    'poids (kg)': 'weight',
+    poids: 'weight',
+    weight: 'weight',
+  },
 }
 
 const statusConfig: Record<
@@ -105,8 +121,10 @@ const statusConfig: Record<
   penNotFound: { color: 'error', label: 'Case introuvable' },
   cowNotFound: { color: 'error', label: 'Vache introuvable' },
   motherNotFound: { color: 'error', label: 'Mère introuvable' },
+  calfNotFound: { color: 'error', label: 'Veau introuvable' },
   missingField: { color: 'error', label: 'Champ manquant' },
   invalidSex: { color: 'error', label: 'Sexe invalide' },
+  invalidWeight: { color: 'error', label: 'Poids invalide' },
 }
 
 // ── State ────────────────────────────────────────────────────────────────────
@@ -341,6 +359,14 @@ function getCellValue(row: Record<string, string>, colLabel: string): string {
           variant="subtle"
           icon="i-lucide-info"
           description="Les vaches mères référencées doivent déjà exister dans l'application."
+          class="mt-3"
+        />
+        <UAlert
+          v-if="importType === 'weighings'"
+          color="info"
+          variant="subtle"
+          icon="i-lucide-info"
+          description="Les veaux référencés (N° veau) doivent déjà exister et avoir un numéro officiel."
           class="mt-3"
         />
       </div>

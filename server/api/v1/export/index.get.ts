@@ -84,9 +84,33 @@ export default defineEventHandler(async event => {
     return { success: true, data }
   }
 
+  if (type === 'weighings') {
+    const dateFilter =
+      dateFrom || dateTo ? { date: { gte: dateFrom, lte: dateTo } } : {}
+    const data = await prisma.weighing.findMany({
+      where: {
+        calf: { cow: { pen: { building: { location: { userId } } } } },
+        ...dateFilter,
+      },
+      include: {
+        calf: {
+          include: {
+            cow: {
+              include: {
+                pen: { include: { building: { include: { location: true } } } },
+              },
+            },
+          },
+        },
+      },
+      orderBy: { date: 'desc' },
+    })
+    return { success: true, data }
+  }
+
   throw createError({
     statusCode: 400,
     message:
-      'Type invalide. Valeurs acceptées : cows, bulls, calves, breedings',
+      'Type invalide. Valeurs acceptées : cows, bulls, calves, breedings, weighings',
   })
 })
