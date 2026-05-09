@@ -99,11 +99,15 @@ function openDelete(building: Building) {
       <template v-else>
         <!-- Section Bâtiments -->
         <div v-if="buildings.length">
-          <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-3 flex items-center gap-2">
+          <h2
+            class="text-sm font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-3 flex items-center gap-2"
+          >
             <UIcon name="i-lucide-building-2" class="size-4" />
             Bâtiments
           </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"
+          >
             <UCard
               v-for="building in buildings"
               :key="building.id"
@@ -114,7 +118,10 @@ function openDelete(building: Building) {
                   <div
                     class="p-2 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 shrink-0 flex items-center justify-center"
                   >
-                    <UIcon name="i-lucide-building-2" class="size-5 text-amber-500" />
+                    <UIcon
+                      name="i-lucide-building-2"
+                      class="size-5 text-amber-500"
+                    />
                   </div>
                   <h3 class="font-semibold text-base truncate">
                     {{ building.name }}
@@ -146,7 +153,9 @@ function openDelete(building: Building) {
 
         <!-- Section Prés -->
         <div v-if="meadows.length">
-          <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-3 flex items-center gap-2">
+          <h2
+            class="text-sm font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-3 flex items-center gap-2"
+          >
             <UIcon name="i-lucide-trees" class="size-4" />
             Prés
           </h2>
@@ -161,7 +170,10 @@ function openDelete(building: Building) {
                   <div
                     class="p-2 rounded-lg bg-green-500/10 dark:bg-green-500/20 shrink-0 flex items-center justify-center"
                   >
-                    <UIcon name="i-lucide-trees" class="size-5 text-green-500" />
+                    <UIcon
+                      name="i-lucide-trees"
+                      class="size-5 text-green-500"
+                    />
                   </div>
                   <h3 class="font-semibold text-base truncate">
                     {{ meadow.name }}

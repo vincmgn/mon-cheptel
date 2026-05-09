@@ -15,9 +15,13 @@ const meadows = computed(() =>
 const subtitle = computed(() => {
   const parts: string[] = []
   if (buildings.value.length)
-    parts.push(`${buildings.value.length} bâtiment${buildings.value.length !== 1 ? 's' : ''}`)
+    parts.push(
+      `${buildings.value.length} bâtiment${buildings.value.length !== 1 ? 's' : ''}`
+    )
   if (meadows.value.length)
-    parts.push(`${meadows.value.length} pré${meadows.value.length !== 1 ? 's' : ''}`)
+    parts.push(
+      `${meadows.value.length} pré${meadows.value.length !== 1 ? 's' : ''}`
+    )
   return parts.join(' · ') || '0 bâtiment'
 })
 </script>
@@ -25,7 +29,9 @@ const subtitle = computed(() => {
 <template>
   <div>
     <div class="mt-4 flex-1">
-      <p class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2">
+      <p
+        class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2"
+      >
         {{ subtitle }}
       </p>
       <ul v-if="props.location.buildings.length" class="space-y-1.5">
@@ -34,16 +40,31 @@ const subtitle = computed(() => {
           :key="building.id"
           class="flex items-center justify-between text-sm"
         >
-          <span class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
+          <span
+            class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300"
+          >
             <UIcon
-              :name="building.type === 'meadow' ? 'i-lucide-trees' : 'i-lucide-building-2'"
+              :name="
+                building.type === 'meadow'
+                  ? 'i-lucide-trees'
+                  : 'i-lucide-building-2'
+              "
               class="size-4 shrink-0"
-              :class="building.type === 'meadow' ? 'text-green-500' : 'text-gray-400'"
+              :class="
+                building.type === 'meadow' ? 'text-green-500' : 'text-gray-400'
+              "
             />
             {{ building.name }}
           </span>
-          <UBadge v-if="building.type !== 'meadow'" color="neutral" variant="subtle" size="md">
-            {{ building._count.pens }} case{{ building._count.pens !== 1 ? 's' : '' }}
+          <UBadge
+            v-if="building.type !== 'meadow'"
+            color="neutral"
+            variant="subtle"
+            size="md"
+          >
+            {{ building._count.pens }} case{{
+              building._count.pens !== 1 ? 's' : ''
+            }}
           </UBadge>
         </li>
       </ul>

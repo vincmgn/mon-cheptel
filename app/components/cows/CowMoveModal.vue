@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { getErrorMessage } from '~/utils/error'
+import type { ApiList, PenWithBuilding } from '~~/types'
 
 const props = defineProps<{
   open: boolean
@@ -14,13 +15,10 @@ const emit = defineEmits<{
 const toast = useToast()
 const isMoving = ref(false)
 
-// Fetch all locations with buildings and pens
-const { data: locationsData } = await useFetch('/api/v1/locations')
-const locations = computed(() => (locationsData.value as any)?.data ?? [])
-
 // Fetch all pens with building info for destination selection
-const { data: pensData } = await useFetch('/api/v1/pens')
-const allPens = computed(() => (pensData.value as any)?.data ?? [])
+const { data: pensData } =
+  await useFetch<ApiList<PenWithBuilding>>('/api/v1/pens')
+const allPens = computed(() => pensData.value?.data ?? [])
 
 // Build a grouped structure: location > building > pens
 const grouped = computed(() => {
@@ -45,16 +43,20 @@ const grouped = computed(() => {
     const loc = pen.building.location
     const bld = pen.building
 
-    if (!map[loc.id]) map[loc.id] = { id: loc.id, name: loc.name, buildings: {} }
-    if (!map[loc.id].buildings[bld.id])
-      map[loc.id].buildings[bld.id] = {
+    if (!map[loc.id])
+      map[loc.id] = { id: loc.id, name: loc.name, buildings: {} }
+
+    const locEntry = map[loc.id]!
+
+    if (!locEntry.buildings[bld.id])
+      locEntry.buildings[bld.id] = {
         id: bld.id,
         name: bld.name,
         type: bld.type ?? 'building',
         pens: [],
       }
 
-    map[loc.id].buildings[bld.id].pens.push({
+    locEntry.buildings[bld.id]!.pens.push({
       id: pen.id,
       name: pen.name,
       cowCount: pen._count.cows,
@@ -91,7 +93,11 @@ async function onMove() {
     })
     emit('moved')
   } catch (e) {
-    toast.add({ title: 'Erreur', description: getErrorMessage(e), color: 'error' })
+    toast.add({
+      title: 'Erreur',
+      description: getErrorMessage(e),
+      color: 'error',
+    })
   } finally {
     isMoving.value = false
     emit('close')
@@ -113,14 +119,25 @@ async function onMove() {
 
         <div class="max-h-80 overflow-y-auto pr-1">
           <div v-for="(loc, index) in grouped" :key="loc.id">
-            <div v-if="index > 0" class="border-t border-gray-200 dark:border-gray-700 my-3" />
-            <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1.5">
+            <div
+              v-if="index > 0"
+              class="border-t border-gray-200 dark:border-gray-700 my-3"
+            />
+            <p
+              class="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1.5"
+            >
               {{ loc.name }}
             </p>
             <div v-for="bld in loc.buildings" :key="bld.id" class="mb-2">
-              <p class="text-xs text-gray-400 dark:text-gray-500 mb-1 flex items-center gap-1">
+              <p
+                class="text-xs text-gray-400 dark:text-gray-500 mb-1 flex items-center gap-1"
+              >
                 <UIcon
-                  :name="bld.type === 'meadow' ? 'i-lucide-trees' : 'i-lucide-building-2'"
+                  :name="
+                    bld.type === 'meadow'
+                      ? 'i-lucide-trees'
+                      : 'i-lucide-building-2'
+                  "
                   class="size-3"
                 />
                 {{ bld.name }}

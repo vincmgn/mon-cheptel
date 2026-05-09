@@ -30,7 +30,11 @@ async function onSubmit() {
   try {
     await $fetch('/api/v1/buildings', {
       method: 'POST',
-      body: { name: name.value.trim(), locationId: props.locationId, type: type.value },
+      body: {
+        name: name.value.trim(),
+        locationId: props.locationId,
+        type: type.value,
+      },
     })
     toast.add({
       title: type.value === 'meadow' ? 'Pré créé' : 'Bâtiment créé',
@@ -81,10 +85,15 @@ async function onSubmit() {
               </UButton>
             </div>
           </UFormField>
-          <UFormField :label="type === 'meadow' ? 'Nom du pré' : 'Nom du bâtiment'" required>
+          <UFormField
+            :label="type === 'meadow' ? 'Nom du pré' : 'Nom du bâtiment'"
+            required
+          >
             <UInput
               v-model="name"
-              :placeholder="type === 'meadow' ? 'Ex: Grand pré' : 'Ex: Étable A'"
+              :placeholder="
+                type === 'meadow' ? 'Ex: Grand pré' : 'Ex: Étable A'
+              "
               autofocus
               class="w-full"
             />

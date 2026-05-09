@@ -15,7 +15,9 @@ const meadowCount = computed(
 const subtitle = computed(() => {
   const parts: string[] = []
   if (buildingCount.value)
-    parts.push(`${buildingCount.value} bâtiment${buildingCount.value !== 1 ? 's' : ''}`)
+    parts.push(
+      `${buildingCount.value} bâtiment${buildingCount.value !== 1 ? 's' : ''}`
+    )
   if (meadowCount.value)
     parts.push(`${meadowCount.value} pré${meadowCount.value !== 1 ? 's' : ''}`)
   return parts.join(' · ') || 'Aucune structure'
@@ -32,7 +34,9 @@ const subtitle = computed(() => {
     </NuxtLink>
     <div>
       <h1 class="text-2xl font-bold">{{ location.name }}</h1>
-      <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{{ subtitle }}</p>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+        {{ subtitle }}
+      </p>
     </div>
   </div>
 </template>

@@ -57,7 +57,9 @@ function toggleSelectAll() {
 }
 
 const allSelected = computed(
-  () => !!pen.value?.cows.length && selectedIds.value.length === pen.value.cows.length
+  () =>
+    !!pen.value?.cows.length &&
+    selectedIds.value.length === pen.value.cows.length
 )
 
 // ---- Move ----
@@ -187,7 +189,10 @@ function onMoved() {
           class="pointer-events-auto flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700"
         >
           <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {{ selectedIds.length }} vache{{ selectedIds.length !== 1 ? 's' : '' }} sélectionnée{{ selectedIds.length !== 1 ? 's' : '' }}
+            {{ selectedIds.length }} vache{{
+              selectedIds.length !== 1 ? 's' : ''
+            }}
+            sélectionnée{{ selectedIds.length !== 1 ? 's' : '' }}
           </span>
           <UButton
             color="neutral"
