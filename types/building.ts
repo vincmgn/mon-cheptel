@@ -4,6 +4,7 @@ import type { Location } from './location'
 export interface Building {
   id: number
   name: string
+  type: 'building' | 'meadow'
   locationId: number
 }
 

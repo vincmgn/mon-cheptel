@@ -38,6 +38,7 @@ export interface CowDetail extends Cow {
     birthDate: string
     cowId: number
     _count: { notes: number }
+    weighings: Array<{ id: number; date: string; weight: number }>
   }>
   breedings: Array<
     Breeding & {

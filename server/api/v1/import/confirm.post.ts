@@ -29,6 +29,12 @@ interface CalfRow {
   motherOfficialId?: string
 }
 
+interface WeighingRow {
+  calfOfficialId?: string
+  date?: string
+  weight?: string
+}
+
 function parseDate(val: string | undefined): Date | undefined {
   if (!val?.trim()) return undefined
   const frMatch = val.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
@@ -321,9 +327,67 @@ export default defineEventHandler(async event => {
     return { success: true, data: { created, skipped } }
   }
 
+  // ── Pesées ────────────────────────────────────────────────────────────────────
+
+  if (type === 'weighings') {
+    const weighingRows = rows as WeighingRow[]
+
+    const calves = await prisma.calf.findMany({
+      where: {
+        officialId: { not: null },
+        cow: { pen: { building: { location: { userId } } } },
+      },
+      select: { id: true, officialId: true },
+    })
+    const calfMap = new Map(calves.map(c => [c.officialId!, c.id]))
+
+    let created = 0
+    let skipped = 0
+
+    for (const row of weighingRows) {
+      if (
+        !row.calfOfficialId?.trim() ||
+        !row.date?.trim() ||
+        !row.weight?.trim()
+      ) {
+        skipped++
+        continue
+      }
+
+      const parsedDate = parseDate(row.date)
+      if (!parsedDate) {
+        skipped++
+        continue
+      }
+
+      const w = parseFloat(row.weight.replace(',', '.'))
+      if (isNaN(w) || w <= 0) {
+        skipped++
+        continue
+      }
+
+      const calfId = calfMap.get(row.calfOfficialId.trim())
+      if (!calfId) {
+        skipped++
+        continue
+      }
+
+      try {
+        await prisma.weighing.create({
+          data: { calfId, weight: w, date: parsedDate },
+        })
+        created++
+      } catch {
+        skipped++
+      }
+    }
+
+    return { success: true, data: { created, skipped } }
+  }
+
   throw createError({
     statusCode: 400,
     message:
-      'Type invalide. Valeurs acceptées : cows, bulls, breedings, calves',
+      'Type invalide. Valeurs acceptées : cows, bulls, breedings, calves, weighings',
   })
 })

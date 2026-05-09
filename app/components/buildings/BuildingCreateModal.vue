@@ -11,13 +11,17 @@ const emit = defineEmits<{
 }>()
 
 const name = ref('')
+const type = ref<'building' | 'meadow'>('building')
 const isCreating = ref(false)
 const toast = useToast()
 
 watch(
   () => props.open,
   isOpen => {
-    if (!isOpen) name.value = ''
+    if (!isOpen) {
+      name.value = ''
+      type.value = 'building'
+    }
   }
 )
 
@@ -26,11 +30,19 @@ async function onSubmit() {
   try {
     await $fetch('/api/v1/buildings', {
       method: 'POST',
-      body: { name: name.value.trim(), locationId: props.locationId },
+      body: {
+        name: name.value.trim(),
+        locationId: props.locationId,
+        type: type.value,
+      },
     })
-    toast.add({ title: 'Bâtiment créé', color: 'success' })
+    toast.add({
+      title: type.value === 'meadow' ? 'Pré créé' : 'Bâtiment créé',
+      color: 'success',
+    })
     emit('created')
     name.value = ''
+    type.value = 'building'
   } catch (e) {
     toast.add({
       title: 'Erreur',
@@ -46,27 +58,57 @@ async function onSubmit() {
 
 <template>
   <div>
-    <UModal :open="open" title="Nouveau bâtiment" @update:open="emit('close')">
+    <UModal
+      :open="open"
+      :title="type === 'meadow' ? 'Nouveau pré' : 'Nouveau bâtiment'"
+      @update:open="emit('close')"
+    >
       <template #body>
         <div class="space-y-4">
-          <UFormField label="Nom" required>
+          <UFormField label="Type" required>
+            <div class="flex gap-2">
+              <UButton
+                :color="type === 'building' ? 'primary' : 'neutral'"
+                :variant="type === 'building' ? 'solid' : 'outline'"
+                icon="i-lucide-building-2"
+                @click="type = 'building'"
+              >
+                Bâtiment
+              </UButton>
+              <UButton
+                :color="type === 'meadow' ? 'primary' : 'neutral'"
+                :variant="type === 'meadow' ? 'solid' : 'outline'"
+                icon="i-lucide-trees"
+                @click="type = 'meadow'"
+              >
+                Pré
+              </UButton>
+            </div>
+          </UFormField>
+          <UFormField
+            :label="type === 'meadow' ? 'Nom du pré' : 'Nom du bâtiment'"
+            required
+          >
             <UInput
               v-model="name"
-              placeholder="Ex: Étable A"
+              :placeholder="
+                type === 'meadow' ? 'Ex: Grand pré' : 'Ex: Étable A'
+              "
               autofocus
               class="w-full"
             />
           </UFormField>
           <div class="flex justify-end gap-2 pt-2">
-            <UButton color="neutral" variant="outline" @click="emit('close')"
-              >Annuler</UButton
-            >
+            <UButton color="neutral" variant="outline" @click="emit('close')">
+              Annuler
+            </UButton>
             <UButton
               :loading="isCreating"
               :disabled="!name.trim()"
               @click="onSubmit"
-              >Créer</UButton
             >
+              Créer
+            </UButton>
           </div>
         </div>
       </template>
